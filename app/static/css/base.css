@@ -1,0 +1,32 @@
+.container{
+    margin: 0;
+    padding: 0;
+}
+
+.header-search-nav-content > .web-title-space{
+    flex-grow: 1;
+}
+
+.web-title-space .display-5{
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+.header-search-nav-content > .search-space{
+    flex-grow: 2;
+}
+
+.search-product-input-search-btn > .w-80{
+    width: 80%;
+}
+
+.header-search-nav-content > .seller-btn-space{
+    flex-grow: 1;
+}
+
+.container > .min-max-vh{
+    min-height: 50vh;
+    height: 80vh;
+    max-height: 100vh;
+}
