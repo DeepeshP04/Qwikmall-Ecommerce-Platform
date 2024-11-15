@@ -1,70 +1,279 @@
 {% extends "base.html" %}
 {%block title%} QwikMall {% endblock %}
+{% block styles%} 
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}"/>
+{%endblock%}
 
 {% block content %}
-<div class="product-category-1-electronics d-flex flex-column justify-content-around">
-    <div class="product-category-1-heading-and-more-product-btn d-flex flex-row justify-content-between align-items-center">
-        <div class="product-category-1-heading">
-            <h1 id="">Electronics</h1>
+<div id="all-product-container">
+    <div class="category-container">
+        <div class="product-category-heading-and-more-product-btn">
+            <div class="product-category-heading">
+                <h1 id="heading" class="font-25">Electronics</h1>
+            </div>
+            <div class="product-category-more-product-btn">
+                <button type="" class="font-25 border-none-bg-color-radius"><i class="fa-solid fa-chevron-right color-white-small"></i></button>
+            </div>
         </div>
-        <div class="product-category-1-more-product-btn">
-            <button type="">></button>
+        <div class="product-category-products">
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="product-category-1-products d-flex flex-row align-items-center text-center">
-        <div class="product-category-1-product-1 d-flex flex-column border border-primary">
-            <div class="product-category-1-product-1-img-space">
-                <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}"/>
+
+    <div class="category-container">
+        <div class="product-category-heading-and-more-product-btn">
+            <div class="product-category-heading">
+                <h1 id="heading" class="font-25">Electronics</h1>
             </div>
-            <div class="product-category-1-product-1-name-space">
-                <p id="">Best Headphone</p>
-            </div>
-            <div class="product-category-1-product-1-price-space">
-                <p id="">Rs.400</p>
+            <div class="product-category-more-product-btn">
+                <button type="" class="font-25 border-none-bg-color-radius"><i class="fa-solid fa-chevron-right color-white-small"></i></button>
             </div>
         </div>
-        <div class="product-category-1-product-2">
-            <div class="product-category-1-product-2-img-space">
-                <img id="" src=""/>
+        <div class="product-category-products">
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
             </div>
-            <div class="product-category-1-product-2-name-space">
-                <p id=""></p>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
             </div>
-            <div class="product-category-1-product-2-price-space">
-                <p id=""></p>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
             </div>
         </div>
-        <div class="product-category-1-product-3">
-            <div class="product-category-1-product-3-img-space">
-                <img id="" src=""/>
+    </div>
+
+    <div class="category-container">
+        <div class="product-category-heading-and-more-product-btn">
+            <div class="product-category-heading">
+                <h1 id="heading" class="font-25">Electronics</h1>
             </div>
-            <div class="product-category-1-product-3-name-space">
-                <p id=""></p>
-            </div>
-            <div class="product-category-1-product-3-price-space">
-                <p id=""></p>
-            </div>
-        </div>
-        <div class="product-category-1-product-4">
-            <div class="product-category-1-product-4-img-space">
-                <img id="" src=""/>
-            </div>
-            <div class="product-category-1-product-4-name-space">
-                <p id=""></p>
-            </div>
-            <div class="product-category-1-product-4-price-space">
-                <p id=""></p>
+            <div class="product-category-more-product-btn">
+                <button type="" class="font-25 border-none-bg-color-radius"><i class="fa-solid fa-chevron-right color-white-small"></i></button>
             </div>
         </div>
-        <div class="product-category-1-product-5">
-            <div class="product-category-1-product-5-img-space">
-                <img id="" src=""/>
+        <div class="product-category-products">
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
             </div>
-            <div class="product-category-1-product-5-name-space">
-                <p id=""></p>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
             </div>
-            <div class="product-category-1-product-5-price-space">
-                <p id=""></p>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="product-category-heading-and-more-product-btn">
+            <div class="product-category-heading">
+                <h1 id="heading" class="font-25">Electronics</h1>
+            </div>
+            <div class="product-category-more-product-btn">
+                <button type="" class="font-25 border-none-bg-color-radius"><i class="fa-solid fa-chevron-right color-white-small"></i></button>
+            </div>
+        </div>
+        <div class="product-category-products">
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-category-product-img-space">
+                    <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt="Best Headphone"/>
+                </div>
+                <div class="product-category-product-name-space">
+                    <p id="product-name">Best Headphone</p>
+                </div>
+                <div class="product-category-product-price-space">
+                    <p id="product-price">Rs.400</p>
+                </div>
             </div>
         </div>
     </div>

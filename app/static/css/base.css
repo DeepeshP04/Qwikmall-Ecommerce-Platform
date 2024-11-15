@@ -28,10 +28,13 @@ header{
 .web-title-space{
     width: 200px;
     height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.web-title-space #display-5{
-    font-size: 3.5rem;
+.web-title-space .display-5{
+    font-size: 30px;
     font-weight: 100;
     line-height: 1.2;
 }
@@ -73,7 +76,7 @@ header{
 
 .login-btn-space #login-btn{
     height: 45px;
-    width: 150px;
+    width: 80px;
     border: none;
     background-color: inherit;
     font-size: 18px;
@@ -82,7 +85,7 @@ header{
 
 .seller-btn-space #looking-to-sell-btn{
     height: 45px;
-    width: 150px;
+    width: 140px;
     border: none;
     background-color: inherit;
     font-size: 18px;
