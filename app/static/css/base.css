@@ -53,6 +53,7 @@ header{
     height: 45px;
     width: 30px;
     padding: 5px;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,11 +64,37 @@ header{
     height: 45px;
     padding: 5px;
     border: none;
-    font-size: 17px;
+    outline: none;
+    font-size: 20px;
     background-color: inherit;
 }
 
-.login-btn-space, .seller-btn-space{
+.login-btn-space{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    position: relative;
+}
+
+.dropdown-login-signup{
+    display: none;
+    width: 200px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 20px;
+}
+
+.dropdown-login-signup a{
+    display: block;
+    width: 100%;
+    height: 40px;
+    line-height: 20px;
+    padding: 10px;
+}
+
+.seller-btn-space{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -81,15 +108,27 @@ header{
     background-color: inherit;
     font-size: 18px;
     font-weight: 500;
+    outline: none;
 }
 
 .seller-btn-space #looking-to-sell-btn{
     height: 45px;
     width: 140px;
     border: none;
+    outline: none;
     background-color: inherit;
     font-size: 18px;
     font-weight: 500;
+}
+
+.login-btn-space #login-btn:hover, .seller-btn-space #looking-to-sell-btn:hover{
+    color: white;
+}
+
+.login-btn-space:hover, .seller-btn-space:hover{
+    background-color: blue;
+    color: white;
+    border-radius: 5px;
 }
 
 /* header styling end */
