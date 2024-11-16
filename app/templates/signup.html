@@ -1,0 +1,31 @@
+{%extends "base.html"%}
+{%block title %} Qwikmall | Signup {%endblock%}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/signup.css')}}">
+{%endblock%}
+
+{%block content %}
+<div id="signup-container">
+    <div class="left-box">
+        <span>Looks like you're new here!</span>
+        <p>Sign up with your mobile number to get started</p>
+    </div>
+    <div class="right-box">
+        <form class="signup-form">
+            <div class="signup-input-section">
+                <input type="text" name="contact" placeholder="Enter Phone Number"></input>
+            </div>
+            <div class="signup-terms-section">
+                <p>By continuing, you agree to QwikMall's <a>Terms of Use</a> and <a>Privacy Policy.</a></p>
+            </div>
+            <div class="signup-button-section">
+                <button>Sign Up</button>
+            </div>
+        </form>
+        <div class="go-to-login-section">
+            <a href="{{url_for('views.login')}}">Existing User? Log in</a>
+        </div>
+    </div>
+</div>
+{%endblock%}

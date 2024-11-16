@@ -1,4 +1,4 @@
-#login-container{
+#signup-container{
     height: 528px;
     width: 900px;
     margin: 20px auto;
@@ -41,7 +41,7 @@
     border: 2px solid #D3D3D3;
 }
 
-.login-form{
+.signup-form{
     height: 180px;
     width: 100%;
     display: flex;
@@ -49,14 +49,14 @@
     justify-content: space-around;
 }
 
-.login-input-section{
+.signup-input-section{
     width: 100%;
     height: 38px;
     padding: 3px 0;
     margin-bottom: 30px;
 }
 
-.login-input-section input{
+.signup-input-section input{
     width: 100%;
     height: 100%;
     border: none;
@@ -65,23 +65,23 @@
     font-size: 16px;
 }
 
-.login-terms-section{
+.signup-terms-section{
     width: 100%;
     padding: 3px 0;
 }
 
-.login-terms-section p{
+.signup-terms-section p{
     width: 100%;
     font-size: 14px;
 }
 
-.login-button-section{
+.signup-button-section{
     height: 50px;
     background-color: orangered;
     text-align: center;
 }
 
-.login-button-section button{
+.signup-button-section button{
     border: none;
     outline: none;
     line-height: 45px;
