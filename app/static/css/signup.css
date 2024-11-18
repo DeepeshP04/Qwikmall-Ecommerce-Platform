@@ -137,3 +137,7 @@
 .verify-section #resend-code{
     font-size: 15px;
 }
+
+#message{
+    display: none;
+}
