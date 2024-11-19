@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, session
 import random
 import os
 from dotenv import load_dotenv
@@ -20,7 +20,8 @@ verification_codes = []
 
 @views.route("/", methods=["GET"])
 def index():
-    return render_template("index.html") 
+    logged_in = session.get("logged_in", False)
+    return render_template("index.html", logged_in=logged_in) 
 
 @views.route("/login", methods=["GET"])
 def login():
@@ -62,6 +63,7 @@ def verify_code():
     
     if verification_code == str(verification_codes[0]):
         print("success")
+        session["logged_in"] = True
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "error": "Invalid code"})

@@ -59,5 +59,10 @@ async function verifyCode() {
         message.style.color = "red"
         message.textContent = "Invalid code."
     }
+}
 
+function dropdownItem(){
+    dropdownDiv = document.querySelector(".dropdown")
+
+    dropdownDiv.style.display = "block"
 }

@@ -23,16 +23,27 @@
                         <input id="search-input" type="search" placeholder="Search for products" name="search-input">
                     </div>
                 </form>
-                <div class="login-btn-space">
-                    <div class="dropdown-login-signup">
-                        <a>Login</a>
-                        <a>Sign Up</a>
+                {% if logged_in %}
+                    <div class="user-space">
+                        <div class="dropdown user-profile">
+                            <a>My Profile</a>
+                            <a>Cart</a>
+                        </div>
+                        <i class="fa-regular fa-user user-icon"></i>
+                        <p id="user">User</p>
+                        <i class="fa-solid fa-angle-down angle-down-btn" onclick="dropdownItem()"></i>
                     </div>
-                    <i class="fa-regular fa-user"></i>
-                    <button id="login-btn" onclick="window.location.href='{{ url_for('views.login')}}'">Login</button>
-                    <i class="fa-solid fa-angle-down">
-                    </i>
-                </div>
+                {% else %}
+                    <div class="login-btn-space">
+                        <div class="dropdown login-signup">
+                            <a>Login</a>
+                            <a>Sign Up</a>
+                        </div>
+                        <i class="fa-regular fa-user user-icon"></i>
+                        <button id="login-btn" onclick="window.location.href='{{ url_for('views.login')}}'">Login</button>
+                        <i class="fa-solid fa-angle-down angle-down-btn" onclick="dropdownItem()"></i>
+                    </div>
+                {% endif %}
                 <div class="seller-btn-space">
                     <i class="fa-solid fa-dollar-sign"></i>
                     <button id="looking-to-sell-btn">Looking to Sell</button>
@@ -60,6 +71,7 @@
                 </div>
             </footer>
         </div>
+        <script src="{{url_for('static', filename='js/signup.js')}}"></script>
         {%block script%} {%endblock%}
     </body>
 </html>
