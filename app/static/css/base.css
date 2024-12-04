@@ -86,7 +86,6 @@ header{
 }
 
 .dropdown{
-    display: none;
     width: 200px;
     position: absolute;
     top: 100%;

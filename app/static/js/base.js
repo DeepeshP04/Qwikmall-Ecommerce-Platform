@@ -11,7 +11,7 @@ searchInput.addEventListener("keydown", (event) => {
 function dropdownItem(){
     const dropdownDiv = document.querySelector(".dropdown")
 
-    if(dropdownDiv.style.display == "none"){
+    if (dropdownDiv.style.display === "none" || dropdownDiv.style.display === ""){
         dropdownDiv.style.display = "block"
     }else{
         dropdownDiv.style.display = "none"
