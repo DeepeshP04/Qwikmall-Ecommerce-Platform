@@ -41,7 +41,7 @@
                         </div>
                         <i class="fa-regular fa-user user-icon"></i>
                         <button id="login-btn" onclick="window.location.href='{{ url_for('views.login')}}'">Login</button>
-                        <i class="fa-solid fa-angle-down angle-down-btn" onclick="dropdownItem()"></i>
+                        <i class="fa-solid fa-angle-down angle-down-btn"></i>
                     </div>
                 {% endif %}
                 <div class="seller-btn-space">
@@ -71,7 +71,7 @@
                 </div>
             </footer>
         </div>
-        <script src="{{url_for('static', filename='js/signup.js')}}"></script>
+        <script src="{{url_for('static', filename='js/base.js')}}"></script>
         {%block script%} {%endblock%}
     </body>
 </html>

@@ -1,3 +1,9 @@
+const signupBtn = document.querySelector("#signup-btn")
+const verifyBtn = document.querySelector("#verify-btn")
+
+signupBtn.addEventListener("click", signup)
+verifyBtn.addEventListener("click", verifyCode)
+
 function signup(){
     const contactInput = document.querySelector("#input-contact").value;
     const errorMessage = document.querySelector(".error-message")
@@ -59,10 +65,4 @@ async function verifyCode() {
         message.style.color = "red"
         message.textContent = "Invalid code."
     }
-}
-
-function dropdownItem(){
-    dropdownDiv = document.querySelector(".dropdown")
-
-    dropdownDiv.style.display = "block"
 }
