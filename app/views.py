@@ -20,8 +20,11 @@ verification_codes = []
 
 @views.route("/", methods=["GET"])
 def index():
+    from .models import Product
+    
     logged_in = session.get("logged_in", False)
-    return render_template("index.html", logged_in=logged_in) 
+    products = Product.query.limit(5).all()
+    return render_template("index.html", logged_in=logged_in, products=products) 
 
 @views.route("/login", methods=["GET"])
 def login():

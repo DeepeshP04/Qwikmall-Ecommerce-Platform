@@ -29,6 +29,14 @@ def create_app():
     app.register_blueprint(views)
     
     from .models import Product, User
+
+    create_db_tables(app)
+    # insert_test_data_in_database(db, Product, app)
+    
+    # return flask app
+    return app
+
+def create_db_tables(app):
     with app.app_context():
         inspector = inspect(db.engine)
         
@@ -37,15 +45,10 @@ def create_app():
             print("Tables created.")
         else:
             print("Tables already exist.")
-           
-    insert_test_data_in_database(db, Product, app)
-    
-    # return flask app
-    return app
 
-def insert_test_data_in_database(db, model, app):
-    with app.app_context():
-        product = model(name="Best headphone", price=400, description="Best headpone", category="Electronics")
-        db.session.add(product)
-        db.session.commit()
-        print("Added")
+# def insert_test_data_in_database(db, model, app):
+#     with app.app_context():
+#         product = model(name="Best headphone", price=400, description="Best headpone", category="Electronics")
+#         db.session.add(product)
+#         db.session.commit()
+#         print("Added")
