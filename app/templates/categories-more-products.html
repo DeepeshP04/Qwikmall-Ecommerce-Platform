@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{%block title%} QwikMall {% endblock %}
+
+{% block styles %} 
+    <link rel="stylesheet" href="{{url_for('static', filename='css/categories-more-products.css')}}"/>
+{% endblock %}
+
+{% block content %}
+<div class="category-products-heading-count-space">
+    <div class="products-heading">
+        <h3>Best of Electronics</h3>
+    </div>
+    <div class="products-count">
+        <p>20</p>
+    </div>
+</div>
+<div class="products">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="product-img-space">
+            <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt={{product.name}}/>
+        </div>
+        <div class="product-name-space">
+            <p id="product-name">{{product.name}}</p>
+        </div>
+        <div class="product-description-space">
+            <p id="product-description">{{product.description}}</p>
+        </div>
+        <div class="product-price-space">
+            <p id="product-price">{{product.price}}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
