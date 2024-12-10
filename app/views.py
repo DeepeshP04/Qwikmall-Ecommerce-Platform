@@ -71,4 +71,6 @@ def verify_code():
     else:
         return jsonify({"success": False, "error": "Invalid code"})
     
-    
+@views.route("/product-categories")
+def more_product_categories():
+    return render_template("product-categories.html")    
