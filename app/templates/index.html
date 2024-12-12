@@ -5,6 +5,10 @@
     <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}"/>
 {%endblock%}
 
+{% block script %}
+    <script src="{{url_for('static', filename='js/index.js')}}"></script>
+{% endblock %}
+
 {% block content %}
 <div id="all-product-container">
     <div class="category-container">
@@ -13,7 +17,7 @@
                 <h1 id="heading" class="font-25">Electronics</h1>
             </div>
             <div class="product-category-more-product-btn">
-                <a href="{{url_for('views.categories_more_products')}}"><button class="font-25 border-none-bg-color-radius more-product-btn"><i class="fa-solid fa-chevron-right color-white-small"></i></button></a>
+                <a href="{{url_for('views.categories_more_subcategory_products')}}"><button class="font-25 border-none-bg-color-radius more-product-btn"><i class="fa-solid fa-chevron-right color-white-small"></i></button></a>
             </div>
         </div>
         <div class="product-category-products">
@@ -97,7 +101,7 @@
                 <h1 id="heading" class="font-25">Electronics</h1>
             </div>
             <div class="product-category-more-product-btn">
-                <a href="{{url_for('views.categories_more_products')}}"><button type="" class="font-25 border-none-bg-color-radius more-product-btn"><i class="fa-solid fa-chevron-right color-white-small"></i></button></a>
+                <a href="{{url_for('views.categories_more_subcategory_products')}}"><button type="" class="font-25 border-none-bg-color-radius more-product-btn"><i class="fa-solid fa-chevron-right color-white-small"></i></button></a>
             </div>
         </div>
         <div class="product-category-products">
@@ -126,7 +130,7 @@
                 <h1 id="heading" class="font-25">Electronics</h1>
             </div>
             <div class="product-category-more-product-btn">
-                <a href="{{url_for('views.categories_more_products')}}"><button type="" class="font-25 border-none-bg-color-radius more-product-btn"><i class="fa-solid fa-chevron-right color-white-small"></i></button></a>
+                <a href="{{url_for('views.categories_more_subcategory_products')}}"><button type="" class="font-25 border-none-bg-color-radius more-product-btn"><i class="fa-solid fa-chevron-right color-white-small"></i></button></a>
             </div>
         </div>
         <div class="product-category-products">
@@ -155,7 +159,7 @@
                 <h1 id="heading" class="font-25">Electronics</h1>
             </div>
             <div class="product-category-more-product-btn">
-                <a href="{{url_for('views.categories_more_products')}}"><button id="more-product-btn" type="" class="font-25 border-none-bg-color-radius"><i class="fa-solid fa-chevron-right color-white-small"></i></button></a>
+                <a href="{{url_for('views.categories_more_subcategory_products')}}"><button id="more-product-btn" type="" class="font-25 border-none-bg-color-radius"><i class="fa-solid fa-chevron-right color-white-small"></i></button></a>
             </div>
         </div>
         <div class="product-category-products">

@@ -71,9 +71,16 @@ def verify_code():
     else:
         return jsonify({"success": False, "error": "Invalid code"})
     
-@views.route("/categories-more-products")
-def categories_more_products():
+@views.route("/categories-more-subcategory-products")
+def categories_more_subcategory_products():
     from .models import Product
     
     products = Product.query.all()
-    return render_template("categories-more-products.html", products=products)    
+    return render_template("categories-more-subcategory-products.html", products=products)    
+
+@views.route("/categories_all_products")
+def categories_all_products():
+    from .models import Product
+    
+    products = Product.query.all()
+    return render_template("categories-more-subcategory-products.html", products=products)
