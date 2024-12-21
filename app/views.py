@@ -83,4 +83,12 @@ def categories_all_products():
     from .models import Product
     
     products = Product.query.all()
-    return render_template("categories-more-subcategory-products.html", products=products)
+    return render_template("categories-all-products.html", products=products)
+
+@views.route("/about")
+def about():
+    return render_template("about.html")
+
+@views.route("/contact-us")
+def contact_us():
+    return render_template("contact-us.html")

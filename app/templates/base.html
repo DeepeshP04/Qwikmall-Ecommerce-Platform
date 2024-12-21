@@ -13,7 +13,7 @@
         <div id="container">
             <header class="header-search-nav-content">
                 <div class="web-title-space">
-                    <h1 class="display-5" id="web-title">QwikMall</h1>
+                    <h1 class="display-5" id="web-title"><a href="{{url_for('views.about')}}">QwikMall</a></h1>
                 </div>
                 <form class="search-space">
                     <div class="search-icon">
@@ -57,10 +57,10 @@
             <footer class="footer-content">
                 <div class="footer-content-nav">
                     <div class="about-us-space">
-                        <a id="about-us">About Us</a>
+                        <a href="{{url_for('views.about')}}" id="about-us">About Us</a>
                     </div>
                     <div class="contact-us-space">
-                        <a id="contact-us">Contact Us</a>
+                        <a href="{{url_for('views.about')}}" id="contact-us">Contact Us</a>
                     </div>
                     <div class="consumer-policy-space">
                         <a id="consumer-policy">Consumer Policy</a>
