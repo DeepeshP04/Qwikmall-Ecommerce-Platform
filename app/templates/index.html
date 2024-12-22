@@ -24,7 +24,7 @@
             {% for product in products %}
             <div class="product-card">
                 <div class="product-category-product-img-space">
-                    <img id="" src={{product.image}} alt={{product.name}}/>
+                    <img id="" src="{{url_for('static', filename='images/headphones.webp')}}" alt={{product.name}}/>
                 </div>
                 <div class="product-category-product-name-space">
                     <p id="product-name">{{product.name}}</p>
@@ -105,10 +105,10 @@
             </div>
         </div>
         <div class="product-category-products">
-            {% for product in products%}
+            {% for product in products %}
             <div class="product-card">
                 <div class="product-category-product-img-space">
-                    <img id="" src={{product.image}} alt={{product.name}}/>
+                    <img id="" src="{{url_for('static', filename='images/headphones.webp')}}" alt={{product.name}}/>
                 </div>
                 <div class="product-category-product-name-space">
                     <p id="product-name">{{product.name}}</p>
@@ -120,7 +120,7 @@
                     <p id="product-price">{{product.price}}</p>
                 </div>
             </div>
-            {% endfor %}
+            {%endfor%}
         </div>
     </div>
 
@@ -134,10 +134,10 @@
             </div>
         </div>
         <div class="product-category-products">
-            {% for product in products%}
+            {% for product in products %}
             <div class="product-card">
                 <div class="product-category-product-img-space">
-                    <img id="" src={{product.image}} alt={{product.name}}/>
+                    <img id="" src="{{url_for('static', filename='images/headphones.webp')}}" alt={{product.name}}/>
                 </div>
                 <div class="product-category-product-name-space">
                     <p id="product-name">{{product.name}}</p>
@@ -149,7 +149,7 @@
                     <p id="product-price">{{product.price}}</p>
                 </div>
             </div>
-            {% endfor %}
+            {%endfor%}
         </div>
     </div>
 
@@ -166,7 +166,7 @@
             {% for product in products %}
             <div class="product-card">
                 <div class="product-category-product-img-space">
-                    <img id="" src={{product.image}} alt={{product.name}}/>
+                    <img id="" src="{{url_for('static', filename='images/headphones.webp')}}" alt={{product.name}}/>
                 </div>
                 <div class="product-category-product-name-space">
                     <p id="product-name">{{product.name}}</p>
@@ -178,7 +178,7 @@
                     <p id="product-price">{{product.price}}</p>
                 </div>
             </div>
-            {% endfor %}
+            {%endfor%}
         </div>
     </div>
 </div>
