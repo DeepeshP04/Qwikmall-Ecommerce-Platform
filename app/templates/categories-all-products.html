@@ -29,22 +29,22 @@
         </div>
     </section>
     <section class="products">
-        <div>
+        <div class="products-heading-section">
             <h1>Best Headphone</h1>
         </div>
         <div class="products-section">
             {% for product in products %}
             <div class="product-card">
-                <div>
-                    <img src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt={{product.name}}/>
+                <div class="product-img-space">
+                    <img src="{{url_for('static', filename='images/headphones.webp')}}" alt={{product.name}}/>
                 </div>
-                <div>
+                <div class="product-name-space">
                     <p>{{product.name}}</p>
                 </div>
-                <div>
+                <div class="product-description-space">
                     <p>{{product.description}}</p>
                 </div>
-                <div>
+                <div class="product-price-space">
                     <p>{{product.price}}</p>
                 </div>
             </div>

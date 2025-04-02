@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import inspect
+from flask_migrate import Migrate
 
 load_dotenv()
 db = SQLAlchemy()
@@ -24,6 +25,7 @@ def create_app():
     app.secret_key = secret_key
 
     db.init_app(app)
+    migrate = Migrate(app, db)
         
     from .views import views
     app.register_blueprint(views)

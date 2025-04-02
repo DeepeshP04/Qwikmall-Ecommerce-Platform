@@ -6,30 +6,32 @@
 {% endblock %}
 
 {% block content %}
-<div class="category-products-heading-count-space">
-    <div class="products-heading">
-        <h3>Best of Electronics</h3>
-    </div>
-    <div class="products-count">
-        <p>20</p>
-    </div>
-</div>
-<div class="products">
-    {% for product in products %}
-    <div class="product-card">
-        <div class="product-img-space">
-            <img id="" src="{{url_for('static', filename='images/product-category-1-product-1-img.png')}}" alt={{product.name}}/>
+<div class="more-products-container">
+    <div class="category-products-heading-count-space">
+        <div class="products-heading">
+            <h3>Best of Electronics</h3>
         </div>
-        <div class="product-name-space">
-            <p id="product-name">{{product.name}}</p>
-        </div>
-        <div class="product-description-space">
-            <p id="product-description">{{product.description}}</p>
-        </div>
-        <div class="product-price-space">
-            <p id="product-price">{{product.price}}</p>
+        <div class="products-count">
+            <p>20 Items</p>
         </div>
     </div>
-    {% endfor %}
+    <div class="products">
+        {% for product in products %}
+        <div class="product-card">
+            <div class="product-img-space">
+                <img src="{{url_for('static', filename='images/headphones.webp')}}" alt={{product.name}}/>
+            </div>
+            <div class="product-name-space">
+                <p>{{product.name}}</p>
+            </div>
+            <div class="product-description-space">
+                <p>{{product.description}}</p>
+            </div>
+            <div class="product-price-space">
+                <p>{{product.price}}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
