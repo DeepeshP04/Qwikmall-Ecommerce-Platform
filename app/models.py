@@ -5,7 +5,7 @@ class User(db.Model):
     username = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.Integer, unique=True, nullable=False)
     email = db.Column(db.Float, nullable=True)
-    created_at = db.Column(db.DateTime, default=db.utcnow)
+    created_at = db.Column(db.DateTime, default=db.func.now())
     
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -15,7 +15,7 @@ class Product(db.Model):
     image = db.Column(db.String(200), nullable=False)
     stock = db.Column(db.Integer, nullable=False, default=0)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=db.utcnow)
+    created_at = db.Column(db.DateTime, default=db.func.now())
     
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
