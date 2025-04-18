@@ -1,3 +1,3 @@
 from flask import Blueprint
 
-user_views = Blueprint("user_views", __name__, url_prefix="/users")
+user_bp = Blueprint("users", __name__, url_prefix="/users")
