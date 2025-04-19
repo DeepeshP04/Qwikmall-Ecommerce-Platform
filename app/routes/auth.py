@@ -7,6 +7,16 @@ def send_code(phone):
     # Generate a verification code
     # Store code in redis with associated phone number and set expiry time of 5 minutes
     # Send verification code to the phone number using twilio
+    # If sending fails, return error message
+    # If sending succeeds, return success message
+    pass
+
+def verify_code(phone, code):
+    # If the code is valid and not expired
+    # Verify the code entered by user and code in redis
+    # If correct, delete the code from redis and return success
+    # If expired or invalid, return error message
+    
     pass
 
 # signup
@@ -27,6 +37,21 @@ def signup_send_code():
     send_code(phone)
     return jsonify({"success": True, "message": "Verification code sent. Please verify to signup."}), 200
         
+@auth_bp.route("/signup/verify-code", methods=["POST"])
+def signup_verify_code():
+    data = request.get_json() or {}
+    phone = data.get("phone")
+    code = data.get("code")
+    
+    if not phone or not code:
+        return jsonify({"success": False, "message": "Phone and Code are required."}), 400
+    
+    verify_code(phone, code)
+    # If verification is successful, create a new user
+    # Save in database
+    # Create a session for the user
+    # Return success message
+
 # login
 @auth_bp.route("/login/send-code", methods=["POST"])
 def login_send_code():
