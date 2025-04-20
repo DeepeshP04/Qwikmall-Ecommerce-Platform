@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from app.models import User
 from app import db
+from twilio.rest import Client
 import random
 import os
 from dotenv import load_dotenv
@@ -14,9 +15,13 @@ phone_number = os.getenv("TWILIO_PHONE_NUMBER")
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
+def get_user_by_phone(phone):
+    # Query the database to find a user with the given phone number
+    return User.query.filter_by(phone=phone).first()
+
 def send_code(phone):
     # Create twilio client using account_sid and auth_token
-    client = client(account_sid, auth_token)
+    client = Client(account_sid, auth_token)
     
     # Generate a verification code
     code = random.randint(100000, 999999)
@@ -45,7 +50,7 @@ def verify_code(phone, code):
         return False
 
     # Verify the code entered by user and code in redis
-    if str(code) != stored_code.decode():
+    if str(code) != stored_code.decode("utf-8"):
         return False
     
     # Delete the code from redis after successful verification
@@ -67,7 +72,7 @@ def signup_send_code():
     
     # Get the user from the database using the phone number
     # If user exists, return user exists message
-    user = User.query.filter_by(phone=phone).first()
+    user = get_user_by_phone(phone)
     if user:
         return jsonify({"success": False, "message": "User already exists. Please login."}), 409
     
@@ -76,9 +81,9 @@ def signup_send_code():
     session["pending_signup"] = {"phone": phone, "username": username}
 
     if not send_code(phone):
-        return jsonify({"success": False, "message": "Error"}), 500
+        return jsonify({"success": False, "message": "Failed to send verification code. Please try again later."}), 500
     
-    return jsonify({"success": True, "message": "Verification code sent. Please verify to signup."}), 200
+    return jsonify({"success": True, "message": "Verification code sent. Code is valid for 5 minutes."}), 200
         
 @auth_bp.route("/signup/verify-code", methods=["POST"])
 def signup_verify_code():
@@ -93,6 +98,8 @@ def signup_verify_code():
         return jsonify({"success": False, "message": "Invalid or expired code. Please try again."}), 400
     
     pending = session.get("pending_signup")
+    if not pending or pending["phone"] != phone:
+        return jsonify({"success": False, "message": "Invalid session. Please try again."}), 400
     
     # If verification is successful, Create a new user in the database
     new_user = User(
@@ -120,14 +127,14 @@ def login_send_code():
     if not phone:
         return jsonify({"success": False, "message": "Phone is required."}), 400
     
-    user = User.query.filter_by(phone=phone).first()
+    user = get_user_by_phone(phone)
     if not user:
         return jsonify({"success": False, "message": "User does not exist. Please signup."}), 409
     
     if not send_code(phone):
-        return jsonify({"success": False, "message": "Error"}), 500
+        return jsonify({"success": False, "message": "Failed to send verification code. Please try again later."}), 500
     
-    return {"success": True, "message": "Verification code sent. Please verify to login."}
+    return {"success": True, "message": "Verification code sent. Code is valid for 5 minutes."}, 200
 
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
