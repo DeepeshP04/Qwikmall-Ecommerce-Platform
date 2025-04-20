@@ -61,13 +61,55 @@ def get_products_by_category(category_id):
             ]
         }
     
-        return jsonify(response_data)
+        return jsonify(response_data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
 # List all products
+@product_bp.route("/products", methods=["GET"])
+def get_all_products():
+    try:
+        products = Product.query.all()
+        response_data = {
+            "products": [
+                {
+                    "id": product.id,
+                    "name": product.name,
+                    "price": product.price,
+                    "description": product.description,
+                    "image_url": product.image,
+                    "stock": product.stock,
+                    "manufacturer": product.manufacturer
+                }
+                for product in products
+            ]
+        }
+    
+        return jsonify(response_data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-# Get a product by id or get product details
+# Get a product by id or get details of a specific product
+@product_bp.route("/products/product_id", methods=["GET"])
+def get_product_details(product_id):
+    try:
+        product = Product.query.filter_by(product_id=product_id).first()
+        response_data = {
+            "product": 
+                {
+                    "id": product.id,
+                    "name": product.name,
+                    "price": product.price,
+                    "description": product.description,
+                    "image_url": product.image,
+                    "stock": product.stock,
+                    "manufacturer": product.manufacturer
+                }
+        }
+    
+        return jsonify(response_data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Post a new product (Admin only)
 
