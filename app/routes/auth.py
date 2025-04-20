@@ -57,7 +57,7 @@ def verify_code(phone, code):
     redis_client.delete(phone)
     return True
 
-# signup
+# Signup
 @auth_bp.route("/signup/send-code", methods=["POST"])
 def signup_send_code():
     # Get the phone number and username from the request data
@@ -118,7 +118,7 @@ def signup_verify_code():
     # Return success message
     return jsonify({"success": True, "message": "Signed up successfully."}), 200
 
-# login
+# Login
 @auth_bp.route("/login/send-code", methods=["POST"])
 def login_send_code():
     data = request.get_json() or {}
@@ -136,7 +136,28 @@ def login_send_code():
     
     return {"success": True, "message": "Verification code sent. Code is valid for 5 minutes."}, 200
 
+@auth_bp.route("/login/verify-code", methods=["POST"])
+def login_verify_code():
+    data = request.get_json() or {}
+    phone = data.get("phone")
+    code = data.get("code")
+    
+    if not phone or not code:
+        return jsonify({"success": False, "message": "Phone and Code are required."}), 400
+    
+    if not verify_code(phone, code):
+        return jsonify({"success": False, "message": "Invalid or expired code. Please try again."}), 400
+    
+    # Create a session for the user
+    user = get_user_by_phone(phone)
+    session["user"] = {"user_id": user.id, "username": user.username, "logged_in": True}
+    
+    # Return success message
+    return jsonify({"success": True, "message": "Logged in successfully."}), 200
+
+# Logout
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
     # Clear the session and return success message
-    pass
+    session.pop("user", None)
+    return jsonify({"success": True, "message": "Logged out successfully."}), 200
