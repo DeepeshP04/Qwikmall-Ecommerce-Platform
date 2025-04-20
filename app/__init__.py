@@ -27,11 +27,11 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
     
-    from routes.auth import auth_bp
-    from routes.cart import cart_bp
-    from routes.orders import order_bp
-    from routes.products import product_bp
-    from routes.users import user_bp
+    from app.routes.auth import auth_bp
+    from app.routes.cart import cart_bp
+    from app.routes.orders import order_bp
+    from app.routes.products import product_bp
+    from app.routes.users import user_bp
     from .views import views
     
     # register blueprints

@@ -5,7 +5,7 @@ from twilio.rest import Client
 import random
 import os
 from dotenv import load_dotenv
-from redis_client import redis_client
+from app.redis_client import redis_client
 
 load_dotenv()
 
