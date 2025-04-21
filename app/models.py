@@ -7,6 +7,14 @@ class User(db.Model):
     email = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
     
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "phone": self.phone,
+            "email": self.email
+        }
+    
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -53,3 +61,12 @@ class Cart(db.Model):
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
     user = db.relationship('User', backref='cart')
     product = db.relationship('Product', backref='cart')
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "product_id": self.product_id,
+            "quantity": self.quantity,
+            "price": self.price,
+            "created_at": self.created_at
+        }
