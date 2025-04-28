@@ -56,7 +56,26 @@ def add_cart_item():
         return jsonify({"success": True, "message": "Item added to cart."}), 201
     
 # Update cart items
-
+@cart_bp.route("/items/<int:product_id>", methods=["PUT"])
+def update_cart_item(product_id):
+    data = request.get_json()
+    quantity = data.get("quantity")
+    
+    user = User.query.get(session["user"]["user_id"])
+    if not user:
+        return jsonify({"success": False, "message": "User not found."}), 404
+    
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({"success": False, "message": "Product not found."}), 404
+    
+    cart_item = Cart.query.filter_by(user_id=user.user_id, product_id=product_id).first()
+    cart_item.quantity = quantity
+    cart_item.price = product.price * quantity
+    db.session.commit()
+    
+    return jsonify({"success": True, "message": "Item updated in cart."}), 200
+    
 # Delete cart item
 @cart_bp.route("/items/<int:product_id>", methods=["DELETE"])
 def delete_cart_item(product_id):
