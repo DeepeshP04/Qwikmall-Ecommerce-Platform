@@ -7,19 +7,21 @@ from app.models import Product
 cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 
 # Get cart items
-@cart_bp.route("/<int:user_id/items", methods=["GET"])
-def get_cart_items_by_id(user_id):
+@cart_bp.route("/items", methods=["GET"])
+def get_cart_items_by_id():
+    user_id = session["user"]["user_id"]
     cart_items = Cart.query.filter_by(user_id=user_id).all()
     return jsonify({"cart": [item.to_dict() for item in cart_items]}), 200
 
 # Add an item to the cart
-@cart_bp.route("/<int:user_id>/items", methods=["POST"])
-def add_cart_item(user_id):
+@cart_bp.route("/items", methods=["POST"])
+def add_cart_item():
     data = request.get_json()
     product_id = data.get("product_id")
     quantity = data.get("quantity", 1)
     
-    user = User.query.get(session["user_id"])
+    user_id = session["user"]["user_id"]
+    user = User.query.get(user_id)
     if not user:
         return jsonify({"success": False, "message": "User not found."}), 404
     
@@ -56,8 +58,9 @@ def add_cart_item(user_id):
 # Update cart items
 
 # Delete cart item
-@cart_bp.route("/<int:user_id>/items/<int:product_id>", methods=["DELETE"])
-def delete_cart_item(user_id, product_id):
+@cart_bp.route("/items/<int:product_id>", methods=["DELETE"])
+def delete_cart_item(product_id):
+    user_id = session["user"]["user_id"]  
     cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
     
     if not cart_item:
