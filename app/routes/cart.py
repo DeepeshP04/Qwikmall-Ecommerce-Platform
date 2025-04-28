@@ -1,6 +1,8 @@
-from flask import Blueprint, jsonify
-from app.models import Cart
+from flask import Blueprint, jsonify, request, session
 from app import db
+from app.models import Cart
+from app.models import User
+from app.models import Product
 
 cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 
@@ -11,7 +13,46 @@ def get_cart_items_by_id(user_id):
     return jsonify({"cart": [item.to_dict() for item in cart_items]}), 200
 
 # Add an item to the cart
-
+@cart_bp.route("/<int:user_id>/items", methods=["POST"])
+def add_cart_item(user_id):
+    data = request.get_json()
+    product_id = data.get("product_id")
+    quantity = data.get("quantity", 1)
+    
+    user = User.query.get(session["user_id"])
+    if not user:
+        return jsonify({"success": False, "message": "User not found."}), 404
+    
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({"success": False, "message": "Product not found."}), 404
+    
+    if quantity <= 0:
+        return jsonify({"success": False, "message": "Quantity must be greater than 0."}), 400
+    
+    existing_cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
+    
+    if existing_cart_item:
+        existing_cart_item.quantity += quantity
+        existing_cart_item.price += product.price * quantity
+        
+        db.session.commit()
+        return jsonify({"success": True, "message": "Item updated in cart."}), 200
+    else:
+        total_price = product.price * quantity
+    
+        new_cart_item = Cart(
+            user_id=user_id,
+            product_id=product_id,
+            quantity=quantity,
+            price=total_price
+        )
+    
+        db.session.add(new_cart_item)
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": "Item added to cart."}), 201
+    
 # Update cart items
 
 # Delete cart item
