@@ -46,7 +46,7 @@ class Order(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     order_date = db.Column(db.DateTime, default=db.func.now())
     total_price = db.Column(db.Float, nullable=False)
-    address = db.Column(db.String(100), nullable=False)
+    address = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)
     status = db.Column(db.String(20), default='Pending')
     user = db.relationship('User', backref='orders')
     product = db.relationship('Product', backref='orders')
