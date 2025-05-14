@@ -4,8 +4,10 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.Integer, unique=True, nullable=False)
-    email = db.Column(db.Float, nullable=True)
+    email = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
+    
+    addresses = db.relationship('Address', backref='user', cascade="all, delete-orphan")
     
     def to_dict(self):
         return {
@@ -32,7 +34,7 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(100), nullable=True)
-    products = db.relationship('Product', backref='category', lazy=True)
+    products = db.relationship('Product', backref='category', lazy=True, cascade="all, delete-orphan")
     
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,18 +49,16 @@ class Order(db.Model):
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)
     status = db.Column(db.String(20), default='Pending')
     
-    user = db.relationship('User', backref='orders')
-    order_items = db.relationship('OrderItem', backref='order')
+    user = db.relationship('User', backref='orders', cascade="all, delete-orphan")
+    order_items = db.relationship('OrderItem', backref='order', cascade="all, delete-orphan")
     
     def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "product_id": self.product_id,
-            "quantity": self.quantity,
             "order_date": self.order_date,
             "total_price": self.total_price,
-            "address": self.address,
+            "address_id": self.address_id,
             "status": self.status
         }
         
@@ -77,17 +77,16 @@ class Cart(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
     
-    user = db.relationship('User', backref='cart')
-    cart_items = db.relationship('CartItem', backref='cart')
+    user = db.relationship('User', backref='cart', cascade="all, delete-orphan")
+    cart_items = db.relationship('CartItem', backref='cart', cascade="all, delete-orphan")
     
     def to_dict(self):
         return {
             "id": self.id,
-            "product_id": self.product_id,
-            "quantity": self.quantity,
-            "price": self.price,
+            "user_id": self.user_id,
             "total_price": self.total_price,
-            "created_at": self.created_at
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
         }
 
 class CartItem(db.Model):
