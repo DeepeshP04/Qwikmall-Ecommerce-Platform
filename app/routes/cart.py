@@ -36,18 +36,20 @@ def add_cart_item():
     
     if existing_cart_item:
         existing_cart_item.quantity += quantity
-        existing_cart_item.price += product.price * quantity
+        existing_cart_item.total_price += product.price * quantity
         
         db.session.commit()
         return jsonify({"success": True, "message": "Item updated in cart."}), 200
     else:
         total_price = product.price * quantity
-    
+        price = product.price 
+        
         new_cart_item = Cart(
             user_id=user_id,
             product_id=product_id,
             quantity=quantity,
-            price=total_price
+            price=price,
+            total_price=total_price
         )
     
         db.session.add(new_cart_item)
@@ -71,7 +73,7 @@ def update_cart_item(product_id):
     
     cart_item = Cart.query.filter_by(user_id=user.user_id, product_id=product_id).first()
     cart_item.quantity = quantity
-    cart_item.price = product.price * quantity
+    cart_item.total_price = product.price * quantity
     db.session.commit()
     
     return jsonify({"success": True, "message": "Item updated in cart."}), 200
