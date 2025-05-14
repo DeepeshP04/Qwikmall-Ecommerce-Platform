@@ -66,15 +66,11 @@ class Order(db.Model):
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Float, nullable=False)
     total_price = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
     
     user = db.relationship('User', backref='cart')
-    product = db.relationship('Product', backref='cart')
     cart_items = db.relationship('CartItem', backref='cart')
     
     def to_dict(self):
