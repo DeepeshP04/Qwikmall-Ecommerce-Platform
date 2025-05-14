@@ -42,14 +42,13 @@ class Address(db.Model):
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
     order_date = db.Column(db.DateTime, default=db.func.now())
     total_price = db.Column(db.Float, nullable=False)
-    address = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)
+    address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)
     status = db.Column(db.String(20), default='Pending')
+    
     user = db.relationship('User', backref='orders')
-    product = db.relationship('Product', backref='orders')
+    order_items = db.relationship('OrderItem', backref='order')
     
     def to_dict(self):
         return {
@@ -62,6 +61,14 @@ class Order(db.Model):
             "address": self.address,
             "status": self.status
         }
+        
+class OrderItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_id  =db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float)
+    total_price = db.Column(db.Float)
     
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
