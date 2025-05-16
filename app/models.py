@@ -7,7 +7,7 @@ class User(db.Model):
     email = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
     
-    addresses = db.relationship('Address', backref='user', cascade="all, delete-orphan")
+    addresses = db.relationship('Address', backref='user')
     
     def to_dict(self):
         return {
@@ -34,7 +34,7 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(100), nullable=True)
-    products = db.relationship('Product', backref='category', lazy=True, cascade="all, delete-orphan")
+    products = db.relationship('Product', backref='category', lazy=True)
     
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,8 +49,8 @@ class Order(db.Model):
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=False)
     status = db.Column(db.String(20), default='Pending')
     
-    user = db.relationship('User', backref='orders', cascade="all, delete-orphan")
-    order_items = db.relationship('OrderItem', backref='order', cascade="all, delete-orphan")
+    user = db.relationship('User', backref='orders')
+    order_items = db.relationship('OrderItem', backref='order')
     
     def to_dict(self):
         return {
@@ -77,8 +77,8 @@ class Cart(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
     
-    user = db.relationship('User', backref='cart', cascade="all, delete-orphan")
-    cart_items = db.relationship('CartItem', backref='cart', cascade="all, delete-orphan")
+    user = db.relationship('User', backref='cart')
+    cart_items = db.relationship('CartItem', backref='cart')
     
     def to_dict(self):
         return {
