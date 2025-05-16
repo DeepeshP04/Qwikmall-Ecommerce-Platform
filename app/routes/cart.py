@@ -1,8 +1,6 @@
 from flask import Blueprint, jsonify, request, session
 from app import db
-from app.models import Cart
-from app.models import User
-from app.models import Product
+from app.models import Cart, User, Product, CartItem
 
 cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 
@@ -32,7 +30,14 @@ def add_cart_item():
     if quantity <= 0:
         return jsonify({"success": False, "message": "Quantity must be greater than 0."}), 400
     
-    existing_cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
+    cart = Cart.query.filter_by(user_id=user_id).first()
+    
+    if not cart:
+        cart = Cart(user_id=user_id)
+        db.session.add(cart)
+        db.session.commit()
+        
+    existing_cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product_id).first()
     
     if existing_cart_item:
         existing_cart_item.quantity += quantity
@@ -44,8 +49,8 @@ def add_cart_item():
         total_price = product.price * quantity
         price = product.price 
         
-        new_cart_item = Cart(
-            user_id=user_id,
+        new_cart_item = CartItem(
+            cart_id=cart.id,
             product_id=product_id,
             quantity=quantity,
             price=price,
