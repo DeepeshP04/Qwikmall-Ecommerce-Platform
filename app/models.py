@@ -59,7 +59,8 @@ class Order(db.Model):
             "order_date": self.order_date,
             "total_price": self.total_price,
             "address_id": self.address_id,
-            "status": self.status
+            "status": self.status,
+            "order_items": [item.to_dict() for item in self.order_items]
         }
         
 class OrderItem(db.Model):
@@ -96,7 +97,8 @@ class Cart(db.Model):
             "user_id": self.user_id,
             "total_price": self.total_price,
             "created_at": self.created_at,
-            "updated_at": self.updated_at
+            "updated_at": self.updated_at,
+            "cart_items": [item.to_dict() for item in self.cart_items]
         }
 
 class CartItem(db.Model):
