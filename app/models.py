@@ -70,6 +70,16 @@ class OrderItem(db.Model):
     price = db.Column(db.Float)
     total_price = db.Column(db.Float)
     
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "order_id": self.order_id,
+            "product_id": self.product_id,
+            "quantity": self.quantity,
+            "price": self.price,
+            "total_price": self.total_price
+        }
+    
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -96,3 +106,13 @@ class CartItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float)
     total_price = db.Column(db.Float)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "cart_id": self.cart_id,
+            "product_id": self.product_id,
+            "quantity": self.quantity,
+            "price": self.price,
+            "total_price": self.total_price
+        }
