@@ -88,8 +88,11 @@ def update_cart_item(product_id):
 # Delete cart item
 @cart_bp.route("/items/<int:product_id>", methods=["DELETE"])
 def delete_cart_item(product_id):
-    user_id = session["user"]["user_id"]  
-    cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
+    user_id = session["user"]["user_id"] 
+    
+    cart = Cart.query.filter_by(user_id=user_id) 
+    
+    cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product_id).first()
     
     if not cart_item:
         return jsonify({"success": False, "message": "Item not found in cart."}), 404
