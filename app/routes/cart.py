@@ -76,7 +76,9 @@ def update_cart_item(product_id):
     if not product:
         return jsonify({"success": False, "message": "Product not found."}), 404
     
-    cart_item = Cart.query.filter_by(user_id=user.user_id, product_id=product_id).first()
+    cart = Cart.query.filter_by(user_id=user.id).first()
+    
+    cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product_id).first()
     cart_item.quantity = quantity
     cart_item.total_price = product.price * quantity
     db.session.commit()
