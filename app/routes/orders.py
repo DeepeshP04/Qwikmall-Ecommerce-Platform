@@ -40,9 +40,9 @@ def get_order_by_id(order_id):
 @order_bp.route("/", methods={"POST"})
 def create_order():
     data = request.get_json()
-    address_id = data.get("address_id")
     items = data.get("items", [])
     user_id = session.get("user")["user_id"]
+    address_id = Address.query.filter_by(user_id)
     
     order_items = []
     total_price = 0
@@ -84,6 +84,6 @@ def create_order():
         
     db.session.commit()
     
-    return jsonify({"success": True, "message": "Order created successfully"}), 201   
+    return jsonify({"success": True, "message": "Order created successfully", "order": new_order.to_dict()}), 201   
 
 # Update an order
