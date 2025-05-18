@@ -32,6 +32,7 @@ def create_app():
     from app.routes.orders import order_bp
     from app.routes.products import product_bp
     from app.routes.users import user_bp
+    from app.routes.payments import payment_bp
     from .views import views
     
     # register blueprints
@@ -40,6 +41,7 @@ def create_app():
     app.register_blueprint(order_bp)
     app.register_blueprint(product_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(payment_bp)
         
     app.register_blueprint(views)
     
