@@ -11,32 +11,30 @@ def get_recommended_products():
     try:
         # Fetch all categories
         categories = Category.query.all()
-        # For each category, fetch 5 products
+        recommended_products = {"categories": []}
+        
         for category in categories:
-            category.products = category.products.limit(5).all()
+            products = Product.query.filter_by(category_id=category.id).limit(5).all()
     
-        products = {
-            "categories": [
-                {
-                    "id": category.id,
-                    "name": category.name,
-                    "description": category.description,
-                    "products": [
-                        {
-                            "id": product.id,
-                            "name": product.name,
-                            "price": product.price,
-                            "description": product.description,
-                            "image_url": product.image,
-                        }
-                        for product in category.products
-                    ],
-                }
-                for category in categories
-            ]
-        }
+            recommended_products["categories"].append({
+                "id": category.id,
+                "name": category.name,
+                "description": category.description,
+                "products": [
+                    {
+                        "id": prod.id,
+                        "name": prod.name,
+                        "price": prod.price,
+                        "description": prod.description,
+                        "image": prod.image,
+                        "stock": prod.stock,
+                        "manufacturer": prod.manufacturer
+                    }
+                    for prod in products
+                ]
+            })
         # Return the JSON response of products
-        return jsonify(products), 200
+        return jsonify(recommended_products), 200
     except Exception as e:
         # Handle any exceptions that occur during the process
         return jsonify({"error": str(e)}), 500
