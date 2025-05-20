@@ -40,7 +40,7 @@ def get_recommended_products():
         return jsonify({"error": str(e)}), 500
 
 # All products of a category
-@product_bp.route("/products/category/<int:category_id>", methods=["GET"])
+@product_bp.route("/category/<int:category_id>", methods=["GET"])
 def get_products_by_category(category_id):
     try:
         products = Product.query.filter_by(category_id=category_id).all()
@@ -64,7 +64,7 @@ def get_products_by_category(category_id):
         return jsonify({"error": str(e)}), 500
     
 # List all products
-@product_bp.route("/products", methods=["GET"])
+@product_bp.route("/", methods=["GET"])
 def get_all_products():
     try:
         products = Product.query.all()
@@ -88,10 +88,10 @@ def get_all_products():
         return jsonify({"error": str(e)}), 500
 
 # Get a product by id or get details of a specific product
-@product_bp.route("/products/<int:product_id>", methods=["GET"])
+@product_bp.route("/<int:product_id>", methods=["GET"])
 def get_product_details(product_id):
     try:
-        product = Product.query.filter_by(product_id=product_id).first()
+        product = Product.query.filter_by(id=product_id).first()
         response_data = {
             "product": 
                 {
