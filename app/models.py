@@ -91,6 +91,9 @@ class Cart(db.Model):
     user = db.relationship('User', backref='cart')
     cart_items = db.relationship('CartItem', backref='cart')
     
+    def update_total_price(self):
+        self.total_price = sum(item.total_price for item in self.cart_items)
+    
     def to_dict(self):
         return {
             "id": self.id,

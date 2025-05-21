@@ -8,7 +8,6 @@ cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 @cart_bp.route("/items", methods=["GET"])
 def get_cart_items_by_id():
     user = session.get("user")
-    print(user)
     if not user:
         return jsonify({"error": "User not logged in"}), 401
     else:
@@ -43,7 +42,7 @@ def add_cart_item():
     cart = Cart.query.filter_by(user_id=user_id).first()
     
     if not cart:
-        cart = Cart(user_id=user_id)
+        cart = Cart(user_id=user_id, total_price=0)
         db.session.add(cart)
         db.session.commit()
         
@@ -52,9 +51,6 @@ def add_cart_item():
     if existing_cart_item:
         existing_cart_item.quantity += quantity
         existing_cart_item.total_price += product.price * quantity
-        
-        db.session.commit()
-        return jsonify({"success": True, "message": "Item updated in cart."}), 200
     else:
         total_price = product.price * quantity
         price = product.price 
@@ -66,11 +62,12 @@ def add_cart_item():
             price=price,
             total_price=total_price
         )
-    
         db.session.add(new_cart_item)
-        db.session.commit()
         
-        return jsonify({"success": True, "message": "Item added to cart."}), 201
+    cart.update_total_price() 
+    db.session.commit()
+        
+    return jsonify({"success": True, "message": "Item added to cart."}), 201
     
 # Update cart items
 @cart_bp.route("/items/<int:product_id>", methods=["PUT"])
