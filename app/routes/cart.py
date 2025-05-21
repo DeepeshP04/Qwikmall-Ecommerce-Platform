@@ -7,7 +7,13 @@ cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 # Get cart items
 @cart_bp.route("/items", methods=["GET"])
 def get_cart_items_by_id():
-    user_id = session["user"]["user_id"]
+    user = session.get("user")
+    print(user)
+    if not user:
+        return jsonify({"error": "User not logged in"}), 401
+    else:
+        user_id = user.get("user_id")
+    
     cart_items = Cart.query.filter_by(user_id=user_id).all()
     return jsonify({"cart": [item.to_dict() for item in cart_items]}), 200
 
@@ -17,8 +23,12 @@ def add_cart_item():
     data = request.get_json()
     product_id = data.get("product_id")
     quantity = data.get("quantity", 1)
-    
-    user_id = session["user"]["user_id"]
+     
+    if not session.get("user"):
+        return jsonify({"error": "User not logged in"}), 401
+    else:
+        user_id = session.get("user").get("user_id")
+        
     user = User.query.get(user_id)
     if not user:
         return jsonify({"success": False, "message": "User not found."}), 404
