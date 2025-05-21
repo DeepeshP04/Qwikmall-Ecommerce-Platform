@@ -88,6 +88,8 @@ def update_cart_item(product_id):
     cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product_id).first()
     cart_item.quantity = quantity
     cart_item.total_price = product.price * quantity
+    
+    cart.update_total_price()
     db.session.commit()
     
     return jsonify({"success": True, "message": "Item updated in cart."}), 200
@@ -97,7 +99,7 @@ def update_cart_item(product_id):
 def delete_cart_item(product_id):
     user_id = session["user"]["user_id"] 
     
-    cart = Cart.query.filter_by(user_id=user_id) 
+    cart = Cart.query.filter_by(user_id=user_id).first()
     
     cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product_id).first()
     
@@ -105,6 +107,7 @@ def delete_cart_item(product_id):
         return jsonify({"success": False, "message": "Item not found in cart."}), 404
     
     db.session.delete(cart_item)
+    cart.update_total_price()
     db.session.commit()
     
     return jsonify({"success": True, "message": "Item removed from cart."}), 200
