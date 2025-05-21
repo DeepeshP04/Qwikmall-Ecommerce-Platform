@@ -29,7 +29,7 @@ def get_order_by_id(order_id):
     else:
         user_id = user.get("user_id")
     
-    order = Order.query.filter_by(user_id=user_id, order_id=order_id).first()
+    order = Order.query.filter_by(user_id=user_id, id=order_id).first()
     
     if not order:
         return {"error": "Order not found"}, 404
@@ -42,7 +42,7 @@ def create_order():
     data = request.get_json()
     items = data.get("items", [])
     user_id = session.get("user")["user_id"]
-    address_id = Address.query.filter_by(user_id)
+    address = Address.query.filter_by(user_id=user_id).first()
     
     order_items = []
     total_price = 0
@@ -52,7 +52,7 @@ def create_order():
     
     # add all items in orderItem table
     for item in items:
-        product = Product.query.filter_by(item["product_id"])
+        product = Product.query.filter_by(id=item.get("product_id")).first()
         if not product:
             return jsonify({"error": f"Product {item['product_id']} not found"}), 404
         
@@ -70,7 +70,7 @@ def create_order():
     # create new order
     new_order = Order(
         user_id=user_id,
-        address_id=address_id,
+        address_id=address.id,
         total_price = total_price
     )
     
