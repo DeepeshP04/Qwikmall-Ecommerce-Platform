@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCartShopping, faMagnifyingGlass, faUser, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { faSellcast } from '@fortawesome/free-brands-svg-icons'
+import './Navbar.css'
 
 function Navbar (){
     return (
