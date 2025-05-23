@@ -2,8 +2,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCartShopping, faMagnifyingGlass, faUser, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { faSellcast } from '@fortawesome/free-brands-svg-icons'
 import './Navbar.css'
+import { useState } from 'react'
 
 function Navbar (){
+
+    const [isMenuOpen, setMenuOpen] = useState(false);
+    const toggleMenu = () => setMenuOpen(!isMenuOpen);
+
     return (
         <div className="navbar">
             <div className="brand-space">
