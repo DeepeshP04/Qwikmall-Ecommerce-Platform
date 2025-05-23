@@ -1,7 +1,7 @@
 .navbar {
     box-sizing: border-box;
     width: 100%;
-    min-height: 55px;
+    min-height: 60px;
     background-color: #2C3E50;
     padding: 10px;
     display: flex;
@@ -10,7 +10,7 @@
     color: #FFFFFF;
 }
 
-.brand {
+.brand-space {
     font-size: 30px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-weight: 300;
@@ -48,37 +48,63 @@
     cursor: pointer;
 }
 
+.nav-actions {
+    width: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 20px;
+}
+
 .login-space {
-    width: 6%;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     cursor: pointer;
+    padding: 5px;
+    gap: 5px;
 }
 
-.cart {
-    width: 4%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
+.login-space:hover {
+    background-color: #0bdafa;
 }
 
-.seller {
-    width: 10%;
+.cart-space {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     cursor: pointer;
+    padding: 5px;
+    gap: 5px;
 }
 
-@media (max-width: 768px){
+.seller-space {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    gap: 5px;
+}
+
+.nav-actions-toggle {
+    width: 40px;
+    display: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #2C3E50;
+}
+
+@media (max-width: 850px){
     .search-bar {
         width: 60%;
     }
 
-    .navbar {
-        flex-wrap: wrap;
-        flex-direction: column;
+    .nav-actions {
+        display: none;
+    }
+
+    .nav-actions-toggle {
+        display: block;
     }
 }
