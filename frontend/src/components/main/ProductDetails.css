@@ -1,0 +1,23 @@
+.product-details {
+    box-sizing: border-box;
+    width: 20%;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 0;
+    text-align: center;
+    color: black;
+}
+
+.product-details:hover {
+    box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.product-img {
+    min-height: 70%;
+}
+
+.product-price {
+    font-weight: 500;
+}
