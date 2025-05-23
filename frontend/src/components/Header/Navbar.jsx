@@ -23,6 +23,7 @@ function Navbar (){
                     <FontAwesomeIcon icon={faUser} />
                     <a className='login'>Login</a>
                     <FontAwesomeIcon icon={faAngleDown} />
+                    {/* Implement functionality to click angledown button to choose login or signup */}
                 </div>
                 <div className="cart-space">
                     <FontAwesomeIcon icon={faCartShopping} />
@@ -35,6 +36,8 @@ function Navbar (){
             </div>
             <button className='nav-actions-toggle' onClick={toggleMenu}>☰</button>
         </div>
+
+        // Implement toggleMenu function to toggle nav-actions in mobile
     )
 }
 
