@@ -13,8 +13,7 @@ function AuthComponent({ spanText, description, submitText, alternateLink }) {
                         <input id="phone" type="number" placeholder="Enter Phone Number"></input>
                     </div>
                     <div className="terms-section">
-                        <input id="terms-checkbox" type="checkbox"></input>
-                        <p>By continuing, you agree to QwikMall's Terms of Use and Privacy Policy.</p>
+                        <p>By continuing, you agree to QwikMall's <a href=''>Terms of Use</a> and <a href=''>Privacy Policy</a>.</p>
                     </div>
                     <div className="button-section">
                         <button id="submit-btn" type="submit">{ submitText }</button>
