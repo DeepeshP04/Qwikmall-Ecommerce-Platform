@@ -1,11 +1,11 @@
 import './AuthComponent.css'
 
-function AuthComponent() {
+function AuthComponent({ spanText, description, submitText, alternateLink }) {
     return (
         <div className="auth-container">
             <div className="left-box">
-                <span>Looks like you're new here!</span>
-                <p>Sign up with your mobile number to get started</p>
+                <span>{ spanText }</span>
+                <p>{ description }</p>
             </div>
             <div className="right-box">
                 <div className="form-section">
@@ -17,11 +17,11 @@ function AuthComponent() {
                         <p>By continuing, you agree to QwikMall's Terms of Use and Privacy Policy.</p>
                     </div>
                     <div className="button-section">
-                        <button id="submit-btn" type="submit">Sign Up</button>
+                        <button id="submit-btn" type="submit">{ submitText }</button>
                     </div>
                 </div>
                 <div className="go-to-login-section">
-                    <a href="">Existing User? Log in</a>
+                    <a href="">{ alternateLink }</a>
                 </div>
             </div>
         </div>
