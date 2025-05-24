@@ -1,8 +1,10 @@
+import './AuthComponent.css'
+
 function AuthComponent() {
     return (
         <div className="auth-container">
             <div className="left-box">
-                <p>Looks like you're new here!</p>
+                <span>Looks like you're new here!</span>
                 <p>Sign up with your mobile number to get started</p>
             </div>
             <div className="right-box">
@@ -18,9 +20,9 @@ function AuthComponent() {
                         <button id="submit-btn" type="submit">Sign Up</button>
                     </div>
                 </div>
-            </div>
-            <div className="go-to-login-section">
-                <a href="">Existing User? Log in</a>
+                <div className="go-to-login-section">
+                    <a href="">Existing User? Log in</a>
+                </div>
             </div>
         </div>
     )
