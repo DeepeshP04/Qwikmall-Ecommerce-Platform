@@ -3,6 +3,8 @@ import { faCartShopping, faMagnifyingGlass, faUser, faAngleDown } from '@fortawe
 import { faSellcast } from '@fortawesome/free-brands-svg-icons'
 import './Navbar.css'
 import { useState } from 'react'
+import {Link} from 'react-router-dom'
+import Login from '../../pages/Login'
 
 function Navbar (){
 
@@ -21,7 +23,7 @@ function Navbar (){
             <div className='nav-actions'>
                 <div className="login-space">
                     <FontAwesomeIcon icon={faUser} />
-                    <a className='login'>Login</a>
+                    <Link to="/login" className="login">Login</Link>
                     <FontAwesomeIcon icon={faAngleDown} />
                     {/* Implement functionality to click angledown button to choose login or signup */}
                 </div>
