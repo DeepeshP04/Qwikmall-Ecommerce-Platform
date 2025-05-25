@@ -8,7 +8,7 @@ function Signup() {
             <Navbar></Navbar>
             <AuthComponent spanText="Looks like you're new here!" 
                 description="Sign up with your mobile number to get started" 
-                submitText="Request OTP" alternateLink="Existing User? Log in">
+                submitText="Request OTP" alternateLink="/login" alternateLinkText="Existing User? Log in">
             </AuthComponent>
             <Footer></Footer>
         </>

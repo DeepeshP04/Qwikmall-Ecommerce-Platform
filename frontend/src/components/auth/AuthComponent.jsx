@@ -1,6 +1,7 @@
 import './AuthComponent.css'
+import { Link } from 'react-router-dom';
 
-function AuthComponent({ spanText, description, submitText, alternateLink }) {
+function AuthComponent({ spanText, description, submitText, alternateLink, alternateLinkText }) {
     return (
         <div className="auth-container">
             <div className="left-box">
@@ -20,7 +21,7 @@ function AuthComponent({ spanText, description, submitText, alternateLink }) {
                     </div>
                 </div>
                 <div className="go-to-login-section">
-                    <a href="">{ alternateLink }</a>
+                    <Link to={alternateLink}>{ alternateLinkText }</Link>
                 </div>
             </div>
         </div>

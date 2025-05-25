@@ -8,7 +8,7 @@ function Login() {
             <Navbar></Navbar>
             <AuthComponent spanText="Login" 
                 description="Get access to your Orders, Wishlist and Recommendations" 
-                submitText="Request OTP" alternateLink="New to Qwikmall? Create an account">
+                submitText="Request OTP" alternateLink="/signup" alternateLinkText="New to Qwikmall? Create an account">
             </AuthComponent>
             <Footer></Footer>
         </>
