@@ -1,4 +1,5 @@
 import ProductCard from "./ProductCard";
+import './ProductGrid.css'
 
 function ProductGrid ({ products }) {
     if (!products.length) {
