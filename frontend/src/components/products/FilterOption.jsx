@@ -1,14 +1,22 @@
 import './FilterOption.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
 function FilterOption () {
     return (
-        <div className="filter-option">
-            <h3 className="filter-option-name">Size</h3>
-            <FontAwesomeIcon icon={faAngleDown} className='toggle-options'/>
-            <div className="filter-options">
-                <div id="option-1">
-                    <input type="checkbox"></input>
-                    <p>2XL</p>
+        <div className='filter-block'>
+            <div className="filter-header">
+                <h4 className="filter-title">Size</h4>
+                <FontAwesomeIcon icon={faAngleDown} className='toggle-icon'/>
+            </div>
+            <div className="filter-content">
+                <div className="filter-option-item">
+                    <input type="checkbox" id="size-2xl"></input>
+                    <label htmlFor='size-2xl'>2XL</label>
+                </div>
+                <div className="filter-option-item">
+                    <input type="checkbox" id="size-2xl"></input>
+                    <label htmlFor='size-2xl'>2XL</label>
                 </div>
             </div>
         </div>
