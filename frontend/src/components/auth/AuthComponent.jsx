@@ -12,6 +12,7 @@ function AuthComponent({ isLogin }) {
                 <div className="form-section">
                     <div className="input-section">
                         <input id="phone" type="number" placeholder="Enter Phone Number"></input>
+                        <p id="error-message"></p>
                     </div>
                     <div className="terms-section">
                         <p>By continuing, you agree to QwikMall's <a href=''>Terms of Use</a> and <a href=''>Privacy Policy</a>.</p>

@@ -41,8 +41,14 @@
 .form-section {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    gap: 10px;
+    justify-content: space-around;
+    gap: 5px;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
 
 .input-section input {
@@ -51,6 +57,10 @@
     font-size: 1rem;
     border: none;
     border-bottom: 1px solid #D3D3D3;
+}
+
+.input-section #error-message {
+    display: none;
 }
 
 .terms-section {
