@@ -11,7 +11,8 @@ function AuthComponent({ isLogin }) {
             <div className="right-box">
                 <div className="form-section">
                     <div className="input-section">
-                        <input id="phone" type="number" placeholder="Enter Phone Number"></input>
+                        { !isLogin && (<input id="username" type='text' name='username' placeholder='Enter Username'></input>)} 
+                        <input id="phone" type="number" name="phone" placeholder="Enter Phone Number"></input>
                         <p id="error-message"></p>
                     </div>
                     <div className="terms-section">
