@@ -1,12 +1,12 @@
 import './AuthComponent.css'
 import { Link } from 'react-router-dom';
 
-function AuthComponent({ spanText, description, submitText, alternateLink, alternateLinkText }) {
+function AuthComponent({ isLogin }) {
     return (
         <div className="auth-container">
             <div className="left-box">
-                <span>{ spanText }</span>
-                <p>{ description }</p>
+                <span>{ isLogin ? "Login" : "Looks like you're new here!" }</span>
+                <p>{ isLogin ? "Get access to your Orders, Wishlist and Recommendations" : "Sign up with your mobile number to get started" }</p>
             </div>
             <div className="right-box">
                 <div className="form-section">
@@ -17,11 +17,11 @@ function AuthComponent({ spanText, description, submitText, alternateLink, alter
                         <p>By continuing, you agree to QwikMall's <a href=''>Terms of Use</a> and <a href=''>Privacy Policy</a>.</p>
                     </div>
                     <div className="button-section">
-                        <button id="submit-btn" type="submit">{ submitText }</button>
+                        <button id="submit-btn" type="submit">Request OTP</button>
                     </div>
                 </div>
                 <div className="go-to-login-section">
-                    <Link to={alternateLink}>{ alternateLinkText }</Link>
+                    <Link to={ isLogin ? "/signup" : "/login" }>{ isLogin ? "New to Qwikmall? Create an account" : "Existing User? Log in" }</Link>
                 </div>
             </div>
         </div>
