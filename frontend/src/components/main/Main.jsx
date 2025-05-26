@@ -1,4 +1,4 @@
-import CategoryProducts from "./CategoryProducts";
+import CategoryProducts from "../products/CategoryProducts";
 
 function Main() {
     return <div className="main">
