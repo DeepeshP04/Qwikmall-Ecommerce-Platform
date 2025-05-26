@@ -1,4 +1,4 @@
-.category-products {
+.recommended-category-products {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -29,6 +29,6 @@
     color: #00ffbbc7;
 }
 
-.products-container {
+.recommended-products-container {
     display: flex;
 }

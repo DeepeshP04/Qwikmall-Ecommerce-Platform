@@ -1,9 +1,9 @@
-import './CategoryProducts.css'
+import './RecommendedCategoryProducts.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import ProductGrid from './ProductGrid'
 
-function CategoryProducts () {
+function RecommendedCategoryProducts () {
     const products = [
         {id: 1, name: "Laptop", price: "₹50000"},
         {id: 2, name: "Laptop", price: "₹50000"},
@@ -13,16 +13,16 @@ function CategoryProducts () {
     ]
 
     return (
-        <div className="category-products">
+        <div className="recommended-category-products">
             <div className="category">
                 <p className='category-name'>Electronics</p>
                 <a className='category-all-products-btn'><FontAwesomeIcon icon={faAngleRight} className='right-arrow' /></a>
             </div>
-            <div className="products-container">
+            <div className="recommeded-products-container">
                 <ProductGrid products={products}></ProductGrid>
             </div>
         </div>
     )
 }
 
-export default CategoryProducts;
+export default RecommendedCategoryProducts;

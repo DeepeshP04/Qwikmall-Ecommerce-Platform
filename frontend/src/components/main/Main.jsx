@@ -1,10 +1,10 @@
-import CategoryProducts from "../products/CategoryProducts";
+import RecommendedCategoryProducts from "../products/RecommendedCategoryProducts";
 
 function Main() {
     return <div className="main">
-        <CategoryProducts></CategoryProducts>
-        <CategoryProducts></CategoryProducts>
-        <CategoryProducts></CategoryProducts>
+        <RecommendedCategoryProducts></RecommendedCategoryProducts>
+        <RecommendedCategoryProducts></RecommendedCategoryProducts>
+        <RecommendedCategoryProducts></RecommendedCategoryProducts>
     </div>
 }
 
