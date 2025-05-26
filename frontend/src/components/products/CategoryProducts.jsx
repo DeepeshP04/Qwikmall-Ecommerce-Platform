@@ -1,5 +1,5 @@
 import './CategoryProducts.css'
-import ProductDetails from './ProductDetails'
+import ProductDetails from './ProductCard'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 

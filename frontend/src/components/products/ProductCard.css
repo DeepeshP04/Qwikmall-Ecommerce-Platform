@@ -1,4 +1,4 @@
-.product-details {
+.product-card {
     box-sizing: border-box;
     width: 16.6%;
     height: 250px;
@@ -9,16 +9,16 @@
     color: black;
 }
 
-.product-details:hover {
+.product-card:hover {
     box-shadow: 12px 12px 40px #0000001a;
     transition: box-shadow .3s ease-out;
 }
 
-.product-img {
+.product-card-img {
     height: 90%;
     object-fit: contain;
 }
 
-.product-price {
+.product-card-price {
     font-weight: 500;
 }
