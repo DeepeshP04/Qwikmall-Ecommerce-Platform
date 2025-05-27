@@ -1,11 +1,13 @@
 import FilterOption from './FilterOption'
 import './FilterPanel.css'
 
-function FilterPanel () {
+function FilterPanel ( {filters}) {
     return (
         <div className="filter-panel">
-            <FilterOption title="Size" options={["XL", "2XL"]} filterId="size"></FilterOption>
-            <FilterOption title="Color" options={["Green", "Red", "Black", "Blue"]} filterId="color"></FilterOption>
+            {filters.map((filter) => (
+                <FilterOption key={filter.id} title={filter.title} options={filter.options}>
+                </FilterOption>
+            ))}
         </div>
     )
 }
