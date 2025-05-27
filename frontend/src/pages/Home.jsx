@@ -1,7 +1,7 @@
 import Navbar from '../components/header/Navbar'
 import Main from '../components/main/Main'
 import Footer from '../components/footer/Footer'
-import FilterPanel from '../components/products/FilterPanel';
+import CategoryAllProducts from '../components/products/CategoryAllProducts';
 
 function Home() {
     return (
@@ -9,7 +9,7 @@ function Home() {
             <Navbar></Navbar>
             <Main></Main>
             <Footer></Footer>
-            <FilterPanel></FilterPanel>
+            <CategoryAllProducts></CategoryAllProducts>
         </>
     )
 }
