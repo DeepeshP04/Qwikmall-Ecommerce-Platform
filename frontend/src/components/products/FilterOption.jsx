@@ -2,7 +2,9 @@ import './FilterOption.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
-function FilterOption ({title, options, filterId}) {
+function FilterOption ({title, options}) {
+    let filterId = title.toLowerCase()
+
     return (
         <div className='filter-block'>
             <div className="filter-header">
