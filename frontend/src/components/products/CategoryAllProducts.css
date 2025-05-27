@@ -1,5 +1,14 @@
 .category-all-products {
     width: 100%;
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background-color: white;
+}
+
+.category-title {
+    color: black;
+    padding-left: 30px;
+    border-bottom: 1px solid #d3d3d3;
 }

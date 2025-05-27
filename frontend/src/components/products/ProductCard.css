@@ -6,6 +6,7 @@
     padding: 10px 20px;
     text-align: center;
     color: black;
+    background-color: white;
 }
 
 .product-card:hover {
