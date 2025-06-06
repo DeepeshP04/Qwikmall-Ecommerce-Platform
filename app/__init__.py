@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import inspect
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 load_dotenv()
 db = SQLAlchemy()
@@ -26,6 +27,8 @@ def create_app():
 
     db.init_app(app)
     migrate = Migrate(app, db)
+    
+    CORS(app, origins=["http://localhost:5173"])
     
     from app.routes.auth import auth_bp
     from app.routes.cart import cart_bp
