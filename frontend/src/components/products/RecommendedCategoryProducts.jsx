@@ -2,6 +2,7 @@ import './RecommendedCategoryProducts.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import ProductGrid from './ProductGrid'
+import { Link } from 'react-router-dom'
 
 function RecommendedCategoryProducts () {
     const products = [
@@ -16,7 +17,7 @@ function RecommendedCategoryProducts () {
         <div className="recommended-category-products">
             <div className="category">
                 <p className='category-name'>Electronics</p>
-                <a className='category-all-products-btn'><FontAwesomeIcon icon={faAngleRight} className='right-arrow' /></a>
+                <Link to="category/categoryName" className='category-all-products-btn'><FontAwesomeIcon icon={faAngleRight} className='right-arrow' /></Link>
             </div>
             <div className="recommeded-products-container">
                 <ProductGrid products={products}></ProductGrid>
