@@ -9,9 +9,10 @@ function RecommendedCategoryProducts () {
     const [categoryProducts, setCategoryProducts] = useState([]);
 
     useEffect(() => {
-        fetch("/products/recommended-products")
-        .then(res => setCategoryProducts(res.data.categories))
-        .catch(err => console.error(err))
+        fetch("http://localhost:5000/products/recommended-products")
+        .then(res => res.json())
+        .then(data => setCategoryProducts(data.categories))
+        .catch(err => console.log("Failed to fetch data", err))
     }, [])
 
     const products = [
