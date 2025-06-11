@@ -1,6 +1,8 @@
 import './ProductDetails.css'
 
 function ProductDetails({ product }) {
+    if (!product) return <p>Loading...</p>
+    
     return (
         <div className="product-details-section">
             <div className="left">

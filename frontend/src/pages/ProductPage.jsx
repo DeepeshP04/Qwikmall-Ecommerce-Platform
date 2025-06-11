@@ -1,11 +1,20 @@
+import { useParams } from "react-router-dom";
 import Footer from "../components/footer/Footer";
 import Navbar from "../components/header/Navbar";
 import ProductDetails from "../components/products/ProductDetails";
+import { useEffect, useState } from "react";
 
 function ProductPage() {
-    const product = {
-        id: 1, name: "Phone", description: "Phone", image_url: "frontend/public/images/laptop_electronics.jpg", price: "₹10000"
-    }
+    const { productId } = useParams();
+    const [product, setProduct] = useState(null);
+
+    useEffect(() => {
+        fetch(`http://localhost:5000/products/${productId}`)
+        .then(res => res.json())
+        .then(data => setProduct(data.product))
+        .catch(err => console.log("Failed to fetch product", err))
+    }, [productId])
+    
     return (
         <>
             <Navbar></Navbar>
