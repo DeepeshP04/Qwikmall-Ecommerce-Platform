@@ -2,30 +2,23 @@ import { useParams } from "react-router-dom";
 import Footer from "../components/footer/Footer";
 import Navbar from "../components/header/Navbar";
 import CategoryAllProducts from "../components/products/CategoryAllProducts";
+import { useEffect, useState } from "react";
 
 function CategoryProductsPage () {
-    const {categorySlug} = useParams()
+    const {categoryId} = useParams()
+    const [categoryProducts, setCategoryProducts] = useState([])
 
-    const products = [
-        {id: 1, name: "Laptop", price: "₹50000"},
-        {id: 2, name: "Laptop", price: "₹50000"},
-        {id: 3, name: "Laptop", price: "₹50000"},
-        {id: 4, name: "Laptop", price: "₹50000"},
-        {id: 5, name: "Laptop", price: "₹50000"},
-        {id: 6, name: "Laptop", price: "₹50000"},
-        {id: 7, name: "Laptop", price: "₹50000"},
-        {id: 8, name: "Laptop", price: "₹50000"},
-        {id: 9, name: "Laptop", price: "₹50000"},
-        {id: 10, name: "Laptop", price: "₹50000"},
-        {id: 11, name: "Laptop", price: "₹50000"},
-        {id: 12, name: "Laptop", price: "₹50000"},
-        {id: 13, name: "Laptop", price: "₹50000"},
-    ]
+    useEffect(() => {
+        fetch(`http://localhost:5000/products/category/${categoryId}`)
+        .then(res => res.json())
+        .then(data => setCategoryProducts(data.products))
+        .catch(err => console.log("Failed to fetch products", err))
+    }, [])
 
     return (
         <>
             <Navbar></Navbar>
-            <CategoryAllProducts categoryName={categorySlug} products={products}></CategoryAllProducts>
+            <CategoryAllProducts categoryName={categoryId} products={categoryProducts}></CategoryAllProducts>
             <Footer></Footer>
         </>
     )

@@ -29,7 +29,7 @@ function RecommendedCategoryProducts () {
                 <div key={category.id}>
                     <div className='category'>
                         <p className='category-name'>{category.name}</p>
-                        <Link to={`category/${category.name}`} className='category-all-products-btn'><FontAwesomeIcon icon={faAngleRight} className='right-arrow' /></Link>
+                        <Link to={`category/${category.id}`} className='category-all-products-btn'><FontAwesomeIcon icon={faAngleRight} className='right-arrow' /></Link>
                     </div>
                     <div className="recommeded-products-container">
                         <ProductGrid products={category.products}></ProductGrid>
