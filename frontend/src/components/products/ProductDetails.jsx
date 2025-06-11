@@ -1,11 +1,13 @@
+import './ProductDetails.css'
+
 function ProductDetails({ product }) {
     return (
         <div className="product-details-section">
             <div className="left">
                 <img id="product-img" src="/images/laptop_electronics.jpg" alt={product.name}/>
                 <div className="buy-or-add-cart">
-                    <button id="buy-btn">Buy Now</button>
-                    <button id="add-to-cart-btn">Add to Cart</button>
+                    <button className="btn" id="buy-btn">Buy Now</button>
+                    <button className="btn" id="add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
             <div className="right">
