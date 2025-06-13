@@ -20,6 +20,7 @@ function Navbar (){
     }, [])
 
     return (
+        <>
         <div className="navbar">
             <div className="brand-space">
                 <a className='brand'>Qwikmall</a>
@@ -31,9 +32,11 @@ function Navbar (){
             <div className="nav-actions">
                 <div className="login-space">
                     <FontAwesomeIcon icon={faUser} />
-                    <Link to="/login" className="login">Login</Link>
-                    <FontAwesomeIcon icon={faAngleDown} />
-                    {/* Implement functionality to click angledown button to choose login or signup */}
+                    <div className='login-dropdown'>
+                        <Link to="/login" className="login">Login</Link>
+                        {/* Implement functionality to click angledown button to choose login or signup */}
+                    </div>
+                    <FontAwesomeIcon icon={faAngleDown}/>  
                 </div>
                 <div className="cart-space">
                     <FontAwesomeIcon icon={faCartShopping} />
@@ -47,8 +50,10 @@ function Navbar (){
 
             {/* Implement toggleMenu function to toggle nav-actions in mobile */}
             <button className='nav-actions-toggle' onClick={toggleMenu}>☰</button>
+        </div>
 
-            {isMenuOpen ? (<div className="mobile-nav-actions">
+        {isMenuOpen ? 
+            (<div className="mobile-nav-actions">
                 <div className="login-space">
                     <FontAwesomeIcon icon={faUser} />
                     <Link to="/login" className="login">Login</Link>
@@ -63,8 +68,9 @@ function Navbar (){
                     <FontAwesomeIcon icon={faSellcast} />
                     <a className='become-seller'>Become a Seller</a>
                 </div>
-            </div>) : ""}
-        </div>
+            </div>) 
+            : ""}
+        </>
     )
 }
 

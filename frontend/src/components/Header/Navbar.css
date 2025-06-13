@@ -100,6 +100,15 @@
     color: #2C3E50;
 }
 
+.mobile-nav-actions {
+    width: 100%;
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: #2C3E50;
+}
+
 @media (max-width: 850px){
     .search-bar {
         width: 60%;
