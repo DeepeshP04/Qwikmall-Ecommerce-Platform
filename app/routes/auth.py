@@ -168,10 +168,11 @@ def login_verify_code():
     if not verify_code(phone, code):
         return jsonify({"success": False, "message": "Invalid or expired code. Please try again."}), 400
     
+    session.pop("pending_login", None)
+    
     # Create a session for the user
     user = get_user_by_phone(phone)
     session["user"] = {"user_id": user.id, "username": user.username, "logged_in": True}
-    session.pop("pending_login", None)
     
     # Return success message
     return jsonify({"success": True, "message": "Logged in successfully."}), 200

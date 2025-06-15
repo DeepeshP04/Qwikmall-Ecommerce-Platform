@@ -61,10 +61,6 @@
     padding-left: 10px;
 }
 
-.input-section #error-message {
-    display: none;
-}
-
 .phone-space {
     display: flex;
     align-items: center;
