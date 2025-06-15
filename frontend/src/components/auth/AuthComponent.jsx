@@ -33,8 +33,11 @@ function AuthComponent({ isLogin }) {
             <div className="right-box">
                 <div className="form-section">
                     <div className="input-section">
-                        { !isLogin && (<input id="username" type='text' name='username' placeholder='Enter Username'></input>)} 
-                        <input id="phone" type="number" name="phone" placeholder="Enter Phone Number" onChange={(e) => setPhone(e.target.value)}></input>
+                        { !isLogin && (<input id="username" type='text' name='username' placeholder='Enter Username' required></input>)} 
+                        <div className='phone-space'>
+                            <span id="country-code-span">+91</span>
+                            <input id="phone" type="tel" name="phone" placeholder="Enter Phone Number" pattern='[0-9]{10}' minLength="10" maxLength="10" required onChange={(e) => setPhone("+91" + e.target.value)}></input>
+                        </div>
                         <p id="error-message"></p>
                     </div>
                     <div className="terms-section">

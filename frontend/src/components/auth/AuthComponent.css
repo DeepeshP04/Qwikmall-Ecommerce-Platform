@@ -65,6 +65,20 @@
     display: none;
 }
 
+.phone-space {
+    display: flex;
+    align-items: center;
+}
+
+.phone-space span {
+    display: flex;
+    align-items: center;
+    background-color: #D3D3D3;
+    height: 35px;
+    padding: 4px;
+    font-size: 0.9rem;
+}
+
 .terms-section {
     display: flex;
     font-size: 0.8rem;
