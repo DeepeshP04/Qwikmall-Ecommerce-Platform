@@ -65,10 +65,15 @@ def signup_send_code():
     phone = data.get("phone")
     username = data.get("username")
     
+    # Implement 1 in frontend
     # Check if phone number and username are provided
     # If not, return error message
     if not phone or not username:
         return jsonify({"success": False, "message": "Phone and Username are required."}), 400
+    
+    # Implement 2
+    # Check if phone starts with +91
+    # If not, add it in phone number as twilio requires number to start with a country code
     
     # Get the user from the database using the phone number
     # If user exists, return user exists message
@@ -76,34 +81,35 @@ def signup_send_code():
     if user:
         return jsonify({"success": False, "message": "User already exists. Please login."}), 409
     
+    if not send_code(phone):
+        return jsonify({"success": False, "message": "Failed to send verification code. Please try again later."}), 500
+
     # Store the phone number and username in the session
     # This is used to create a new user after the code is verified
     session["pending_signup"] = {"phone": phone, "username": username}
-
-    if not send_code(phone):
-        return jsonify({"success": False, "message": "Failed to send verification code. Please try again later."}), 500
     
     return jsonify({"success": True, "message": "Verification code sent. Code is valid for 5 minutes."}), 200
         
 @auth_bp.route("/signup/verify-code", methods=["POST"])
 def signup_verify_code():
     data = request.get_json() or {}
-    phone = data.get("phone")
     code = data.get("code")
     
-    if not phone or not code:
-        return jsonify({"success": False, "message": "Phone and Code are required."}), 400
+    # Implement 3 in frontend
+    # Check if code is provided
+    # If not, return error message
+    if not code:
+        return jsonify({"success": False, "message": "Code is required."}), 400
+    
+    pending = session.get("pending_signup")
+    phone = pending.get("phone")
     
     if not verify_code(phone, code):
         return jsonify({"success": False, "message": "Invalid or expired code. Please try again."}), 400
     
-    pending = session.get("pending_signup")
-    if not pending or pending["phone"] != phone:
-        return jsonify({"success": False, "message": "Invalid session. Please try again."}), 400
-    
     # If verification is successful, Create a new user in the database
     new_user = User(
-        phone=pending["phone"],
+        phone=phone,
         username=pending["username"]
     )
     db.session.add(new_user)
@@ -124,8 +130,15 @@ def login_send_code():
     data = request.get_json() or {}
     phone = data.get("phone")
     
+    # Implement 4 in frontend
+    # Check if phone number is provided
+    # If not, return error message
     if not phone:
         return jsonify({"success": False, "message": "Phone is required."}), 400
+    
+    # Implement 5
+    # Check if phone starts with +91
+    # If not, add it in phone number as twilio requires number to start with a country code
     
     user = get_user_by_phone(phone)
     if not user:
@@ -134,16 +147,23 @@ def login_send_code():
     if not send_code(phone):
         return jsonify({"success": False, "message": "Failed to send verification code. Please try again later."}), 500
     
+    session["pending_login"] = {"phone": phone}
+    
     return {"success": True, "message": "Verification code sent. Code is valid for 5 minutes."}, 200
 
 @auth_bp.route("/login/verify-code", methods=["POST"])
 def login_verify_code():
     data = request.get_json() or {}
-    phone = data.get("phone")
     code = data.get("code")
     
-    if not phone or not code:
-        return jsonify({"success": False, "message": "Phone and Code are required."}), 400
+    # Implement 6 in frontend
+    # Check if code is provided
+    # If not, return error message
+    if not code:
+        return jsonify({"success": False, "message": "Code is required."}), 400
+    
+    pending = session.get("pending_login")
+    phone = pending.get("phone")
     
     if not verify_code(phone, code):
         return jsonify({"success": False, "message": "Invalid or expired code. Please try again."}), 400
@@ -151,6 +171,7 @@ def login_verify_code():
     # Create a session for the user
     user = get_user_by_phone(phone)
     session["user"] = {"user_id": user.id, "username": user.username, "logged_in": True}
+    session.pop("pending_login", None)
     
     # Return success message
     return jsonify({"success": True, "message": "Logged in successfully."}), 200
