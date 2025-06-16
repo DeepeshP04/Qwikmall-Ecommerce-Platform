@@ -7,6 +7,7 @@ function AuthComponent({ isLogin }) {
     const [error, setError] = useState("")
     const[codeSent, setCodeSent] = useState(false)
     const [code, setCode] = useState("")
+    const [username, setUsername] = useState("")
 
     function validatePhone () {
         const regex = /^[0-9]{10}$/
@@ -72,7 +73,31 @@ function AuthComponent({ isLogin }) {
             }
         // Signup
         } else {
+            if (!codeSent) {
+                if (!validatePhone()) {
+                    setError("Phone number must be exactly 10 digits.")
+                } else {
+                    setError("")
 
+                    fetch("http://localhost:5000/auth/signup/send-code", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(
+                            {username: username, phone: phone}
+                        ),
+                        credentials: "include"
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success){
+                            setCodeSent(true)
+                        }
+                    })
+                    .catch(err => console.log("Error sending code", err))
+                }
+            }
         }
     }
 
@@ -85,7 +110,7 @@ function AuthComponent({ isLogin }) {
             <div className="right-box">
                 <div className="form-section">
                     <div className="input-section">
-                        { !isLogin && (<input id="username" type='text' name='username' placeholder='Enter Username' required></input>)} 
+                        { !isLogin && (<input id="username" type='text' name='username' placeholder='Enter Username' required onChange={(e) => setUsername(e.target.value)}></input>)} 
                         {!codeSent ? (<div className='phone-space'>
                             <span id="country-code-span">+91</span>
                             <input id="phone" type="tel" name="phone" placeholder="Enter Phone Number" minLength="10" maxLength="10" required onChange={(e) => setPhone(e.target.value)}></input>
