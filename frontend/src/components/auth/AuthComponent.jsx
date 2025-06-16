@@ -79,13 +79,14 @@ function AuthComponent({ isLogin }) {
                 } else {
                     setError("")
 
+                    const fullPhone = "+91" + phone
                     fetch("http://localhost:5000/auth/signup/send-code", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify(
-                            {username: username, phone: phone}
+                            {username: username, phone: fullPhone}
                         ),
                         credentials: "include"
                     })
@@ -93,9 +94,39 @@ function AuthComponent({ isLogin }) {
                     .then(data => {
                         if (data.success){
                             setCodeSent(true)
+                            console.log(data.message)
+                        } else {
+                            console.log(data.message)
                         }
                     })
                     .catch(err => console.log("Error sending code", err))
+                }
+            } else {
+                if (code.length != 6) {
+                    setError("Enter a valid 6-digit code.")
+                    return
+                } else {
+                    setError("")
+
+                    fetch("http://localhost:5000/auth/signup/verify-code", {
+                        method: "POST", 
+                        headers: {
+                            "Content-type": "application/json"
+                        },
+                        body: JSON.stringify(
+                            {code: code}
+                        ),
+                        credentials: "include"
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log(data.message)
+                        } else{
+                            setError(data.message || "Verification failed")
+                        }
+                    })
+                    .catch(err => console.log("Verification error", err))
                 }
             }
         }
@@ -110,7 +141,7 @@ function AuthComponent({ isLogin }) {
             <div className="right-box">
                 <div className="form-section">
                     <div className="input-section">
-                        { !isLogin && (<input id="username" type='text' name='username' placeholder='Enter Username' required onChange={(e) => setUsername(e.target.value)}></input>)} 
+                        { !isLogin && !codeSent && (<input id="username" type='text' name='username' placeholder='Enter Username' required onChange={(e) => setUsername(e.target.value)}></input>)} 
                         {!codeSent ? (<div className='phone-space'>
                             <span id="country-code-span">+91</span>
                             <input id="phone" type="tel" name="phone" placeholder="Enter Phone Number" minLength="10" maxLength="10" required onChange={(e) => setPhone(e.target.value)}></input>
