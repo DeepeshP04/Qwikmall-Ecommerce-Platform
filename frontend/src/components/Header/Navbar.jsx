@@ -4,11 +4,14 @@ import { faSellcast } from '@fortawesome/free-brands-svg-icons'
 import './Navbar.css'
 import { useEffect, useState } from 'react'
 import {Link} from 'react-router-dom'
+import { useContext } from 'react'
+import { AuthContext } from '../../App'
 
 function Navbar (){
 
     const [isMenuOpen, setMenuOpen] = useState(false);
     const toggleMenu = () => setMenuOpen(!isMenuOpen);
+    const { isLoggedIn } = useContext(AuthContext)
 
     useEffect(() => {
         const handleResize = () => {
@@ -32,10 +35,17 @@ function Navbar (){
             <div className="nav-actions">
                 <div className="login-space">
                     <FontAwesomeIcon icon={faUser} />
-                    <div className='login-dropdown'>
-                        <Link to="/login" className="login">Login</Link>
-                        {/* Implement functionality to click angledown button to choose login or signup */}
-                    </div>
+                    {isLoggedIn ? (
+                        <div className='account-dropdown'>
+                            <Link to="/" className="account">Account</Link>
+                        </div>
+                    ) : (
+                        <div className='login-dropdown'>
+                            <Link to="/login" className="login">Login</Link>
+                            {/* Implement functionality to click angledown button to choose login or signup */}
+                        </div>
+                    )}
+                    
                     <FontAwesomeIcon icon={faAngleDown}/>  
                 </div>
                 <div className="cart-space">

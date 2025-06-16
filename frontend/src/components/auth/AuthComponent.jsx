@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import './AuthComponent.css'
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../App';
 
 function AuthComponent({ isLogin }) {
     const [phone, setPhone] = useState("")
@@ -8,6 +9,7 @@ function AuthComponent({ isLogin }) {
     const[codeSent, setCodeSent] = useState(false)
     const [code, setCode] = useState("")
     const [username, setUsername] = useState("")
+    const {setIsLoggedIn} = useContext(AuthContext)
     const navigate = useNavigate()
 
     function validatePhone () {
@@ -65,6 +67,7 @@ function AuthComponent({ isLogin }) {
                     .then(data => {
                         if (data.success) {
                             console.log(data.message)
+                            setIsLoggedIn(true)
                             navigate("/")
 
                         } else{
@@ -125,6 +128,7 @@ function AuthComponent({ isLogin }) {
                     .then(data => {
                         if (data.success) {
                             console.log(data.message)
+                            setIsLoggedIn(true)
                             navigate("/")
                         } else{
                             setError(data.message || "Verification failed")
