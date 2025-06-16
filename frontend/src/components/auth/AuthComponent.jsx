@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './AuthComponent.css'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function AuthComponent({ isLogin }) {
     const [phone, setPhone] = useState("")
@@ -8,6 +8,7 @@ function AuthComponent({ isLogin }) {
     const[codeSent, setCodeSent] = useState(false)
     const [code, setCode] = useState("")
     const [username, setUsername] = useState("")
+    const navigate = useNavigate()
 
     function validatePhone () {
         const regex = /^[0-9]{10}$/
@@ -63,7 +64,9 @@ function AuthComponent({ isLogin }) {
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            console.log("Logged in!")
+                            console.log(data.message)
+                            navigate("/")
+
                         } else{
                             setError(data.message || "Verification failed")
                         }
@@ -122,6 +125,7 @@ function AuthComponent({ isLogin }) {
                     .then(data => {
                         if (data.success) {
                             console.log(data.message)
+                            navigate("/")
                         } else{
                             setError(data.message || "Verification failed")
                         }
