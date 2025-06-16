@@ -28,7 +28,7 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
     
-    CORS(app, origins=["http://localhost:5173"])
+    CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
     
     from app.routes.auth import auth_bp
     from app.routes.cart import cart_bp
