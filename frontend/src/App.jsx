@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import CategoryProductsPage from './pages/CategoryProductsPage'
 import ProductPage from './pages/ProductPage'
 import { createContext, useState } from 'react'
+import Cart from './pages/Cart'
 
 const AuthContext = createContext()
 
