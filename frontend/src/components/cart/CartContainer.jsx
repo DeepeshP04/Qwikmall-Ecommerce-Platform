@@ -1,8 +1,13 @@
 import CartItemList from "./CartItemList";
 
-function Cart () {
+function CartContainer () {
+    const cartItems = [
+        {quantity: "1", price: "40000", name: "Laptop", img: "images/laptop_electronics.jpg"},
+        {quantity: "2", price: "50000", name: "Laptop", img: "images/laptop_electronics.jpg"}
+    ]
+    
     return (
-        <div className="cart">
+        <div className="cart-container">
             <div className="cart-items">
                 <CartItemList cartItems={cartItems}></CartItemList>
             </div>
@@ -32,4 +37,4 @@ function Cart () {
     )
 }
 
-export default Cart;
+export default CartContainer;

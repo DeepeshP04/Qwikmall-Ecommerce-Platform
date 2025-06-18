@@ -1,4 +1,4 @@
-import CartItemList from "../components/cart/CartItemList";
+import CartContainer from '../components/cart/CartContainer';
 import Footer from "../components/footer/Footer";
 import Navbar from "../components/header/Navbar";
 
@@ -6,7 +6,7 @@ function Cart () {
     return (
         <>
             <Navbar></Navbar>
-            <CartItemList></CartItemList>
+            <CartContainer></CartContainer>
             <Footer></Footer>
         </>
     )
