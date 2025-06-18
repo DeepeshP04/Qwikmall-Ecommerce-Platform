@@ -1,8 +1,8 @@
 import CartItem from "./CartItem";
 
-function CartItemList () {
+function CartItemList ({cartItems}) {
     return (
-        <CartItem></CartItem>
+        <div></div>
     )
 }
 

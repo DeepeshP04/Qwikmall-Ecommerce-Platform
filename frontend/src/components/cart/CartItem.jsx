@@ -1,10 +1,6 @@
 import './CartItem.css'
 
-function CartItem () {
-    const cartItem = {
-        imgUrl: "images/laptop_electronics.jpg", name: "Laptop", price: "₹50000" 
-    }
-
+function CartItem ({cartItem}) {
     return (
         <div className="cart-item-container">
             <div className="item-img-space">
