@@ -112,14 +112,16 @@ class CartItem(db.Model):
     price = db.Column(db.Float)
     total_price = db.Column(db.Float)
     
+    product = db.relationship("Product")
+    
     def to_dict(self):
         return {
             "id": self.id,
-            "cart_id": self.cart_id,
-            "product_id": self.product_id,
             "quantity": self.quantity,
             "price": self.price,
-            "total_price": self.total_price
+            "total_price": self.total_price,
+            "product_name": self.product.name,
+            "product_img": self.product.image
         }
         
 class Payment(db.Model):
