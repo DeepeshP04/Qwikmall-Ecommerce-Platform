@@ -13,8 +13,11 @@ def get_cart_items_by_id():
     else:
         user_id = user.get("user_id")
     
-    cart_items = Cart.query.filter_by(user_id=user_id).all()
-    return jsonify({"cart": [item.to_dict() for item in cart_items]}), 200
+    cart = Cart.query.filter_by(user_id=user_id).first()
+    if cart:
+        return jsonify({"cart": cart.to_dict()}), 200
+    else:
+        return jsonify({"cart": None, "message": "No cart found!"}), 404
 
 # Add an item to the cart
 @cart_bp.route("/items", methods=["POST"])
