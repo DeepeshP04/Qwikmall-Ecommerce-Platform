@@ -13,7 +13,7 @@ function CartContainer () {
                 <CartItemList cartItems={cartItems}></CartItemList>
             </div>
             <div className="cart-summary">
-                <h3>Price Details</h3>
+                <h3 className="price-details-heading">Price Details</h3>
                 <div className="price-details">
                     <div className="price-row">
                         <span>Total Items:</span>

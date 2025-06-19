@@ -8,7 +8,7 @@
 }
 
 .item-img-space {
-    width: 12%;
+    width: 9em;
     height: 100%;
     display: flex;
     align-items: center;
@@ -20,6 +20,7 @@
 }
 
 .item-content-space {
+    min-width: 300px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -43,7 +44,7 @@
 }
 
 .quantity-control {
-    max-width: 6em;
+    width: 7em;
     display: flex;
     justify-content: space-evenly;
     gap: 0.5em;
@@ -52,4 +53,20 @@
 .quantity-input {
     width: 45%;
     text-align: center;
+}
+
+.quantity-update-btn {
+    background-color: white;
+    border-radius: 50%;
+    width: 2.5em;
+    height: 2em;
+    border: 1px solid gray;
+}
+
+.item-remove-btn {
+    border: none;
+    background-color: white;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 600;
 }

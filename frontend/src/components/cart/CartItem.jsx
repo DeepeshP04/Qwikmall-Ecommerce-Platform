@@ -13,12 +13,12 @@ function CartItem ({cartItem}) {
                 </div>
                 <div className='item-action-space'>
                     <div className='quantity-control'>
-                        <button className='quantity-decrease-btn'>-</button>
-                        <input className='quantity-input' type='number' value={cartItem.quantity} readOnly></input>
-                        <button className='quantity-increase-btn'>+</button>
+                        <button className='quantity-update-btn'>-</button>
+                        <input className='quantity-input' type='number' value={cartItem.quantity} readOnly />
+                        <button className='quantity-update-btn'>+</button>
                     </div>
                     <div className='remove-btn-container'>
-                        <button id="item-remove-btn">Remove</button>
+                        <button className="item-remove-btn">Remove</button>
                     </div>
                 </div>
             </div>
