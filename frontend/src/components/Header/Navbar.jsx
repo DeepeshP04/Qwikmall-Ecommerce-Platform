@@ -50,7 +50,7 @@ function Navbar (){
                 </div>
                 <div className="cart-space">
                     <FontAwesomeIcon icon={faCartShopping} />
-                    <a className='cart'>Cart</a>
+                    <Link to="/cart" className='cart'>Cart</Link>
                 </div>
                 <div className="seller-space">
                     <FontAwesomeIcon icon={faSellcast} />
