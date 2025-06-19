@@ -83,6 +83,11 @@
     gap: 5px;
 }
 
+.cart {
+    color: white;
+    text-decoration: none;
+}
+
 .seller-space {
     display: flex;
     justify-content: space-between;
