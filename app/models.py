@@ -120,8 +120,8 @@ class CartItem(db.Model):
             "quantity": self.quantity,
             "price": self.price,
             "total_price": self.total_price,
-            "product_name": self.product.name,
-            "product_img": self.product.image
+            "name": self.product.name,
+            "img": self.product.image
         }
         
 class Payment(db.Model):
