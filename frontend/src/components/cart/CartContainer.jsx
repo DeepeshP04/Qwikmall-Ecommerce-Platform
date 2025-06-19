@@ -1,4 +1,5 @@
 import CartItemList from "./CartItemList";
+import './CartContainer.css'
 
 function CartContainer () {
     const cartItems = [
