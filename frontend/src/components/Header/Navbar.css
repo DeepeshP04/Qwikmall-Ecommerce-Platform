@@ -1,0 +1,129 @@
+.navbar {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 60px;
+    background-color: #2C3E50;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    color: #FFFFFF;
+}
+
+.brand-space {
+    font-size: 30px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: 300;
+    color: #00ffbbc7;
+}
+
+.search-bar {
+    width: 40%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+}
+
+.search-bar input {
+    width: 90%;
+    height: 35px;
+    border: none;
+    border-radius: 10px 0 0 10px;
+    background: none;
+    outline: none;
+    margin-left: 20px;
+    font-size: medium;
+}
+
+.search-bar button {
+    width: 10%;
+    height: 40px;
+    border: none;
+    outline: none;
+    border-radius: 0 10px 10px 0;
+    font-size: large;
+    cursor: pointer;
+}
+
+.nav-actions {
+    width: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.login-space {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    gap: 5px;
+}
+
+.login {
+    color: white;
+    text-decoration: none;
+}
+
+.login-space:hover {
+    background-color: #0bdafa;
+}
+
+.cart-space {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    gap: 5px;
+}
+
+.cart {
+    color: white;
+    text-decoration: none;
+}
+
+.seller-space {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    gap: 5px;
+}
+
+.nav-actions-toggle {
+    width: 40px;
+    display: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #2C3E50;
+}
+
+.mobile-nav-actions {
+    width: 100%;
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: #2C3E50;
+}
+
+@media (max-width: 850px){
+    .search-bar {
+        width: 60%;
+    }
+
+    .nav-actions {
+        display: none;
+    }
+
+    .nav-actions-toggle {
+        display: block;
+    }
+}

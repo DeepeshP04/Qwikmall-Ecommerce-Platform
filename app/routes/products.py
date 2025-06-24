@@ -43,8 +43,10 @@ def get_recommended_products():
 @product_bp.route("/category/<int:category_id>", methods=["GET"])
 def get_products_by_category(category_id):
     try:
+        category = Category.query.get(category_id)
         products = Product.query.filter_by(category_id=category_id).all()
         response_data = {
+            "category_name": category.name,
             "products": [
                 {
                     "id": product.id,

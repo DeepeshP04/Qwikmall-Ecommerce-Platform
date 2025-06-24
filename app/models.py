@@ -3,7 +3,7 @@ from . import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
-    phone = db.Column(db.Integer, unique=True, nullable=False)
+    phone = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
     
@@ -112,14 +112,16 @@ class CartItem(db.Model):
     price = db.Column(db.Float)
     total_price = db.Column(db.Float)
     
+    product = db.relationship("Product")
+    
     def to_dict(self):
         return {
             "id": self.id,
-            "cart_id": self.cart_id,
-            "product_id": self.product_id,
             "quantity": self.quantity,
             "price": self.price,
-            "total_price": self.total_price
+            "total_price": self.total_price,
+            "name": self.product.name,
+            "img": self.product.image
         }
         
 class Payment(db.Model):
