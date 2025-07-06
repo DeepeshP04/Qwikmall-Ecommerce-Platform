@@ -29,6 +29,8 @@ class Product(db.Model):
     manufacturer = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    images = db.relationship('ProductImage', backref='product', lazy=True)
+    reviews = db.relationship('Review', backref='product', lazy=True)
     
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -139,3 +141,21 @@ class Payment(db.Model):
     
     user = db.relationship("User", backref="payments", lazy=True)
     order = db.relationship("Order", backref="payment", lazy=True)
+
+class ProductImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    image_url = db.Column(db.String(200), nullable=False)
+    is_primary = db.Column(db.Boolean, default=False)
+    alt_text = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.String(1000), nullable=True)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
