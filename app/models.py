@@ -7,8 +7,10 @@ class User(db.Model):
     email = db.Column(db.String(100), nullable=True)
     role = db.Column(db.String(20), nullable=False, default="user")
     created_at = db.Column(db.DateTime, default=db.func.now())
-    
-    addresses = db.relationship('Address', backref='user')
+    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    addresses = db.relationship('Address', backref='user', lazy=True)
+    orders = db.relationship('Order', backref='user', lazy=True)
+    cart = db.relationship('Cart', backref='user', lazy=True)
     
     def to_dict(self):
         return {
