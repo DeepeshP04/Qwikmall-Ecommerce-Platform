@@ -1,0 +1,32 @@
+{%extends "base.html"%}
+{%block title %} Qwikmall | Login {%endblock%}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
+{%endblock%}
+
+{%block content %}
+<div id="login-container">
+    <div class="left-box">
+        <span>Login</span>
+        <p>Get access to your Orders, Wishlist and Recommendations</p>
+    </div>
+    <div class="right-box">
+        <div class="login-section">
+            <div class="login-input-section">
+                <input type="text" name="email-or-contact" placeholder="Enter Email/Phone Number"></input>
+                <p class="error-message"></p>
+            </div>
+            <div class="login-terms-section">
+                <p>By continuing, you agree to QwikMall's <a>Terms of Use</a> and <a>Privacy Policy.</a></p>
+            </div>
+            <div class="login-button-section">
+                <button>Request OTP</button>
+            </div>
+        </div>
+        <div class="go-to-signup-section">
+            <a href="{{url_for('views.signup')}}">New to QwikMall? Create an account</a>
+        </div>
+    </div>
+</div>
+{%endblock%}

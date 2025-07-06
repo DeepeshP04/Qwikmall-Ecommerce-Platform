@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %} QwikMall {% endblock %}
+
+{% block styles %} 
+    <link rel="stylesheet" href="{{url_for('static', filename='css/categories-all-products.css')}}"/>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="product-filters">
+        <div>
+            <span>Filters</span>
+        </div>
+        <div>
+            <span>Size</span>
+            <i class="fa-solid fa-angle-down angle-down-btn"></i>
+        </div>
+        <div>
+            <span>Price</span>
+            <i class="fa-solid fa-angle-down angle-down-btn"></i>
+        </div>
+        <div>
+            <span>Color</span>
+            <i class="fa-solid fa-angle-down angle-down-btn"></i>
+        </div>
+        <div>
+            <span>Brand</span>
+            <i class="fa-solid fa-angle-down angle-down-btn"></i>
+        </div>
+    </section>
+    <section class="products">
+        <div class="products-heading-section">
+            <h1>Best Headphone</h1>
+        </div>
+        <div class="products-section">
+            {% for product in products %}
+            <div class="product-card">
+                <div class="product-img-space">
+                    <img src="{{url_for('static', filename='images/headphones.webp')}}" alt={{product.name}}/>
+                </div>
+                <div class="product-name-space">
+                    <p>{{product.name}}</p>
+                </div>
+                <div class="product-description-space">
+                    <p>{{product.description}}</p>
+                </div>
+                <div class="product-price-space">
+                    <p>{{product.price}}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

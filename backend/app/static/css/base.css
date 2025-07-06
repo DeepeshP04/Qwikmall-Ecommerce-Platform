@@ -1,0 +1,172 @@
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    background-color: rgba(208, 211, 212, 0.349);
+}
+
+#container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+/* header styling start */
+
+header{
+    height: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 12px;
+    background-color: white;
+}
+
+.web-title-space{
+    width: 200px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.web-title-space .display-5{
+    font-size: 30px;
+    font-weight: 100;
+    line-height: 1.2;
+}
+
+.search-space{
+    width: 730px;
+    height: 45px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: #f0f5ff;
+    border-radius: 10px;
+}
+
+.search-icon{
+    height: 45px;
+    width: 30px;
+    padding: 5px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-product-input-search-btn #search-input{
+    width: 680px;
+    height: 45px;
+    padding: 5px;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    background-color: inherit;
+}
+
+.user-space{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    position: relative;
+}
+
+.login-btn-space{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    position: relative;
+}
+
+.dropdown{
+    width: 200px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 10px;
+}
+
+.dropdown a{
+    display: block;
+    width: 100%;
+    height: 40px;
+    line-height: 20px;
+    padding: 10px;
+}
+
+.seller-btn-space{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+}
+
+.login-btn-space #login-btn{
+    height: 45px;
+    width: 80px;
+    border: none;
+    background-color: inherit;
+    font-size: 18px;
+    font-weight: 500;
+    outline: none;
+}
+
+.seller-btn-space #looking-to-sell-btn{
+    height: 45px;
+    width: 140px;
+    border: none;
+    outline: none;
+    background-color: inherit;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.login-btn-space #login-btn:hover, .seller-btn-space #looking-to-sell-btn:hover{
+    color: white;
+}
+
+.login-btn-space:hover, .seller-btn-space:hover{
+    background-color: blue;
+    color: white;
+    border-radius: 5px;
+}
+
+/* header styling end */
+
+/* footer styling start */
+
+footer{
+    width: 100%;
+    height: 100px;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 8px;
+    color: white;
+
+}
+
+.footer-content-nav{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-content-nav div{
+    width: 200px;
+    text-align: center;
+}
+
+/* footer styling end */
