@@ -5,6 +5,7 @@ class User(db.Model):
     username = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(100), nullable=True)
+    role = db.Column(db.String(20), nullable=False, default="user")
     created_at = db.Column(db.DateTime, default=db.func.now())
     
     addresses = db.relationship('Address', backref='user')
