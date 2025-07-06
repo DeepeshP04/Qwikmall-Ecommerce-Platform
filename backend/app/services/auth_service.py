@@ -15,34 +15,34 @@ class AuthService:
         self.auth_token = os.getenv("TWILIO_AUTH_TOKEN")
         self.phone_number = os.getenv("TWILIO_PHONE_NUMBER")
     
-    def get_user_by_phone(self, phone):
-        """Get user by phone number"""
-        return User.query.filter_by(phone=phone).first()
+    def get_user_by_mobile(self, mobile):
+        """Get user by mobile number"""
+        return User.query.filter_by(phone=mobile).first()
     
-    def send_verification_code(self, phone):
-        """Send verification code via SMS"""
+    def send_otp(self, mobile):
+        """Send OTP via SMS"""
         client = Client(self.account_sid, self.auth_token)
         
         # Generate a verification code
         code = random.randint(100000, 999999)
         
         # Store code in redis with 5 minutes expiry
-        redis_client.set(phone, code, 300)
+        redis_client.set(mobile, code, 300)
         
         try:
             message = client.messages.create(
                 body=f"Your verification code is {code}",
                 from_=self.phone_number,
-                to=phone
+                to=mobile
             )
             return True
         except Exception as e:
             print(f"Error sending SMS: {e}")
             return False
     
-    def verify_code(self, phone, code):
-        """Verify the code entered by user"""
-        stored_code = redis_client.get(phone)
+    def verify_otp(self, mobile, code):
+        """Verify the OTP entered by user"""
+        stored_code = redis_client.get(mobile)
         if not stored_code:
             return False
         
@@ -50,13 +50,13 @@ class AuthService:
             return False
         
         # Delete the code from redis after successful verification
-        redis_client.delete(phone)
+        redis_client.delete(mobile)
         return True
     
-    def create_user(self, phone, username):
+    def create_user(self, mobile, username):
         """Create a new user"""
         new_user = User(
-            phone=phone,
+            phone=mobile,
             username=username
         )
         db.session.add(new_user)
@@ -67,7 +67,8 @@ class AuthService:
         """Create session for logged in user"""
         session["user"] = {
             "user_id": user.id, 
-            "username": user.username, 
+            "username": user.username,
+            "role": user.role,
             "logged_in": True
         }
     
@@ -80,4 +81,9 @@ class AuthService:
         user_data = session.get("user")
         if user_data and user_data.get("logged_in"):
             return User.query.get(user_data["user_id"])
-        return None 
+        return None
+    
+    def is_user_logged_in(self):
+        """Check if user is logged in"""
+        user_data = session.get("user")
+        return user_data and user_data.get("logged_in") 
