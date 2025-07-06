@@ -23,15 +23,12 @@ class User(db.Model):
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.DECIMAL(10, 2), nullable=False)
     description = db.Column(db.String(100), nullable=False)
-    image = db.Column(db.String(200), nullable=False)
-    stock = db.Column(db.Integer, nullable=False, default=0)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     manufacturer = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-    # category = db.relationship('Category', backref='products')
     
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
