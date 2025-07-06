@@ -48,7 +48,7 @@ def create_app():
         
     app.register_blueprint(views)
     
-    from .models import Product, User
+    from .models import Product, User, Category, Order, OrderItem, Cart, CartItem, Payment, ProductImage, Review, ProductAttribute, ProductAttributeValue, Address
 
     # create_db_tables(app)
     # insert_test_data_in_database(db, Product, app)
