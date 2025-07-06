@@ -92,12 +92,10 @@ class OrderItem(db.Model):
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    total_price = db.Column(db.Float, nullable=False)
+    total_price = db.Column(db.DECIMAL(10, 2), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-    
-    user = db.relationship('User', backref='cart')
-    cart_items = db.relationship('CartItem', backref='cart')
+    cart_items = db.relationship('CartItem', backref='cart', lazy=True)
     
     def update_total_price(self):
         self.total_price = sum(item.total_price for item in self.cart_items)
@@ -117,10 +115,6 @@ class CartItem(db.Model):
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Float)
-    total_price = db.Column(db.Float)
-    
-    product = db.relationship("Product")
     
     def to_dict(self):
         return {
