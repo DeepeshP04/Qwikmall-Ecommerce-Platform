@@ -1,116 +1,47 @@
 from flask import Blueprint, jsonify, request, session
 from app import db
 from app.models import Cart, User, Product, CartItem
+from app.services.cart_service import CartService
+from app.utils.helpers import login_required
 
 cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 
-# Get cart items
-@cart_bp.route("/items", methods=["GET"])
-def get_cart_items_by_id():
-    user = session.get("user")
-    if not user:
-        return jsonify({"error": "User not logged in"}), 401
-    else:
-        user_id = user.get("user_id")
-    
-    cart = Cart.query.filter_by(user_id=user_id).first()
-    if cart:
-        return jsonify({"cart": cart.to_dict()}), 200
-    else:
-        return jsonify({"cart": None, "message": "No cart found!"}), 404
+# Get current user's cart
+@cart_bp.route("", methods=["GET"])
+@login_required
+def get_my_cart():
+    user_id = session["user"]["user_id"]
+    # Only allow user to access their own cart
+    # (If admin access to others' carts is needed, add logic here)
+    success, response, status = CartService.get_user_cart(user_id)
+    return jsonify(response), status
 
 # Add an item to the cart
 @cart_bp.route("/items", methods=["POST"])
+@login_required
 def add_cart_item():
     data = request.get_json()
     product_id = data.get("product_id")
     quantity = data.get("quantity", 1)
-     
-    if not session.get("user"):
-        return jsonify({"error": "User not logged in"}), 401
-    else:
-        user_id = session.get("user").get("user_id")
-        
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"success": False, "message": "User not found."}), 404
-    
-    product = Product.query.get(product_id)
-    if not product:
-        return jsonify({"success": False, "message": "Product not found."}), 404
-    
-    if quantity <= 0:
-        return jsonify({"success": False, "message": "Quantity must be greater than 0."}), 400
-    
-    cart = Cart.query.filter_by(user_id=user_id).first()
-    
-    if not cart:
-        cart = Cart(user_id=user_id, total_price=0)
-        db.session.add(cart)
-        db.session.commit()
-        
-    existing_cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product_id).first()
-    
-    if existing_cart_item:
-        existing_cart_item.quantity += quantity
-        existing_cart_item.total_price += product.price * quantity
-    else:
-        total_price = product.price * quantity
-        price = product.price 
-        
-        new_cart_item = CartItem(
-            cart_id=cart.id,
-            product_id=product_id,
-            quantity=quantity,
-            price=price,
-            total_price=total_price
-        )
-        db.session.add(new_cart_item)
-        
-    cart.update_total_price() 
-    db.session.commit()
-        
-    return jsonify({"success": True, "message": "Item added to cart."}), 201
-    
+    user_id = session["user"]["user_id"]
+    success, response, status = CartService.add_or_update_cart_item(user_id, product_id, quantity)
+    return jsonify(response), status
+
 # Update cart items
-@cart_bp.route("/items/<int:product_id>", methods=["PUT"])
-def update_cart_item(product_id):
+@cart_bp.route("/items/<int:item_id>", methods=["PATCH"])
+@login_required
+def update_cart_item(item_id):
     data = request.get_json()
     quantity = data.get("quantity")
+    user_id = session["user"]["user_id"]
     
-    user = User.query.get(session["user"]["user_id"])
-    if not user:
-        return jsonify({"success": False, "message": "User not found."}), 404
-    
-    product = Product.query.get(product_id)
-    if not product:
-        return jsonify({"success": False, "message": "Product not found."}), 404
-    
-    cart = Cart.query.filter_by(user_id=user.id).first()
-    
-    cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product_id).first()
-    cart_item.quantity = quantity
-    cart_item.total_price = product.price * quantity
-    
-    cart.update_total_price()
-    db.session.commit()
-    
-    return jsonify({"success": True, "message": "Item updated in cart."}), 200
-    
+    success, response, status = CartService.update_cart_item_quantity(user_id, item_id, quantity)
+    return jsonify(response), status
+
 # Delete cart item
-@cart_bp.route("/items/<int:product_id>", methods=["DELETE"])
-def delete_cart_item(product_id):
-    user_id = session["user"]["user_id"] 
-    
-    cart = Cart.query.filter_by(user_id=user_id).first()
-    
-    cart_item = CartItem.query.filter_by(cart_id=cart.id, product_id=product_id).first()
-    
-    if not cart_item:
-        return jsonify({"success": False, "message": "Item not found in cart."}), 404
-    
-    db.session.delete(cart_item)
-    cart.update_total_price()
-    db.session.commit()
-    
-    return jsonify({"success": True, "message": "Item removed from cart."}), 200
+@cart_bp.route("/items/<int:item_id>", methods=["DELETE"])
+@login_required
+def delete_cart_item(item_id):
+    user_id = session["user"]["user_id"]
+    success, response, status = CartService.delete_cart_item(user_id, item_id)
+    return jsonify(response), status
