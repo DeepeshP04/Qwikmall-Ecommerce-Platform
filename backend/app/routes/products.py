@@ -1,115 +1,123 @@
-from flask import Blueprint, jsonify
-from app.models import Category, Product
+from flask import Blueprint, request, jsonify
+from app.services.product_service import ProductService
 
 product_bp = Blueprint("products", __name__, url_prefix="/products")
+product_service = ProductService()
 
-# Recommended products for home page
-# For now, this is a static list of products
-# In the future, this will be replaced with recommended products for user
-@product_bp.route("/recommended-products", methods=["GET"])
+@product_bp.route("/recommended", methods=["GET"])
 def get_recommended_products():
-    try:
-        # Fetch all categories
-        categories = Category.query.all()
-        recommended_products = {"categories": []}
-        
-        for category in categories:
-            products = Product.query.filter_by(category_id=category.id).limit(5).all()
+    """Get 5 products from each category for home page"""
+    success, data = product_service.get_recommended_products()
     
-            recommended_products["categories"].append({
-                "id": category.id,
-                "name": category.name,
-                "description": category.description,
-                "products": [
-                    {
-                        "id": prod.id,
-                        "name": prod.name,
-                        "price": prod.price,
-                        "description": prod.description,
-                        "image": prod.image,
-                        "stock": prod.stock,
-                        "manufacturer": prod.manufacturer
-                    }
-                    for prod in products
-                ]
-            })
-        # Return the JSON response of products
-        return jsonify(recommended_products), 200
-    except Exception as e:
-        # Handle any exceptions that occur during the process
-        return jsonify({"error": str(e)}), 500
+    if success:
+        return jsonify({
+            "success": True,
+            "data": data
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": data
+        }), 500
 
-# All products of a category
-@product_bp.route("/category/<int:category_id>", methods=["GET"])
-def get_products_by_category(category_id):
-    try:
-        category = Category.query.get(category_id)
-        products = Product.query.filter_by(category_id=category_id).all()
-        response_data = {
-            "category_name": category.name,
-            "products": [
-                {
-                    "id": product.id,
-                    "name": product.name,
-                    "price": product.price,
-                    "description": product.description,
-                    "image_url": product.image,
-                    "stock": product.stock,
-                    "manufacturer": product.manufacturer
-                }
-                for product in products
-            ]
-        }
+@product_bp.route("/category/<category_name>", methods=["GET"])
+def get_products_by_category(category_name):
+    """Get all products of a specific category"""
+    success, data = product_service.get_products_by_category(category_name)
     
-        return jsonify(response_data), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
-# List all products
-@product_bp.route("/", methods=["GET"])
+    if success:
+        return jsonify({
+            "success": True,
+            "data": data
+        }), 200
+    else:
+        if data == "Category does not exist":
+            return jsonify({
+                "success": False,
+                "message": data
+            }), 404
+        else:
+            return jsonify({
+                "success": False,
+                "message": data
+            }), 500
+
+@product_bp.route("", methods=["GET"])
 def get_all_products():
-    try:
-        products = Product.query.all()
-        response_data = {
-            "products": [
-                {
-                    "id": product.id,
-                    "name": product.name,
-                    "price": product.price,
-                    "description": product.description,
-                    "image_url": product.image,
-                    "stock": product.stock,
-                    "manufacturer": product.manufacturer
-                }
-                for product in products
-            ]
-        }
+    """Get all products with optional search"""
+    search_query = request.args.get('q')
+    success, data = product_service.get_all_products(search_query)
     
-        return jsonify(response_data), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    if success:
+        return jsonify({
+            "success": True,
+            "data": data
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": data
+        }), 500
 
-# Get a product by id or get details of a specific product
 @product_bp.route("/<int:product_id>", methods=["GET"])
-def get_product_details(product_id):
-    try:
-        product = Product.query.filter_by(id=product_id).first()
-        response_data = {
-            "product": 
-                {
-                    "id": product.id,
-                    "name": product.name,
-                    "price": product.price,
-                    "description": product.description,
-                    "image_url": product.image,
-                    "stock": product.stock,
-                    "manufacturer": product.manufacturer
-                }
-        }
+def get_product_by_id(product_id):
+    """Get specific product details"""
+    success, data = product_service.get_product_by_id(product_id)
     
-        return jsonify(response_data), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    if success:
+        return jsonify({
+            "success": True,
+            "data": data
+        }), 200
+    else:
+        if data == "Product does not exist":
+            return jsonify({
+                "success": False,
+                "message": data
+            }), 404
+        else:
+            return jsonify({
+                "success": False,
+                "message": data
+            }), 500
+
+@product_bp.route("/category/<category_name>/filters", methods=["GET"])
+def get_category_filters(category_name):
+    """Get filter options for products in a category"""
+    success, data = product_service.get_category_filters(category_name)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "data": data
+        }), 200
+    else:
+        if data == "Category does not exist":
+            return jsonify({
+                "success": False,
+                "message": data
+            }), 404
+        else:
+            return jsonify({
+                "success": False,
+                "message": data
+            }), 500
+
+@product_bp.route("/filters", methods=["GET"])
+def get_all_filters():
+    """Get filter options for all products"""
+    success, data = product_service.get_category_filters()
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "data": data
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "message": data
+        }), 500
 
 # Post a new product (Admin only)
 
