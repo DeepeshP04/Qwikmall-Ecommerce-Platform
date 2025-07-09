@@ -35,3 +35,17 @@ class OrderService:
             db.session.add(item)
         db.session.commit()
         return {"success": True, "message": "Order created successfully", "order": new_order.to_dict()}, 201 
+
+    @staticmethod
+    def list_user_orders(user_id):
+        orders = Order.query.filter_by(user_id=user_id).all()
+        if not orders:
+            return {"success": False, "message": "No orders found."}, 404
+        return {"success": True, "orders": [order.to_dict() for order in orders]}, 200
+
+    @staticmethod
+    def get_order_details(user_id, order_id):
+        order = Order.query.filter_by(user_id=user_id, id=order_id).first()
+        if not order:
+            return {"success": False, "message": "Order not found."}, 404
+        return {"success": True, "order": order.to_dict()}, 200 
