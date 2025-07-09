@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify, session
 from app.services.auth_service import AuthService
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
-auth_service = AuthService()
 
 # Signup
 @auth_bp.route("/signup/request-otp", methods=["POST"])
@@ -19,7 +18,7 @@ def signup_request_otp():
         }), 400
     
     # Check if user already exists
-    user = auth_service.get_user_by_mobile(mobile)
+    user = AuthService.get_user_by_mobile(mobile)
     if user:
         return jsonify({
             "success": False, 
@@ -27,7 +26,7 @@ def signup_request_otp():
         }), 409
     
     # Send OTP
-    if not auth_service.send_otp(mobile):
+    if not AuthService.send_otp(mobile):
         return jsonify({
             "success": False, 
             "message": "Failed to send OTP. Please try again later."
@@ -63,20 +62,20 @@ def signup_verify_otp():
     mobile = pending.get("mobile")
     
     # Verify OTP
-    if not auth_service.verify_otp(mobile, code):
+    if not AuthService.verify_otp(mobile, code):
         return jsonify({
             "success": False, 
             "message": "Invalid or expired OTP"
         }), 422
     
     # Create new user
-    new_user = auth_service.create_user(mobile, pending["username"])
+    new_user = AuthService.create_user(mobile, pending["username"])
     
     # Remove the pending signup data from the session
     session.pop("pending_signup", None)
     
     # Create a session for the user
-    auth_service.login_user(new_user)
+    AuthService.login_user(new_user)
     
     return jsonify({
         "success": True, 
@@ -97,7 +96,7 @@ def login_request_otp():
         }), 400
     
     # Check if user exists
-    user = auth_service.get_user_by_mobile(mobile)
+    user = AuthService.get_user_by_mobile(mobile)
     if not user:
         return jsonify({
             "success": False, 
@@ -105,7 +104,7 @@ def login_request_otp():
         }), 404
     
     # Send OTP
-    if not auth_service.send_otp(mobile):
+    if not AuthService.send_otp(mobile):
         return jsonify({
             "success": False, 
             "message": "Failed to send OTP. Please try again later."
@@ -141,7 +140,7 @@ def login_verify_otp():
     mobile = pending.get("mobile")
     
     # Verify OTP
-    if not auth_service.verify_otp(mobile, code):
+    if not AuthService.verify_otp(mobile, code):
         return jsonify({
             "success": False, 
             "message": "Invalid or expired otp"
@@ -151,8 +150,8 @@ def login_verify_otp():
     session.pop("pending_login", None)
     
     # Get user and create session
-    user = auth_service.get_user_by_mobile(mobile)
-    auth_service.login_user(user)
+    user = AuthService.get_user_by_mobile(mobile)
+    AuthService.login_user(user)
     
     return jsonify({
         "success": True, 
@@ -163,13 +162,13 @@ def login_verify_otp():
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
     # Check if user is logged in
-    if not auth_service.is_user_logged_in():
+    if not AuthService.is_user_logged_in():
         return jsonify({
             "success": False, 
             "message": "No user logged in."
         }), 401
     
-    auth_service.logout_user()
+    AuthService.logout_user()
     return jsonify({
         "success": True, 
         "message": "Logged out successfully."

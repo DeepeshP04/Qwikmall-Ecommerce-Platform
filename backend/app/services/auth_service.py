@@ -10,18 +10,19 @@ from app.redis_client import redis_client
 load_dotenv()
 
 class AuthService:
-    def __init__(self):
-        self.account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-        self.auth_token = os.getenv("TWILIO_AUTH_TOKEN")
-        self.phone_number = os.getenv("TWILIO_PHONE_NUMBER")
+    account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+    auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+    phone_number = os.getenv("TWILIO_PHONE_NUMBER")
     
-    def get_user_by_mobile(self, mobile):
+    @staticmethod
+    def get_user_by_mobile(mobile):
         """Get user by mobile number"""
         return User.query.filter_by(phone=mobile).first()
     
-    def send_otp(self, mobile):
+    @staticmethod
+    def send_otp(mobile):
         """Send OTP via SMS"""
-        client = Client(self.account_sid, self.auth_token)
+        client = Client(AuthService.account_sid, AuthService.auth_token)
         
         # Generate a verification code
         code = random.randint(100000, 999999)
@@ -32,7 +33,7 @@ class AuthService:
         try:
             message = client.messages.create(
                 body=f"Your verification code is {code}",
-                from_=self.phone_number,
+                from_=AuthService.phone_number,
                 to=mobile
             )
             return True
