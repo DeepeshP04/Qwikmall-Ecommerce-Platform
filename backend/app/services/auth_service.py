@@ -41,7 +41,8 @@ class AuthService:
             print(f"Error sending SMS: {e}")
             return False
     
-    def verify_otp(self, mobile, code):
+    @staticmethod
+    def verify_otp(mobile, code):
         """Verify the OTP entered by user"""
         stored_code = redis_client.get(mobile)
         if not stored_code:
@@ -54,7 +55,8 @@ class AuthService:
         redis_client.delete(mobile)
         return True
     
-    def create_user(self, mobile, username):
+    @staticmethod
+    def create_user(mobile, username):
         """Create a new user"""
         new_user = User(
             phone=mobile,
@@ -64,7 +66,8 @@ class AuthService:
         db.session.commit()
         return new_user
     
-    def login_user(self, user):
+    @staticmethod
+    def login_user(user):
         """Create session for logged in user"""
         session["user"] = {
             "user_id": user.id, 
@@ -73,18 +76,21 @@ class AuthService:
             "logged_in": True
         }
     
-    def logout_user(self):
+    @staticmethod
+    def logout_user():
         """Clear user session"""
         session.pop("user", None)
     
-    def get_current_user(self):
+    @staticmethod
+    def get_current_user():
         """Get current logged in user"""
         user_data = session.get("user")
         if user_data and user_data.get("logged_in"):
             return User.query.get(user_data["user_id"])
         return None
     
-    def is_user_logged_in(self):
+    @staticmethod
+    def is_user_logged_in():
         """Check if user is logged in"""
         user_data = session.get("user")
         return user_data and user_data.get("logged_in") 

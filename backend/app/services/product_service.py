@@ -4,10 +4,8 @@ from sqlalchemy import or_, func
 from sqlalchemy.orm import joinedload
 
 class ProductService:
-    def __init__(self):
-        pass
-    
-    def get_recommended_products(self):
+    @staticmethod
+    def get_recommended_products():
         """Get 5 products from each category for home page"""
         try:
             categories = Category.query.all()
@@ -26,7 +24,7 @@ class ProductService:
                     ).first()
                     
                     # Calculate overall rating
-                    overall_rating = self.calculate_overall_rating(product.id)
+                    overall_rating = ProductService.calculate_overall_rating(product.id)
                     
                     product_data = {
                         "product_id": product.id,
@@ -50,7 +48,8 @@ class ProductService:
             print(f"Error getting recommended products: {e}")
             return False, "Something went wrong. Please try again later."
     
-    def get_products_by_category(self, category_name):
+    @staticmethod
+    def get_products_by_category(category_name):
         """Get all products of a specific category"""
         try:
             category = Category.query.filter_by(name=category_name).first()
@@ -68,7 +67,7 @@ class ProductService:
                 ).first()
                 
                 # Calculate overall rating
-                overall_rating = self.calculate_overall_rating(product.id)
+                overall_rating = ProductService.calculate_overall_rating(product.id)
                 
                 product_data = {
                     "id": product.id,
@@ -91,7 +90,8 @@ class ProductService:
             print(f"Error getting products by category: {e}")
             return False, "Something went wrong. Please try again later."
     
-    def get_all_products(self, search_query=None):
+    @staticmethod
+    def get_all_products(search_query=None):
         """Get all products with optional search"""
         try:
             query = Product.query
@@ -116,7 +116,7 @@ class ProductService:
                 ).first()
                 
                 # Calculate overall rating
-                overall_rating = self.calculate_overall_rating(product.id)
+                overall_rating = ProductService.calculate_overall_rating(product.id)
                 
                 product_data = {
                     "id": product.id,
@@ -133,7 +133,8 @@ class ProductService:
             print(f"Error getting all products: {e}")
             return False, "Something went wrong. Please try again later."
     
-    def get_product_by_id(self, product_id):
+    @staticmethod
+    def get_product_by_id(product_id):
         """Get specific product details"""
         try:
             product = Product.query.get(product_id)
@@ -163,7 +164,7 @@ class ProductService:
                 reviews_data.append(review_data)
             
             # Calculate overall rating
-            overall_rating = self.calculate_overall_rating(product_id)
+            overall_rating = ProductService.calculate_overall_rating(product_id)
             
             product_data = {
                 "id": product.id,
@@ -182,7 +183,8 @@ class ProductService:
             print(f"Error getting product by id: {e}")
             return False, "Something went wrong. Please try again later."
     
-    def get_category_filters(self, category_name=None):
+    @staticmethod
+    def get_category_filters(category_name=None):
         """Get filter options for products"""
         try:
             if not category_name:
@@ -210,7 +212,8 @@ class ProductService:
             print(f"Error getting filters: {e}")
             return False, "Unable to load filter options. Please try again later."
     
-    def calculate_overall_rating(self, product_id):
+    @staticmethod
+    def calculate_overall_rating(product_id):
         """Calculate overall rating for a product"""
         try:
             reviews = Review.query.filter_by(product_id=product_id).all()
