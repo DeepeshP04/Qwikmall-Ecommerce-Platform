@@ -6,6 +6,8 @@ import random
 import os
 from dotenv import load_dotenv
 from app.redis_client import redis_client
+from app.schemas.auth import SignupRequestOTPSchema, SignupVerifyOTPSchema, LoginRequestOTPSchema, LoginVerifyOTPSchema
+from marshmallow import ValidationError
 
 load_dotenv()
 
@@ -98,7 +100,7 @@ class AuthService:
     @staticmethod
     def signup_request_otp(username, mobile):
         try:
-            SignupRequestOTPSchema.load({"username": username, "mobile": mobile})
+            validated_data = SignupRequestOTPSchema().load({"username": username, "mobile": mobile})
         except ValidationError as e:
             return jsonify({
                 "success": False,
@@ -124,7 +126,7 @@ class AuthService:
     @staticmethod
     def signup_verify_otp(code):
         try:
-            SignupVerifyOTPSchema.load({"code": code})
+            validated_data = SignupVerifyOTPSchema().load({"code": code})
         except ValidationError as e:
             return jsonify({
                 "success": False,
@@ -153,7 +155,7 @@ class AuthService:
     @staticmethod
     def login_request_otp(mobile):
         try:
-            LoginRequestOTPSchema.load({"mobile": mobile})
+            validated_data = LoginRequestOTPSchema().load({"mobile": mobile})
         except ValidationError as e:
             return jsonify({
                 "success": False,
@@ -179,7 +181,7 @@ class AuthService:
     @staticmethod
     def login_verify_otp(code):
         try:
-            LoginVerifyOTPSchema.load({"code": code})
+            validated_data = LoginVerifyOTPSchema().load({"code": code})
         except ValidationError as e:
             return jsonify({
                 "success": False,
