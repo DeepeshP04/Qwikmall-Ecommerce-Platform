@@ -97,23 +97,25 @@ class AuthService:
 
     @staticmethod
     def signup_request_otp(username, mobile):
-        if not username or not mobile:
+        try:
+            SignupRequestOTPSchema.load({"username": username, "mobile": mobile})
+        except ValidationError as e:
             return jsonify({
                 "success": False,
-                "message": "Username and mobile are required."
+                "message": e.messages
             }), 400
-        user = AuthService.get_user_by_mobile(mobile)
+        user = AuthService.get_user_by_mobile(validated_data["mobile"])
         if user:
             return jsonify({
                 "success": False,
                 "message": "Mobile number already registered. Try logging in."
             }), 409
-        if not AuthService.send_otp(mobile):
+        if not AuthService.send_otp(validated_data["mobile"]):
             return jsonify({
                 "success": False,
                 "message": "Failed to send OTP. Please try again later."
             }), 500
-        session["pending_signup"] = {"mobile": mobile, "username": username}
+        session["pending_signup"] = {"mobile": validated_data["mobile"], "username": validated_data["username"]}
         return jsonify({
             "success": True,
             "message": "OTP sent successfully. Please verify to sign up"
@@ -121,10 +123,12 @@ class AuthService:
 
     @staticmethod
     def signup_verify_otp(code):
-        if not code:
+        try:
+            SignupVerifyOTPSchema.load({"code": code})
+        except ValidationError as e:
             return jsonify({
                 "success": False,
-                "message": "OTP Code is required."
+                "message": e.messages
             }), 400
         pending = session.get("pending_signup")
         if not pending:
@@ -133,7 +137,7 @@ class AuthService:
                 "message": "No pending signup found. Please request OTP again."
             }), 400
         mobile = pending.get("mobile")
-        if not AuthService.verify_otp(mobile, code):
+        if not AuthService.verify_otp(mobile, validated_data["code"]):
             return jsonify({
                 "success": False,
                 "message": "Invalid or expired OTP"
@@ -148,10 +152,12 @@ class AuthService:
 
     @staticmethod
     def login_request_otp(mobile):
-        if not mobile:
+        try:
+            LoginRequestOTPSchema.load({"mobile": mobile})
+        except ValidationError as e:
             return jsonify({
                 "success": False,
-                "message": "Mobile number is required."
+                "message": e.messages
             }), 400
         user = AuthService.get_user_by_mobile(mobile)
         if not user:
@@ -159,12 +165,12 @@ class AuthService:
                 "success": False,
                 "message": "Mobile number not registered. Please sign up."
             }), 404
-        if not AuthService.send_otp(mobile):
+        if not AuthService.send_otp(validated_data["mobile"]):
             return jsonify({
                 "success": False,
                 "message": "Failed to send OTP. Please try again later."
             }), 500
-        session["pending_login"] = {"mobile": mobile}
+        session["pending_login"] = {"mobile": validated_data["mobile"]}
         return jsonify({
             "success": True,
             "message": "OTP sent successfully. Please verify to login"
@@ -172,10 +178,12 @@ class AuthService:
 
     @staticmethod
     def login_verify_otp(code):
-        if not code:
+        try:
+            LoginVerifyOTPSchema.load({"code": code})
+        except ValidationError as e:
             return jsonify({
                 "success": False,
-                "message": "OTP code is required."
+                "message": e.messages
             }), 400
         pending = session.get("pending_login")
         if not pending:
@@ -184,7 +192,7 @@ class AuthService:
                 "message": "No pending login found. Please request OTP again."
             }), 400
         mobile = pending.get("mobile")
-        if not AuthService.verify_otp(mobile, code):
+        if not AuthService.verify_otp(mobile, validated_data["code"]):
             return jsonify({
                 "success": False,
                 "message": "Invalid or expired otp"
