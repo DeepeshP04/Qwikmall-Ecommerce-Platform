@@ -3,9 +3,6 @@ from app.models import Order, Product, Address, OrderItem, db
 
 class OrderService:
     @staticmethod
-    def unauthorized_response():
-        return jsonify({"success": False, "message": "User not logged in"}), 401
-    @staticmethod
     def create_order(user_id, items):
         if not items:
             return {"success": False, "message": "No items provided."}, 400
