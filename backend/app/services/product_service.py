@@ -2,6 +2,7 @@ from app.models import Product, Category, ProductImage, Review, ProductAttribute
 from app import db
 from sqlalchemy import or_, func
 from sqlalchemy.orm import joinedload
+from flask import jsonify
 
 class ProductService:
     @staticmethod
@@ -43,10 +44,10 @@ class ProductService:
                 }
                 recommended_data.append(category_data)
             
-            return True, recommended_data
+            return jsonify({"success": True, "data": recommended_data}), 200
         except Exception as e:
             print(f"Error getting recommended products: {e}")
-            return False, "Something went wrong. Please try again later."
+            return jsonify({"success": False, "message": "Something went wrong. Please try again later."}), 500
     
     @staticmethod
     def get_products_by_category(category_name):
@@ -54,7 +55,7 @@ class ProductService:
         try:
             category = Category.query.filter_by(name=category_name).first()
             if not category:
-                return False, "Category does not exist"
+                return jsonify({"success": False, "message": "Category does not exist"}), 404
             
             products = Product.query.filter_by(category_id=category.id).all()
             
@@ -85,10 +86,10 @@ class ProductService:
                 "products": products_data
             }
             
-            return True, response_data
+            return jsonify({"success": True, "data": response_data}), 200
         except Exception as e:
             print(f"Error getting products by category: {e}")
-            return False, "Something went wrong. Please try again later."
+            return jsonify({"success": False, "message": "Something went wrong. Please try again later."}), 500
     
     @staticmethod
     def get_all_products(search_query=None):
@@ -128,10 +129,10 @@ class ProductService:
                 }
                 products_data.append(product_data)
             
-            return True, products_data
+            return jsonify({"success": True, "data": products_data}), 200
         except Exception as e:
             print(f"Error getting all products: {e}")
-            return False, "Something went wrong. Please try again later."
+            return jsonify({"success": False, "message": "Something went wrong. Please try again later."}), 500
     
     @staticmethod
     def get_product_by_id(product_id):
@@ -139,7 +140,7 @@ class ProductService:
         try:
             product = Product.query.get(product_id)
             if not product:
-                return False, "Product does not exist"
+                return jsonify({"success": False, "message": "Product does not exist"}), 404
             
             # Get all images
             images = ProductImage.query.filter_by(product_id=product_id).all()
@@ -178,21 +179,21 @@ class ProductService:
                 "reviews": reviews_data
             }
             
-            return True, product_data
+            return jsonify({"success": True, "data": product_data}), 200
         except Exception as e:
             print(f"Error getting product by id: {e}")
-            return False, "Something went wrong. Please try again later."
+            return jsonify({"success": False, "message": "Something went wrong. Please try again later."}), 500
     
     @staticmethod
     def get_category_filters(category_name=None):
         """Get filter options for products"""
         try:
             if not category_name:
-                return False, "Category name is required"
+                return jsonify({"success": False, "message": "Category name is required"}), 400
             # Get products in specific category
             category = Category.query.filter_by(name=category_name).first()
             if not category:
-                return False, "Category does not exist"
+                return jsonify({"success": False, "message": "Category does not exist"}), 404
                 
             product_ids = [p.id for p in Product.query.filter_by(category_id=category.id).all()]
             attr_values = (
@@ -207,10 +208,10 @@ class ProductService:
                 filters.setdefault(attr_name, set()).add(value)
             
             filters = {k: list(v) for k, v in filters.items()}
-            return True, filters
+            return jsonify({"success": True, "data": filters}), 200
         except Exception as e:
             print(f"Error getting filters: {e}")
-            return False, "Unable to load filter options. Please try again later."
+            return jsonify({"success": False, "message": "Unable to load filter options. Please try again later."}), 500
     
     @staticmethod
     def calculate_overall_rating(product_id):
