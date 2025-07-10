@@ -2,6 +2,7 @@ from flask import Blueprint, session, jsonify, request
 from app.models import Order, Product, Address, OrderItem
 from app import db
 from app.services.order_service import OrderService
+from app.services.checkout_service import CheckoutService
 
 order_bp = Blueprint("orders", __name__, url_prefix="/orders")
 
@@ -35,4 +36,14 @@ def get_order_details(order_id):
         return jsonify({"success": False, "message": "User not logged in"}), 401
     user_id = user["user_id"]
     response, status = OrderService.get_order_details(user_id, order_id)
+    return jsonify(response), status
+
+@order_bp.route('/checkout', methods=['POST'])
+def checkout():
+    user = session.get('user')
+    if not user:
+        return jsonify({'success': False, 'message': 'User not logged in'}), 401
+    user_id = user['user_id']
+    data = request.get_json()
+    response, status = CheckoutService.checkout(user_id, data)
     return jsonify(response), status
