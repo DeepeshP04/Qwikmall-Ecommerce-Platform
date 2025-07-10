@@ -4,9 +4,6 @@ from flask import jsonify, current_app
 
 class CheckoutService:
     @staticmethod
-    def unauthorized_response():
-        return jsonify({"success": False, "message": "User not logged in"}), 401
-    @staticmethod
     def checkout(user_id, data):
         address_id = data.get("address_id")
         payment_method = data.get("payment_method", "razorpay")

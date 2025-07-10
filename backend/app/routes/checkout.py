@@ -1,13 +1,12 @@
 from flask import Blueprint, request, session
 from app.services.checkout_service import CheckoutService
+from app.utils.helpers import login_required
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 
 @checkout_bp.route('/', methods=['POST'])
+@login_required
 def checkout():
-    user = session.get('user')
-    if not user:
-        return CheckoutService.unauthorized_response()
-    user_id = user['user_id']
+    user_id = session.get('user').get('user_id')
     data = request.get_json()
     return CheckoutService.checkout(user_id, data)
