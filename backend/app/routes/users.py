@@ -18,8 +18,5 @@ def get_my_profile():
 @login_required
 def update_user_profile():
     user_id = session.get("user").get("user_id")
-    user = User.query.get(user_id)
     data = request.get_json()
-    if "role" in data:
-        data.pop("role")
-    return UserService.update_user_profile(user, data)
+    return UserService.update_user_profile(user_id, data)

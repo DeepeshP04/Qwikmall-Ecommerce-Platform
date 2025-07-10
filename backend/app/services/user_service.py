@@ -18,9 +18,12 @@ class UserService:
         return jsonify({"success": True, "data": user_data}), 200
 
     @staticmethod
-    def update_user_profile(user, data):
+    def update_user_profile(user_id, data):
+        user = User.query.get(user_id)
         if not user:
             return jsonify({"success": False, "message": "User does not exist"}), 404
+        if "role" in data:
+            data.pop("role")
         for key, value in data.items():
             setattr(user, key, value)
         db.session.commit()
