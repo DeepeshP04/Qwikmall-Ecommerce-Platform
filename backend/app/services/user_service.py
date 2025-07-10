@@ -1,40 +1,29 @@
 from app.models import User
 from app import db
+from flask import jsonify
 
 class UserService:
     @staticmethod
     def get_user_details_by_id(user_id):
         user = User.query.get(user_id)
         if not user:
-            return None
-        
-        address = Address.query.filter_by(user_id=user_id).first()
-        address_data = {
-            "id": address.id,
-            "address_line_1": address.address_line_1,
-            "address_line_2": address.address_line_2 if address.address_line_2 else None,
-            "city": address.city,
-            "state": address.state,
-            "country": address.country,
-            "pincode": address.pincode,
-        }
-
-        return {
+            return jsonify({"success": False, "message": "User does not exist"}), 404
+        user_data = {
             "id": user.id,
             "username": user.username,
-            "email": user.email if user.email else None,
+            "email": user.email,
             "phone": user.phone,
-            "address": address_data,
+            "role": user.role
         }
+        return jsonify({"success": True, "data": user_data}), 200
 
     @staticmethod
     def update_user_profile(user, data):
-        for field in ["username", "email", "phone"]:
-            if field in data:
-                setattr(user, field, data[field])
-
+        if not user:
+            return jsonify({"success": False, "message": "User does not exist"}), 404
+        for key, value in data.items():
+            setattr(user, key, value)
         db.session.commit()
-
-        return True
+        return jsonify({"success": True, "message": "User profile updated successfully."}), 200
 
         

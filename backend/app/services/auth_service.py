@@ -1,4 +1,4 @@
-from flask import session
+from flask import jsonify, session
 from app.models import User
 from app import db
 from twilio.rest import Client
@@ -94,3 +94,118 @@ class AuthService:
         """Check if user is logged in"""
         user_data = session.get("user")
         return user_data and user_data.get("logged_in") 
+
+    @staticmethod
+    def signup_request_otp(username, mobile):
+        if not username or not mobile:
+            return jsonify({
+                "success": False,
+                "message": "Username and mobile are required."
+            }), 400
+        user = AuthService.get_user_by_mobile(mobile)
+        if user:
+            return jsonify({
+                "success": False,
+                "message": "Mobile number already registered. Try logging in."
+            }), 409
+        if not AuthService.send_otp(mobile):
+            return jsonify({
+                "success": False,
+                "message": "Failed to send OTP. Please try again later."
+            }), 500
+        session["pending_signup"] = {"mobile": mobile, "username": username}
+        return jsonify({
+            "success": True,
+            "message": "OTP sent successfully. Please verify to sign up"
+        }), 200
+
+    @staticmethod
+    def signup_verify_otp(code):
+        if not code:
+            return jsonify({
+                "success": False,
+                "message": "OTP Code is required."
+            }), 400
+        pending = session.get("pending_signup")
+        if not pending:
+            return jsonify({
+                "success": False,
+                "message": "No pending signup found. Please request OTP again."
+            }), 400
+        mobile = pending.get("mobile")
+        if not AuthService.verify_otp(mobile, code):
+            return jsonify({
+                "success": False,
+                "message": "Invalid or expired OTP"
+            }), 422
+        new_user = AuthService.create_user(mobile, pending["username"])
+        session.pop("pending_signup", None)
+        AuthService.login_user(new_user)
+        return jsonify({
+            "success": True,
+            "message": "User signed up successfully."
+        }), 201
+
+    @staticmethod
+    def login_request_otp(mobile):
+        if not mobile:
+            return jsonify({
+                "success": False,
+                "message": "Mobile number is required."
+            }), 400
+        user = AuthService.get_user_by_mobile(mobile)
+        if not user:
+            return jsonify({
+                "success": False,
+                "message": "Mobile number not registered. Please sign up."
+            }), 404
+        if not AuthService.send_otp(mobile):
+            return jsonify({
+                "success": False,
+                "message": "Failed to send OTP. Please try again later."
+            }), 500
+        session["pending_login"] = {"mobile": mobile}
+        return jsonify({
+            "success": True,
+            "message": "OTP sent successfully. Please verify to login"
+        }), 200
+
+    @staticmethod
+    def login_verify_otp(code):
+        if not code:
+            return jsonify({
+                "success": False,
+                "message": "OTP code is required."
+            }), 400
+        pending = session.get("pending_login")
+        if not pending:
+            return jsonify({
+                "success": False,
+                "message": "No pending login found. Please request OTP again."
+            }), 400
+        mobile = pending.get("mobile")
+        if not AuthService.verify_otp(mobile, code):
+            return jsonify({
+                "success": False,
+                "message": "Invalid or expired otp"
+            }), 422
+        session.pop("pending_login", None)
+        user = AuthService.get_user_by_mobile(mobile)
+        AuthService.login_user(user)
+        return jsonify({
+            "success": True,
+            "message": "Logged in successfully."
+        }), 200
+
+    @staticmethod
+    def logout():
+        if not AuthService.is_user_logged_in():
+            return jsonify({
+                "success": False,
+                "message": "No user logged in."
+            }), 401
+        AuthService.logout_user()
+        return jsonify({
+            "success": True,
+            "message": "Logged out successfully."
+        }), 200 

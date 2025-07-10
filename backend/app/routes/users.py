@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request, session
 from app.models import User
 from app import db
 from app.services.user_service import UserService
@@ -11,11 +11,7 @@ user_bp = Blueprint("users", __name__, url_prefix="/users")
 @login_required
 def get_my_profile():
     user_id = session.get("user").get("user_id")
-    user_data = UserService.get_user_details_by_id(user_id)
-    if not user_data:
-        return jsonify({"success": False, "message": "User does not exist"}), 404
-    
-    return jsonify({"success": True, "data": user_data}), 200
+    return UserService.get_user_details_by_id(user_id)
 
 # Update user profile
 @user_bp.route("/me", methods=["PATCH"])
@@ -23,12 +19,7 @@ def get_my_profile():
 def update_user_profile():
     user_id = session.get("user").get("user_id")
     user = User.query.get(user_id)
-    if not user:
-        return jsonify({"success": False, "message": "User does not exist"}), 404
-    
     data = request.get_json()
     if "role" in data:
         data.pop("role")
-
-    UserService.update_user_profile(user, data)
-    return jsonify({"success": True, "message": "User profile updated successfully."}), 200
+    return UserService.update_user_profile(user, data)

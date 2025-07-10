@@ -1,21 +1,24 @@
 import razorpay
 from app.models import Product, Cart, CartItem, Order, OrderItem, Address, db
-from flask import current_app
+from flask import jsonify, current_app
 
 class CheckoutService:
+    @staticmethod
+    def unauthorized_response():
+        return jsonify({"success": False, "message": "User not logged in"}), 401
     @staticmethod
     def checkout(user_id, data):
         address_id = data.get("address_id")
         payment_method = data.get("payment_method", "razorpay")
         address = Address.query.filter_by(id=address_id, user_id=user_id).first()
         if not address:
-            return {"success": False, "message": "Invalid address."}, 400
+            return jsonify({"success": False, "message": "Invalid address."}), 400
 
         # Buy Now flow
         if data.get("product_id"):
             product = Product.query.get(data["product_id"])
             if not product:
-                return {"success": False, "message": "Product not found."}, 404
+                return jsonify({"success": False, "message": "Product not found."}), 404
             quantity = data.get("quantity", 1)
             total_price = float(product.price) * quantity
             order_items = [OrderItem(product_id=product.id, quantity=quantity, price=product.price, total_price=total_price)]
@@ -23,7 +26,7 @@ class CheckoutService:
             # Cart flow
             cart = Cart.query.filter_by(user_id=user_id).first()
             if not cart or not cart.cart_items:
-                return {"success": False, "message": "Cart is empty."}, 400
+                return jsonify({"success": False, "message": "Cart is empty."}), 400
             order_items = []
             total_price = 0
             for item in cart.cart_items:
@@ -49,10 +52,10 @@ class CheckoutService:
             "notes": {"order_id": new_order.id}
         })
         # Save razorpay_order['id'] in your order if needed
-        return {
+        return jsonify({
             "order_id": new_order.id,
             "payment_provider": "razorpay",
             "payment_order_id": razorpay_order["id"],
             "amount": int(total_price * 100),
             "currency": "INR"
-        }, 200 
+        }), 200 

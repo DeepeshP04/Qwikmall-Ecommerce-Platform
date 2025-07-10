@@ -1,4 +1,5 @@
-from flask import Blueprint
+from flask import Blueprint, request, session
+from app.services.checkout_service import CheckoutService
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 
@@ -6,8 +7,7 @@ checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 def checkout():
     user = session.get('user')
     if not user:
-        return jsonify({'success': False, 'message': 'User not logged in'}), 401
+        return CheckoutService.unauthorized_response()
     user_id = user['user_id']
     data = request.get_json()
-    response, status = CheckoutService.checkout(user_id, data)
-    return jsonify(response), status
+    return CheckoutService.checkout(user_id, data)

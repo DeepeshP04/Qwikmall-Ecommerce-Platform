@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, request, session
 from app import db
 from app.models import Cart, User, Product, CartItem
 from app.services.cart_service import CartService
@@ -11,10 +11,7 @@ cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 @login_required
 def get_my_cart():
     user_id = session["user"]["user_id"]
-    # Only allow user to access their own cart
-    # (If admin access to others' carts is needed, add logic here)
-    success, response, status = CartService.get_user_cart(user_id)
-    return jsonify(response), status
+    return CartService.get_user_cart(user_id)
 
 # Add an item to the cart
 @cart_bp.route("/items", methods=["POST"])
@@ -24,8 +21,7 @@ def add_cart_item():
     product_id = data.get("product_id")
     quantity = data.get("quantity", 1)
     user_id = session["user"]["user_id"]
-    success, response, status = CartService.add_or_update_cart_item(user_id, product_id, quantity)
-    return jsonify(response), status
+    return CartService.add_or_update_cart_item(user_id, product_id, quantity)
 
 # Update cart items
 @cart_bp.route("/items/<int:item_id>", methods=["PATCH"])
@@ -34,14 +30,11 @@ def update_cart_item(item_id):
     data = request.get_json()
     quantity = data.get("quantity")
     user_id = session["user"]["user_id"]
-    
-    success, response, status = CartService.update_cart_item_quantity(user_id, item_id, quantity)
-    return jsonify(response), status
+    return CartService.update_cart_item_quantity(user_id, item_id, quantity)
 
 # Delete cart item
 @cart_bp.route("/items/<int:item_id>", methods=["DELETE"])
 @login_required
 def delete_cart_item(item_id):
     user_id = session["user"]["user_id"]
-    success, response, status = CartService.delete_cart_item(user_id, item_id)
-    return jsonify(response), status
+    return CartService.delete_cart_item(user_id, item_id)
