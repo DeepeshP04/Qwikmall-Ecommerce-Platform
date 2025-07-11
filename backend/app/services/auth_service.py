@@ -82,20 +82,6 @@ class AuthService:
     def logout_user():
         """Clear user session"""
         session.pop("user", None)
-    
-    @staticmethod
-    def get_current_user():
-        """Get current logged in user"""
-        user_data = session.get("user")
-        if user_data and user_data.get("logged_in"):
-            return User.query.get(user_data["user_id"])
-        return None
-    
-    @staticmethod
-    def is_user_logged_in():
-        """Check if user is logged in"""
-        user_data = session.get("user")
-        return user_data and user_data.get("logged_in") 
 
     @staticmethod
     def signup_request_otp(username, mobile):
@@ -209,13 +195,10 @@ class AuthService:
 
     @staticmethod
     def logout():
-        if not AuthService.is_user_logged_in():
-            return jsonify({
-                "success": False,
-                "message": "No user logged in."
-            }), 401
         AuthService.logout_user()
-        return jsonify({
+        response = jsonify({
             "success": True,
             "message": "Logged out successfully."
-        }), 200 
+        })
+        response.set_cookie('session', '', expires=0)
+        return response, 200

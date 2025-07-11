@@ -1,5 +1,6 @@
 from flask import Blueprint, request, session
 from app.services.auth_service import AuthService
+from app.utils.helpers import login_required
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -32,5 +33,6 @@ def login_verify_otp():
 
 # Logout
 @auth_bp.route("/logout", methods=["POST"])
+@login_required
 def logout():
     return AuthService.logout()

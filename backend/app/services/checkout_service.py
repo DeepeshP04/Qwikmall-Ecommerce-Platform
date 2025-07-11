@@ -1,5 +1,6 @@
 import razorpay
-from app.models import Product, Cart, CartItem, Order, OrderItem, Address, db
+from app.models import Product, Cart, CartItem, Order, OrderItem, Address
+from app import db
 from flask import jsonify, current_app
 
 class CheckoutService:

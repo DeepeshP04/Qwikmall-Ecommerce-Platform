@@ -1,5 +1,6 @@
 from flask import jsonify
-from app.models import Order, Product, Address, OrderItem, db
+from app.models import Order, Product, Address, OrderItem
+from app import db
 
 class OrderService:
     @staticmethod
@@ -8,7 +9,7 @@ class OrderService:
             return {"success": False, "message": "No items provided."}, 400
         address = Address.query.filter_by(user_id=user_id).first()
         if not address:
-            return {"success": False, "message": "No address found for user."}, 400
+            return {"success": False, "message": "No address found for user."}, 404
         order_items = []
         total_price = 0
         for item in items:
@@ -42,11 +43,11 @@ class OrderService:
         orders = Order.query.filter_by(user_id=user_id).all()
         if not orders:
             return {"success": False, "message": "No orders found."}, 404
-        return {"success": True, "orders": [order.to_dict() for order in orders]}, 200
+        return {"success": True, "data": [order.to_dict() for order in orders]}, 200
 
     @staticmethod
     def get_order_details(user_id, order_id):
         order = Order.query.filter_by(user_id=user_id, id=order_id).first()
         if not order:
             return {"success": False, "message": "Order not found."}, 404
-        return {"success": True, "order": order.to_dict()}, 200 
+        return {"success": True, "data": order.to_dict()}, 200 

@@ -7,14 +7,14 @@ from app.utils.helpers import login_required
 cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 
 # Get current user's cart
-@cart_bp.route("", methods=["GET"])
+@cart_bp.route("/", methods=["GET"], strict_slashes=False)
 @login_required
 def get_my_cart():
     user_id = session["user"]["user_id"]
     return CartService.get_user_cart(user_id)
 
 # Add an item to the cart
-@cart_bp.route("/items", methods=["POST"])
+@cart_bp.route("/items", methods=["POST"], strict_slashes=False)
 @login_required
 def add_cart_item():
     data = request.get_json()
@@ -24,7 +24,7 @@ def add_cart_item():
     return CartService.add_or_update_cart_item(user_id, product_id, quantity)
 
 # Update cart items
-@cart_bp.route("/items/<int:item_id>", methods=["PATCH"])
+@cart_bp.route("/items/<int:item_id>", methods=["PATCH"], strict_slashes=False)
 @login_required
 def update_cart_item(item_id):
     data = request.get_json()
@@ -33,7 +33,7 @@ def update_cart_item(item_id):
     return CartService.update_cart_item_quantity(user_id, item_id, quantity)
 
 # Delete cart item
-@cart_bp.route("/items/<int:item_id>", methods=["DELETE"])
+@cart_bp.route("/items/<int:item_id>", methods=["DELETE"], strict_slashes=False)
 @login_required
 def delete_cart_item(item_id):
     user_id = session["user"]["user_id"]

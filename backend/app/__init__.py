@@ -37,6 +37,7 @@ def create_app():
     from app.routes.users import user_bp
     from app.routes.payments import payment_bp
     from app.routes.checkout import checkout_bp
+    from app.routes.admin import admin_bp
     from .views import views
 
     # register blueprints
@@ -47,6 +48,7 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(payment_bp)
     app.register_blueprint(checkout_bp)
+    app.register_blueprint(admin_bp)
     app.register_blueprint(views)
     
     from .models import Product, User, Category, Order, OrderItem, Cart, CartItem, Payment, ProductImage, Review, ProductAttribute, ProductAttributeValue, Address

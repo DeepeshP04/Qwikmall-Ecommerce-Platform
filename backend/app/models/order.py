@@ -16,7 +16,7 @@ class Order(db.Model):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "order_date": self.order_date,
+            "order_date": self.created_at,
             "total_price": self.total_price,
             "address_id": self.address_id,
             "status": self.status,
@@ -33,9 +33,7 @@ class OrderItem(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "order_id": self.order_id,
             "product_id": self.product_id,
             "quantity": self.quantity,
-            "price": self.price,
-            "total_price": self.total_price
+            "price": self.price
         }

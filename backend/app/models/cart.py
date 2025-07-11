@@ -8,9 +8,6 @@ class Cart(db.Model):
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
     cart_items = db.relationship('CartItem', backref='cart', lazy=True)
     
-    def update_total_price(self):
-        self.total_price = sum(item.total_price for item in self.cart_items)
-    
     def to_dict(self):
         return {
             "id": self.id,
@@ -26,13 +23,4 @@ class CartItem(db.Model):
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "quantity": self.quantity,
-            "price": self.price,
-            "total_price": self.total_price,
-            "name": self.product.name,
-            "img": self.product.image
-        }
+    product = db.relationship('Product', lazy=True)

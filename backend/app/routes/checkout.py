@@ -4,7 +4,7 @@ from app.utils.helpers import login_required
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 
-@checkout_bp.route('/', methods=['POST'])
+@checkout_bp.route('/', methods=['POST'], strict_slashes=False)
 @login_required
 def checkout():
     user_id = session.get('user').get('user_id')

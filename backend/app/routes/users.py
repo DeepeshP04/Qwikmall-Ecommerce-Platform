@@ -7,14 +7,14 @@ from app.utils.helpers import login_required
 user_bp = Blueprint("users", __name__, url_prefix="/users")
 
 # Get a user's profile
-@user_bp.route("/me", methods=["GET"])
+@user_bp.route("/me", methods=["GET"], strict_slashes=False)
 @login_required
 def get_my_profile():
     user_id = session.get("user").get("user_id")
     return UserService.get_user_details_by_id(user_id)
 
 # Update user profile
-@user_bp.route("/me", methods=["PATCH"])
+@user_bp.route("/me", methods=["PATCH"], strict_slashes=False)
 @login_required
 def update_user_profile():
     user_id = session.get("user").get("user_id")
