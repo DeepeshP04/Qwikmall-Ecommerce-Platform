@@ -1,84 +1,66 @@
 .product-grid {
     width: 100%;
     display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    padding: 20px;
+    gap: 16px;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 16px;
 }
 
-/* Responsive Grid Layout */
+/* Responsive Grid Layout - Ensuring 5 products per row when possible */
 @media (min-width: 1400px) {
     .product-grid {
         grid-template-columns: repeat(5, 1fr);
-        gap: 24px;
+        gap: 20px;
+        padding: 20px;
     }
 }
 
 @media (min-width: 1200px) and (max-width: 1399px) {
     .product-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 22px;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 18px;
+        padding: 18px;
     }
 }
 
 @media (min-width: 992px) and (max-width: 1199px) {
     .product-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        padding: 16px;
     }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
     .product-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-        padding: 16px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        padding: 14px;
     }
 }
 
 @media (min-width: 576px) and (max-width: 767px) {
     .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        padding: 14px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        padding: 12px;
     }
 }
 
 @media (max-width: 575px) {
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        padding: 12px;
+        gap: 10px;
+        padding: 10px;
     }
 }
 
 @media (max-width: 400px) {
     .product-grid {
         grid-template-columns: repeat(1, 1fr);
-        gap: 10px;
-        padding: 10px;
+        gap: 8px;
+        padding: 8px;
     }
-}
-
-/* Loading State */
-.product-grid.loading {
-    opacity: 0.7;
-}
-
-/* Empty State */
-.product-grid.empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    text-align: center;
-    color: #666;
-}
-
-.product-grid.empty::before {
-    content: "No products found";
-    font-size: 16px;
-    font-weight: 500;
 }
 
 /* Animation for grid items */
@@ -96,13 +78,3 @@
         transform: translateY(0);
     }
 }
-
-/* Stagger animation for grid items */
-.product-grid > *:nth-child(1) { animation-delay: 0.1s; }
-.product-grid > *:nth-child(2) { animation-delay: 0.2s; }
-.product-grid > *:nth-child(3) { animation-delay: 0.3s; }
-.product-grid > *:nth-child(4) { animation-delay: 0.4s; }
-.product-grid > *:nth-child(5) { animation-delay: 0.5s; }
-.product-grid > *:nth-child(6) { animation-delay: 0.6s; }
-.product-grid > *:nth-child(7) { animation-delay: 0.7s; }
-.product-grid > *:nth-child(8) { animation-delay: 0.8s; }
