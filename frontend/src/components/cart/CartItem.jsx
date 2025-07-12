@@ -1,24 +1,39 @@
 import './CartItem.css'
 
 function CartItem ({cartItem}) {
+    const calculateItemTotal = () => {
+        const price = cartItem.product.price || 0;
+        const quantity = cartItem.quantity || 1;
+        return (price * quantity).toFixed(2);
+    };
+
     return (
         <div className="cart-item-container">
             <div className="item-img-space">
-                <img src={cartItem.img} alt={cartItem.name}></img>
+                <img src={cartItem.product.img_url} alt={cartItem.product.name} />
             </div>
             <div className='item-content-space'>
                 <div className="item-details-space">
-                    <h3 className="item-name">{cartItem.name}</h3>
-                    <p className="item-price">{cartItem.price}</p>
+                    <h3 className="item-name">{cartItem.product.name}</h3>
+                    <p className="item-price">₹{cartItem.product.price}</p>
                 </div>
                 <div className='item-action-space'>
                     <div className='quantity-control'>
-                        <button className='quantity-update-btn'>-</button>
-                        <input className='quantity-input' type='number' value={cartItem.quantity} readOnly />
-                        <button className='quantity-update-btn'>+</button>
+                        <button className='quantity-update-btn' title="Decrease quantity">-</button>
+                        <input 
+                            className='quantity-input' 
+                            type='number' 
+                            value={cartItem.quantity} 
+                            readOnly 
+                            min="1"
+                        />
+                        <button className='quantity-update-btn' title="Increase quantity">+</button>
                     </div>
                     <div className='remove-btn-container'>
-                        <button className="item-remove-btn">Remove</button>
+                        <button className="item-remove-btn" title="Remove item">Remove</button>
+                    </div>
+                    <div className="item-total">
+                        Total: ₹{calculateItemTotal()}
                     </div>
                 </div>
             </div>

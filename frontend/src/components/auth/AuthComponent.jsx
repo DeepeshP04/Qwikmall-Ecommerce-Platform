@@ -28,13 +28,13 @@ function AuthComponent({ isLogin }) {
                     setError("")
 
                     const fullPhone = "+91" + phone
-                    fetch('http://localhost:5000/auth/login/send-code', {
+                    fetch('http://localhost:5000/auth/login/request-otp', {
                         method: "POST",
                         headers: {
                             "Content-type": "application/json"
                         },
                         body: JSON.stringify(
-                            {phone: fullPhone}
+                            {mobile: fullPhone}
                         ),
                         credentials: "include"
                     })
@@ -53,7 +53,7 @@ function AuthComponent({ isLogin }) {
                     return
                 } else {
                     setError("")
-                    fetch("http://localhost:5000/auth/login/verify-code", {
+                    fetch("http://localhost:5000/auth/login/verify-otp", {
                         method: "POST", 
                         headers: {
                             "Content-type": "application/json"
@@ -86,13 +86,13 @@ function AuthComponent({ isLogin }) {
                     setError("")
 
                     const fullPhone = "+91" + phone
-                    fetch("http://localhost:5000/auth/signup/send-code", {
+                    fetch("http://localhost:5000/auth/signup/request-otp", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify(
-                            {username: username, phone: fullPhone}
+                            {username: username, mobile: fullPhone}
                         ),
                         credentials: "include"
                     })
@@ -114,7 +114,7 @@ function AuthComponent({ isLogin }) {
                 } else {
                     setError("")
 
-                    fetch("http://localhost:5000/auth/signup/verify-code", {
+                    fetch("http://localhost:5000/auth/signup/verify-otp", {
                         method: "POST", 
                         headers: {
                             "Content-type": "application/json"
