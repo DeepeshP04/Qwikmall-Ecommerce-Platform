@@ -11,6 +11,7 @@ class User(db.Model):
     addresses = db.relationship('Address', backref='user', lazy=True)
     orders = db.relationship('Order', backref='user', lazy=True)
     cart = db.relationship('Cart', backref='user', lazy=True)
+    reviews = db.relationship('Review', backref='user', lazy=True)
     
     def to_dict(self):
         return {

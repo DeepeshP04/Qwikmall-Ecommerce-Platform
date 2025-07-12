@@ -6,20 +6,20 @@ import { useEffect, useState } from "react";
 import Loader from "../components/Loader/loader";
 
 function CategoryProductsPage () {
-    const {categoryId} = useParams()
+    const {categoryName} = useParams()
     const [categoryProducts, setCategoryProducts] = useState({category_name: "", products: []})
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         setIsLoading(true)
-        fetch(`http://localhost:5000/products/category/${categoryId}`)
+        fetch(`http://localhost:5000/products/category/${categoryName}`)
         .then(res => res.json())
         .then(data => {
-            setCategoryProducts(data)
+            setCategoryProducts(data.data)
             setIsLoading(false)
         })
         .catch(err => console.log("Failed to fetch products", err))
-    }, [categoryId])
+    }, [categoryName])
 
     return (
         <>
