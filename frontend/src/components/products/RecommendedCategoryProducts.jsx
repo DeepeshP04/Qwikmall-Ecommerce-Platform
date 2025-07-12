@@ -16,6 +16,7 @@ function RecommendedCategoryProducts () {
         .then(res => res.json())
         .then(data => {
             setCategoryProducts(data.data)
+            console.log(data.data)
             setIsLoading(false)
         })
         .catch(err => console.log("Failed to fetch data", err))
