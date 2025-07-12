@@ -12,10 +12,10 @@ function RecommendedCategoryProducts () {
 
     useEffect(() => {
         setIsLoading(true)
-        fetch("http://localhost:5000/products/recommended-products")
+        fetch("http://localhost:5000/products/recommended")
         .then(res => res.json())
         .then(data => {
-            setCategoryProducts(data.categories)
+            setCategoryProducts(data.data)
             setIsLoading(false)
         })
         .catch(err => console.log("Failed to fetch data", err))
