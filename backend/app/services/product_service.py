@@ -28,7 +28,7 @@ class ProductService:
                     overall_rating = ProductService.calculate_overall_rating(product.id)
                     
                     product_data = {
-                        "product_id": product.id,
+                        "id": product.id,
                         "name": product.name,
                         "price": float(product.price),
                         "img_url": primary_image.image_url if primary_image else None,
