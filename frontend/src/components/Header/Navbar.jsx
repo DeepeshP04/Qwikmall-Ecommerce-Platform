@@ -70,7 +70,9 @@ function Navbar (){
                     onBlur={() => setAccountDropdownOpen(false)}
                 >
                     <FontAwesomeIcon icon={faUser} />
-                    <span className="account-label">{isLoggedIn ? 'Account' : 'Login'}</span>
+                    <Link to={isLoggedIn ? "/account" : "/login"} className="account-label">
+                        {isLoggedIn ? 'Account' : 'Login'}
+                    </Link>
                     <span
                         className={`arrow ${accountDropdownOpen ? 'open' : ''}`}
                         onClick={() => setAccountDropdownOpen((open) => !open)}
@@ -115,7 +117,9 @@ function Navbar (){
                     onBlur={() => setAccountDropdownOpen(false)}
                 >
                     <FontAwesomeIcon icon={faUser} />
-                    <span className="account-label">{isLoggedIn ? 'Account' : 'Login'}</span>
+                    <Link to={isLoggedIn ? "/account" : "/login"} className="account-label">
+                        {isLoggedIn ? 'Account' : 'Login'}
+                    </Link>
                     <span className={`arrow ${accountDropdownOpen ? 'open' : ''}`}> <FontAwesomeIcon icon={faAngleDown} /> </span>
                     {accountDropdownOpen && (
                         <div className="account-dropdown-menu">
