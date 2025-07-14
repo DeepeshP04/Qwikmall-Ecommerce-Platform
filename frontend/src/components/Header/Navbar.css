@@ -1,12 +1,12 @@
 .navbar {
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 60px;
-    background-color: #2C3E50;
-    padding: 10px;
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    font-family: 'Inter', 'Roboto', 'Segoe UI', Arial, sans-serif;
+    height: 68px;
+    padding: 0 1.5rem;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.08);
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: flex-start;
     color: #FFFFFF;
     position: fixed;
     top: 0;
@@ -14,37 +14,47 @@
     width: 100%;
     z-index: 1000;
     transition: background 0.3s, box-shadow 0.3s;
-    background: #2C3E50;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .navbar--scrolled {
-    background: rgba(44, 62, 80, 0.7);
+    background: rgba(30, 60, 114, 0.7);
     backdrop-filter: blur(8px);
     box-shadow: none;
 }
 
 .navbar--scrolled:hover, .navbar--scrolled:focus-within {
-    background: #2C3E50;
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
     backdrop-filter: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-/* Add top padding to main content to prevent it from being hidden behind navbar */
-body, #root, .app-main-content {
-    padding-top: 70px;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.08);
 }
 
 .brand-space {
-    font-size: 30px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-weight: 300;
+    font-size: 2rem;
+    font-family: 'Inter', 'Roboto', 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
     cursor: pointer;
+    letter-spacing: 1px;
+    margin-right: 2.5rem;
+    margin-left: 1.5rem;
 }
 
 .brand {
     text-decoration: none;
-    color: #00ffbbc7;
+    color: #00C9A7;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    text-transform: none;
+    transition: color 0.2s;
+    padding: 0 8px;
+    line-height: 1.2;
+    background: none;
+}
+.brand:hover, .brand:focus {
+    color: #1de9b6;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .search-bar {
@@ -55,6 +65,7 @@ body, #root, .app-main-content {
     justify-content: space-between;
     border-radius: 10px;
     background-color: #FFFFFF;
+    font-family: inherit;
 }
 
 .search-bar input {
@@ -65,7 +76,8 @@ body, #root, .app-main-content {
     background: none;
     outline: none;
     margin-left: 20px;
-    font-size: medium;
+    font-size: 1rem;
+    font-family: inherit;
 }
 
 .search-bar button {
@@ -74,57 +86,67 @@ body, #root, .app-main-content {
     border: none;
     outline: none;
     border-radius: 0 10px 10px 0;
-    font-size: large;
+    font-size: 1.2rem;
     cursor: pointer;
+    background: #00C9A7;
+    color: #fff;
+    transition: background 0.2s;
+}
+.search-bar button:hover {
+    background: #00b89c;
 }
 
 .nav-actions {
-    width: 25%;
+    flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    gap: 20px;
+    justify-content: space-evenly;
+    gap: 24px;
+    margin-left: 2.5rem;
 }
 
-.login-space {
+.login-space, .cart-space, .seller-space {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    padding: 5px;
-    gap: 5px;
+    padding: 5px 10px;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
 }
 
-.login {
-    color: white;
+.login-space:hover, .cart-space:hover, .seller-space:hover {
+    background: rgba(255,255,255,0.08);
+    color: #00C9A7;
+}
+
+.login, .cart {
+    color: #fff;
     text-decoration: none;
-}
-
-.login-space:hover {
-    background-color: #0bdafa;
-}
-
-.cart-space {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 5px;
-    gap: 5px;
-}
-
-.cart {
-    color: white;
-    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: color 0.2s;
 }
 
 .seller-space {
+    background: none;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 6px;
+    margin-left: 1.5rem;
+    padding: 10px 22px;
+    min-width: 150px;
+    font-size: 1.1rem;
+    white-space: nowrap;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    cursor: pointer;
-    padding: 5px;
-    gap: 5px;
+    justify-content: center;
+    transition: color 0.2s;
+}
+.seller-space:hover {
+    color: #00C9A7;
 }
 
 .nav-actions-toggle {
@@ -166,13 +188,13 @@ body, #root, .app-main-content {
     right: 0;
     background: #fff;
     color: #2C3E50;
-    min-width: 140px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    min-width: 160px;
+    box-shadow: 0 4px 16px rgba(30,60,114,0.12);
     border-radius: 8px;
     z-index: 100;
     display: flex;
     flex-direction: column;
-    padding: 6px 0;
+    padding: 8px 0;
     animation: fadeIn 0.2s;
 }
 @keyframes fadeIn {
@@ -183,20 +205,33 @@ body, #root, .app-main-content {
     background: none;
     border: none;
     color: #2C3E50;
-    padding: 10px 18px;
+    padding: 12px 20px;
     text-align: left;
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
     border-radius: 0;
+    font-family: inherit;
 }
 .dropdown-item:hover, .dropdown-item:focus {
-    background: #f0f4f8;
-    color: #007bff;
+    background: #00C9A7;
+    color: #fff;
 }
 .account-dropdown-menu button {
     width: 100%;
     outline: none;
+}
+
+/* Cart badge (if used) */
+.cart-badge {
+    background: #FF6F61;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 50%;
+    padding: 2px 7px;
+    margin-left: 4px;
+    vertical-align: top;
 }
 
 @media (max-width: 850px){
