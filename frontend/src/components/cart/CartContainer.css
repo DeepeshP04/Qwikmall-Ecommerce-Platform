@@ -11,6 +11,23 @@
     background-color: #f8f9fa;
 }
 
+.cart-container.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 120px);
+}
+
+/* Optionally, center .cart-items for these states as well */
+.cart-items.centered {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Responsive breakpoints */
 @media (max-width: 768px) {
     .cart-container {

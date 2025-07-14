@@ -1,6 +1,7 @@
 import CartItemList from "./CartItemList";
 import './CartContainer.css'
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from '../../App';
 
 function CartContainer () {
     const [cart, setCart] = useState({
@@ -9,9 +10,14 @@ function CartContainer () {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { isLoggedIn } = useContext(AuthContext);
 
     useEffect(() => {
-        fetchCartItems();
+        if (isLoggedIn) {
+            fetchCartItems();
+        } else {
+            setLoading(false);
+        }
     }, []);
 
     const fetchCartItems = async () => {
@@ -63,6 +69,27 @@ function CartContainer () {
         }
     };
 
+    // Remove cart item handler
+    const removeCartItem = async (cartItemId) => {
+        // Optimistically update UI
+        setCart(prevCart => {
+            const updatedItems = (prevCart.items || prevCart.cart_items).filter(item => item.item_id !== cartItemId);
+            return { ...prevCart, items: updatedItems, cart_items: updatedItems };
+        });
+        // Send DELETE to backend
+        try {
+            await fetch(`http://localhost:5000/cart/items/${cartItemId}/`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+            // Optionally, re-fetch cart to sync totals
+            fetchCartItems();
+        } catch (err) {
+            // Optionally, show error and revert UI
+            console.error('Failed to remove cart item', err);
+        }
+    };
+
     const calculateTotal = () => {
         const subtotal = cart.total_price || 0;
         const shipping = 40;
@@ -71,8 +98,8 @@ function CartContainer () {
 
     if (loading) {
         return (
-            <div className="cart-container">
-                <div className="cart-items">
+            <div className="cart-container centered">
+                <div className="cart-items centered">
                     <div className="cart-loading">
                         <div className="loading-spinner"></div>
                     </div>
@@ -88,10 +115,9 @@ function CartContainer () {
 
     if (error) {
         return (
-            <div className="cart-container">
-                <div className="cart-items">
+            <div className="cart-container centered">
+                <div className="cart-items centered">
                     <div className="cart-empty">
-                        <div className="cart-empty-icon">⚠️</div>
                         <h3>Error Loading Cart</h3>
                         <p>{error}</p>
                         <button 
@@ -100,6 +126,21 @@ function CartContainer () {
                         >
                             Try Again
                         </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!isLoggedIn) {
+        return (
+            <div className="cart-container centered">
+                <div className="cart-items centered">
+                    <div className="cart-empty">
+                        <div className="cart-empty-icon">🔒</div>
+                        <h3>Please log in to view your cart</h3>
+                        <p>You need to be logged in to access your shopping cart.</p>
+                        <a href="/login" className="continue-shopping-btn">Login</a>
                     </div>
                 </div>
             </div>
@@ -121,7 +162,7 @@ function CartContainer () {
                         </a>
                     </div>
                 ) : (
-                    <CartItemList cartItems={cart.items} onUpdateQuantity={updateCartItemQuantity} />
+                    <CartItemList cartItems={cart.items} onUpdateQuantity={updateCartItemQuantity} onRemoveItem={removeCartItem} />
                 )}
             </div>
             {!isCartEmpty && (

@@ -1,7 +1,7 @@
 import './CartItem.css'
 import { useState } from 'react';
 
-function CartItem ({cartItem, onUpdateQuantity}) {
+function CartItem ({cartItem, onUpdateQuantity, onRemoveItem}) {
     const [quantity, setQuantity] = useState(cartItem.quantity || 1);
 
     const handleDecrease = () => {
@@ -44,7 +44,7 @@ function CartItem ({cartItem, onUpdateQuantity}) {
                         <button className='quantity-update-btn' title="Increase quantity" onClick={handleIncrease}>+</button>
                     </div>
                     <div className='remove-btn-container'>
-                        <button className="item-remove-btn" title="Remove item">Remove</button>
+                        <button className="item-remove-btn" title="Remove item" onClick={() => onRemoveItem(cartItem.item_id)}>Remove</button>
                     </div>
                     <div className="item-total item-total-small">
                         ₹{calculateItemTotal()}

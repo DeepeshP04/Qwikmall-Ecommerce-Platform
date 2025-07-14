@@ -1,7 +1,7 @@
 import CartItem from "./CartItem";
 import './CartItemList.css'
 
-function CartItemList ({cartItems, onUpdateQuantity}) {
+function CartItemList ({cartItems, onUpdateQuantity, onRemoveItem}) {
     return (
         <div className="container">
             <div className="cart-header">
@@ -11,7 +11,7 @@ function CartItemList ({cartItems, onUpdateQuantity}) {
                 </p>
             </div>
             {cartItems.map(cartItem => (
-                <CartItem key={cartItem.item_id} cartItem={cartItem} onUpdateQuantity={onUpdateQuantity} />
+                <CartItem key={cartItem.item_id} cartItem={cartItem} onUpdateQuantity={onUpdateQuantity} onRemoveItem={onRemoveItem} />
             ))}
         </div>
     )
