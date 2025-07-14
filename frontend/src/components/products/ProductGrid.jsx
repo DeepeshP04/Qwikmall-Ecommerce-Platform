@@ -9,7 +9,7 @@ function ProductGrid ({ products }) {
     return (
         <div className="product-grid">
             {products.map(product => (
-                <ProductCard key={product.id} product={product}></ProductCard>
+                <ProductCard key={product.product_id} product={product}></ProductCard>
             ))}
         </div>
     )
