@@ -14,6 +14,7 @@ function Navbar (){
     const { isLoggedIn } = useContext(AuthContext)
     const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
     const accountRef = useRef(null);
+    const [scrolled, setScrolled] = useState(false);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -41,9 +42,17 @@ function Navbar (){
         window.addEventListener("resize", handleResize)
     }, [])
 
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 40);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     return (
         <>
-        <div className="navbar">
+        <div className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}>
             <div className="brand-space">
                 <a href="/" className='brand'>Qwikmall</a>
             </div>

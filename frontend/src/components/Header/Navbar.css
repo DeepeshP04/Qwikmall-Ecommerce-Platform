@@ -8,6 +8,31 @@
     align-items: center;
     justify-content: space-around;
     color: #FFFFFF;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    transition: background 0.3s, box-shadow 0.3s;
+    background: #2C3E50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.navbar--scrolled {
+    background: rgba(44, 62, 80, 0.7);
+    backdrop-filter: blur(8px);
+    box-shadow: none;
+}
+
+.navbar--scrolled:hover, .navbar--scrolled:focus-within {
+    background: #2C3E50;
+    backdrop-filter: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Add top padding to main content to prevent it from being hidden behind navbar */
+body, #root, .app-main-content {
+    padding-top: 70px;
 }
 
 .brand-space {
