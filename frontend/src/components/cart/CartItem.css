@@ -229,6 +229,12 @@
     }
 }
 
+.item-total-small {
+    font-size: 0.95rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
 /* Loading skeleton for cart items */
 .cart-item-skeleton {
     width: 100%;

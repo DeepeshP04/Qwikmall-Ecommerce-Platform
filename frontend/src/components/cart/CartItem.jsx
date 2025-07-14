@@ -1,9 +1,23 @@
 import './CartItem.css'
+import { useState } from 'react';
 
-function CartItem ({cartItem}) {
+function CartItem ({cartItem, onUpdateQuantity}) {
+    const [quantity, setQuantity] = useState(cartItem.quantity || 1);
+
+    const handleDecrease = () => {
+        if (quantity > 1) {
+            const newQty = quantity - 1;
+            setQuantity(newQty);
+            onUpdateQuantity(cartItem.item_id, newQty);
+        }
+    };
+    const handleIncrease = () => {
+        const newQty = quantity + 1;
+        setQuantity(newQty);
+        onUpdateQuantity(cartItem.item_id, newQty);
+    };
     const calculateItemTotal = () => {
         const price = cartItem.product.price || 0;
-        const quantity = cartItem.quantity || 1;
         return (price * quantity).toFixed(2);
     };
 
@@ -19,21 +33,21 @@ function CartItem ({cartItem}) {
                 </div>
                 <div className='item-action-space'>
                     <div className='quantity-control'>
-                        <button className='quantity-update-btn' title="Decrease quantity">-</button>
+                        <button className='quantity-update-btn' title="Decrease quantity" onClick={handleDecrease}>-</button>
                         <input 
                             className='quantity-input' 
                             type='number' 
-                            value={cartItem.quantity} 
+                            value={quantity} 
                             readOnly 
                             min="1"
                         />
-                        <button className='quantity-update-btn' title="Increase quantity">+</button>
+                        <button className='quantity-update-btn' title="Increase quantity" onClick={handleIncrease}>+</button>
                     </div>
                     <div className='remove-btn-container'>
                         <button className="item-remove-btn" title="Remove item">Remove</button>
                     </div>
-                    <div className="item-total">
-                        Total: ₹{calculateItemTotal()}
+                    <div className="item-total item-total-small">
+                        ₹{calculateItemTotal()}
                     </div>
                 </div>
             </div>

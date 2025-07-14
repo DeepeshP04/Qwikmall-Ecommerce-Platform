@@ -1,7 +1,7 @@
 import CartItem from "./CartItem";
 import './CartItemList.css'
 
-function CartItemList ({cartItems}) {
+function CartItemList ({cartItems, onUpdateQuantity}) {
     return (
         <div className="container">
             <div className="cart-header">
@@ -11,7 +11,7 @@ function CartItemList ({cartItems}) {
                 </p>
             </div>
             {cartItems.map(cartItem => (
-                <CartItem key={cartItem.id} cartItem={cartItem} />
+                <CartItem key={cartItem.item_id} cartItem={cartItem} onUpdateQuantity={onUpdateQuantity} />
             ))}
         </div>
     )

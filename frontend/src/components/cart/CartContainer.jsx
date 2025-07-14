@@ -38,6 +38,31 @@ function CartContainer () {
         }
     };
 
+    // Update quantity handler
+    const updateCartItemQuantity = async (cartItemId, newQuantity) => {
+        // Optimistically update UI
+        setCart(prevCart => {
+            const updatedItems = (prevCart.items || prevCart.cart_items).map(item =>
+                item.id === cartItemId ? { ...item, quantity: newQuantity } : item
+            );
+            return { ...prevCart, items: updatedItems, cart_items: updatedItems };
+        });
+        // Send PATCH to backend
+        try {
+            await fetch(`http://localhost:5000/cart/items/${cartItemId}/`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ quantity: newQuantity })
+            });
+            // Optionally, re-fetch cart to sync totals
+            fetchCartItems();
+        } catch (err) {
+            // Optionally, show error and revert UI
+            console.error('Failed to update cart item quantity', err);
+        }
+    };
+
     const calculateTotal = () => {
         const subtotal = cart.total_price || 0;
         const shipping = 40;
@@ -96,7 +121,7 @@ function CartContainer () {
                         </a>
                     </div>
                 ) : (
-                    <CartItemList cartItems={cart.items} />
+                    <CartItemList cartItems={cart.items} onUpdateQuantity={updateCartItemQuantity} />
                 )}
             </div>
             {!isCartEmpty && (
