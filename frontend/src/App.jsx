@@ -5,13 +5,21 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import CategoryProductsPage from './pages/CategoryProductsPage'
 import ProductPage from './pages/ProductPage'
-import { createContext, useState } from 'react'
+import { createContext, useState, useEffect } from 'react'
 import Cart from './pages/Cart'
 
 const AuthContext = createContext()
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    fetch('http://localhost:5000/auth/status', {credentials: "include"})
+    .then(res => res.json())
+    .then(data => {
+      setIsLoggedIn(data.data.logged_in)
+    })
+  }, [])
 
   return (
     <BrowserRouter>

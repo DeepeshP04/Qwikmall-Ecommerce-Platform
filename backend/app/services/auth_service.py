@@ -202,3 +202,17 @@ class AuthService:
         })
         response.set_cookie('session', '', expires=0)
         return response, 200
+    
+    @staticmethod
+    def get_auth_status():
+        user = session.get("user")
+        if user:
+            return jsonify({
+                "success": True,
+                "data": {"logged_in": user.get("logged_in"), "user_id": user.get("user_id")}
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "data": {"logged_in": False, "user_id": None}
+            }), 401

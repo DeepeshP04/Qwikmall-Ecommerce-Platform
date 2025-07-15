@@ -36,3 +36,7 @@ def login_verify_otp():
 @login_required
 def logout():
     return AuthService.logout()
+
+@auth_bp.route("/status", methods=["GET"])
+def get_auth_status():
+    return AuthService.get_auth_status()
