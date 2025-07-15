@@ -85,7 +85,7 @@ function CategoryAllProducts ({categoryName, products}) {
     return (
         <div className="category-all-products">
             <div className="category-header">
-                <h2 className="category-title">{categoryName || 'All Products'}</h2>
+                <h2 className="category-title">{categoryName === "None" ? "All Products" : categoryName}</h2>
                 <p className="product-count">{filteredProducts.length} products found</p>
             </div>
             

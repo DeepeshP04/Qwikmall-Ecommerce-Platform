@@ -13,8 +13,7 @@ function AllProductsPage () {
         fetch(`http://localhost:5000/products/`)
         .then(res => res.json())
         .then(data => {
-            setAllProducts(data.data.products || [])
-            console.log(data.data)
+            setAllProducts(data.data.products || data.data)
             setIsLoading(false)
         })
         .catch(err => {

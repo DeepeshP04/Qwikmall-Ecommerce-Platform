@@ -212,7 +212,26 @@ class ProductService:
         except Exception as e:
             print(f"Error getting filters: {e}")
             return jsonify({"success": False, "message": "Unable to load filter options. Please try again later."}), 500
-    
+
+    @staticmethod
+    def get_all_filters():
+        """Get filter options for all products"""
+        try:
+            attr_values = (
+                db.session.query(ProductAttribute.name, ProductAttributeValue.value)
+                .join(ProductAttribute, ProductAttributeValue.attribute_id == ProductAttribute.id)
+                .all()
+            )
+            filters = {}
+            for attr_name, value in attr_values:
+                filters.setdefault(attr_name, set()).add(value)
+            
+            filters = {k: list(v) for k, v in filters.items()}
+            return jsonify({"success": True, "data": filters}), 200
+        except Exception as e:
+            print(f"Error getting all filters: {e}")
+            return jsonify({"success": False, "message": "Unable to load filter options. Please try again later."}), 500
+
     @staticmethod
     def calculate_overall_rating(product_id):
         """Calculate overall rating for a product"""
