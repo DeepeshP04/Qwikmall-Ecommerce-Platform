@@ -11,7 +11,7 @@ function Navbar (){
 
     const [isMenuOpen, setMenuOpen] = useState(false);
     const toggleMenu = () => setMenuOpen(!isMenuOpen);
-    const { isLoggedIn } = useContext(AuthContext)
+    const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext)
     const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
     const accountRef = useRef(null);
     const [scrolled, setScrolled] = useState(false);
@@ -31,7 +31,20 @@ function Navbar (){
     const goToSignup = () => { window.location.href = '/signup'; };
     const goToAccount = () => { window.location.href = '/account'; };
     const goToOrders = () => { window.location.href = '/orders'; };
-    const logout = () => { /* Implement logout logic */ };
+    const logout = () => { handleLogout() };
+
+    const handleLogout = () => {
+        fetch('http://localhost:5000/auth/logout', {method: "POST", credentials: "include"})
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                setIsLoggedIn(false);
+                window.location.href = '/';
+            } else {
+                console.log(data.message);
+            }
+        })
+    }
 
     useEffect(() => {
         const handleResize = () => {

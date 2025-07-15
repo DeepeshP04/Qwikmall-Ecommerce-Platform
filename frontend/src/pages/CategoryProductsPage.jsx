@@ -24,7 +24,7 @@ function CategoryProductsPage () {
     return (
         <>
             <Navbar></Navbar>
-            {isLoading ? <Loader /> : <CategoryAllProducts categoryName={categoryProducts.category_name} products={categoryProducts.products}></CategoryAllProducts>}
+            {isLoading ? <Loader /> : <CategoryAllProducts categoryName={categoryProducts.category_name} products={categoryProducts.products} allProductsMode={false}></CategoryAllProducts>}
             <Footer></Footer>
         </>
     )

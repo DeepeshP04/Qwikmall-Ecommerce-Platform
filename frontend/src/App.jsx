@@ -7,6 +7,7 @@ import CategoryProductsPage from './pages/CategoryProductsPage'
 import ProductPage from './pages/ProductPage'
 import { createContext, useState, useEffect } from 'react'
 import Cart from './pages/Cart'
+import AllProductsPage from './pages/AllProductsPage';
 
 const AuthContext = createContext()
 
@@ -31,6 +32,7 @@ function App() {
         <Route path='/category/:categoryName' element={<CategoryProductsPage></CategoryProductsPage>}/>
         <Route path='product/:productId' element={<ProductPage></ProductPage>}/>
         <Route path='cart' element={<Cart></Cart>}/>
+        <Route path='/products/' element={<AllProductsPage />}/>
       </Routes>
     </AuthContext.Provider>
     </BrowserRouter>

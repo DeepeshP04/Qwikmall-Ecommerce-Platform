@@ -16,7 +16,13 @@ function CategoryAllProducts ({categoryName, products}) {
     const fetchFilters = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5000/products/category/${categoryName}/filters`);
+            let url;
+            if (categoryName === "None") {
+                url = `http://localhost:5000/products/filters`;
+            } else {
+                url = `http://localhost:5000/products/category/${categoryName}/filters`;
+            }
+            const response = await fetch(url);
             const data = await response.json();
             
             if (response.ok && data.success) {
@@ -79,7 +85,7 @@ function CategoryAllProducts ({categoryName, products}) {
     return (
         <div className="category-all-products">
             <div className="category-header">
-                <h2 className="category-title">{categoryName}</h2>
+                <h2 className="category-title">{categoryName || 'All Products'}</h2>
                 <p className="product-count">{filteredProducts.length} products found</p>
             </div>
             
