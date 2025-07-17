@@ -3,7 +3,7 @@ import { faCartShopping, faMagnifyingGlass, faUser, faAngleDown } from '@fortawe
 import { faSellcast } from '@fortawesome/free-brands-svg-icons'
 import './Navbar.css'
 import { useEffect, useState, useRef } from 'react'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import { useContext } from 'react'
 import { AuthContext } from '../../App'
 
@@ -15,6 +15,8 @@ function Navbar (){
     const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
     const accountRef = useRef(null);
     const [scrolled, setScrolled] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -46,6 +48,11 @@ function Navbar (){
         })
     }
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        navigate(`/products?query=${searchQuery}`);
+    };
+
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth > 850) {
@@ -69,8 +76,8 @@ function Navbar (){
             <div className="brand-space">
                 <a href="/" className='brand'>Qwikmall</a>
             </div>
-            <form className="search-bar" method="GET">
-                <input id="search-input" type="search" name="query" placeholder="Search for products..."/>
+            <form className="search-bar" method="GET" onSubmit={handleSearch}>
+                <input id="search-input" type="search" name="query" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search for products..."/>
                 <button id="search-btn" type="submit"><FontAwesomeIcon icon={faMagnifyingGlass} /></button>
             </form>
             <div className="nav-actions">
