@@ -32,7 +32,7 @@ function CartContainer () {
             console.log("Cart response:", data);
             
             if (response.ok) {
-                setCart(data.data || { items: [], total_price: 0 });
+                setCart(data.data || { items: data.data.cart_items, total_price: 0 });
             } else {
                 setError(data.message || 'Failed to load cart items');
             }

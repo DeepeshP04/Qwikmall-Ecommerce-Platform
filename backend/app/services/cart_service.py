@@ -16,7 +16,7 @@ class CartService:
                     "id": item.product.id,
                     "name": item.product.name,
                     "price": float(item.product.price),
-                    "img_url": item.product.images[0].url if item.product.images else None
+                    "img_url": item.product.images[0].image_url if item.product.images else None
                 }
             }
             for item in cart.cart_items

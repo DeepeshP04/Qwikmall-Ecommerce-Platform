@@ -1,5 +1,7 @@
 import './ProductDetails.css'
 import { useState } from 'react'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 function ProductDetails({ product }) {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -17,6 +19,29 @@ function ProductDetails({ product }) {
             setQuantity(newQuantity);
         }
     };
+
+    const handleAddToCart = () => {
+        fetch('http://localhost:5000/cart/items', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ product_id: product.id, quantity: quantity }), credentials: 'include'
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                toast.success('Item added to cart');
+                console.log(data.message);
+            } else {
+                toast.error(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
+    
 
     return (
         <div className="product-details-container">
@@ -117,7 +142,7 @@ function ProductDetails({ product }) {
                         <button className="btn btn-primary buy-now-btn">
                             Buy Now
                         </button>
-                        <button className="btn btn-secondary add-to-cart-btn">
+                        <button className="btn btn-secondary add-to-cart-btn" onClick={handleAddToCart}>
                             Add to Cart
                         </button>
                     </div>
