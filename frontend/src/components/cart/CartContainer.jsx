@@ -32,7 +32,7 @@ function CartContainer () {
             console.log("Cart response:", data);
             
             if (response.ok) {
-                setCart(data.data || { items: data.data.cart_items, total_price: 0 });
+                setCart(data.data || { items: data.data.cart_items, total_price: data.data.total_price});
             } else {
                 setError(data.message || 'Failed to load cart items');
             }
@@ -93,7 +93,7 @@ function CartContainer () {
     const calculateTotal = () => {
         const subtotal = cart.total_price || 0;
         const shipping = 40;
-        return subtotal + shipping;
+        return parseInt(subtotal) + parseInt(shipping);
     };
 
     if (loading) {
