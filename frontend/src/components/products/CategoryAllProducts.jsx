@@ -40,36 +40,52 @@ function CategoryAllProducts ({categoryName, products}) {
     };
 
     const handleFilterChange = (selectedFilters) => {
-        // Apply filters to products
+        // Initially filtered is all products
         let filtered = products;
-        
-        // Apply each filter type
+
+        // for each selectedFilter type, take all selected options
+        // filter the products matching filter options
         Object.keys(selectedFilters).forEach(filterType => {
+            console.log(selectedFilters, filterType)
             const selectedOptions = selectedFilters[filterType];
+            console.log(selectedOptions)
+            // if (selectedOptions && selectedOptions.length > 0) {
+            //     filtered = filtered.filter(product => {
+            //         console.log(product)
+            //         return selectedOptions.some(option => {
+            //             const productValue = product[filterType.toLowerCase()];
+            //             if (!productValue) return false;
+            //             if (Array.isArray(productValue)) {
+            //                 return productValue.some(val => 
+            //                     val.toString().toLowerCase() === option.toString().toLowerCase()
+            //                 );
+            //             } else {
+            //                 return productValue.toString().toLowerCase() === option.toString().toLowerCase();
+            //             }
+            //         });
+            //     });
+            // }
             if (selectedOptions && selectedOptions.length > 0) {
-                filtered = filtered.filter(product => {
-                    return selectedOptions.some(option => {
-                        // Check if product has the filter attribute
-                        const productValue = product[filterType.toLowerCase()];
-                        if (!productValue) return false;
-                        
-                        // Handle different data types
-                        if (Array.isArray(productValue)) {
-                            // If product value is an array, check if any value matches
-                            return productValue.some(val => 
-                                val.toString().toLowerCase() === option.toString().toLowerCase()
-                            );
-                        } else {
-                            // If product value is a string, do direct comparison
-                            return productValue.toString().toLowerCase() === option.toString().toLowerCase();
-                        }
-                    });
+            filtered = filtered.filter(product => {
+                const productValue = product.attributes?.[filterType];
+
+                if (!productValue) return false;
+
+                return selectedOptions.some(option => {
+                    if (Array.isArray(productValue)) {
+                        return productValue.some(val =>
+                            val.toString().toLowerCase() === option.toString().toLowerCase()
+                        );
+                    } else {
+                        return productValue.toString().toLowerCase() === option.toString().toLowerCase();
+                    }
                 });
-            }
+            });
+        }
         });
-        
-        setFilteredProducts(filtered);
-    };
+
+        setFilteredProducts(filtered)
+    }
 
     if (loading) {
         return (

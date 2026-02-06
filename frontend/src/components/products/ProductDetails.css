@@ -208,6 +208,8 @@
     justify-content: center;
     font-weight: 600;
     background: white;
+    color: black;
+    font-size: 16px;
 }
 
 /* Action Buttons */

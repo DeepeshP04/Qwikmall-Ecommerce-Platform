@@ -1,11 +1,15 @@
 import './ProductDetails.css'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { AuthContext } from '../../App'
+import { useNavigate } from 'react-router-dom';
 
 function ProductDetails({ product }) {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
+    const { isLoggedIn } = useContext(AuthContext);
+  const navigate = useNavigate();
 
     if (!product) return <p>Loading...</p>
     
@@ -21,6 +25,7 @@ function ProductDetails({ product }) {
     };
 
     const handleAddToCart = () => {
+        if(isLoggedIn) {
         fetch('http://localhost:5000/cart/items', {
             method: 'POST',
             headers: {
@@ -39,9 +44,20 @@ function ProductDetails({ product }) {
         .catch(error => {
             console.error('Error:', error);
         });
+    } else {
+        toast('Please login to add product to cart')
+        navigate('/login')
+    }
     };
 
-    
+    const handleBuy = () => {
+        if(isLoggedIn) {
+            
+        } else {
+            toast('Please login to buy product')
+            navigate('/login')
+        }
+    }    
 
     return (
         <div className="product-details-container">
@@ -139,7 +155,7 @@ function ProductDetails({ product }) {
 
                     {/* Action Buttons */}
                     <div className="action-buttons">
-                        <button className="btn btn-primary buy-now-btn">
+                        <button className="btn btn-primary buy-now-btn" onClick={handleBuy}>
                             Buy Now
                         </button>
                         <button className="btn btn-secondary add-to-cart-btn" onClick={handleAddToCart}>

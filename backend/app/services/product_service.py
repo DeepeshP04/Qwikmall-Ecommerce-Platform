@@ -69,6 +69,11 @@ class ProductService:
                 
                 # Calculate overall rating
                 overall_rating = ProductService.calculate_overall_rating(product.id)
+
+                attributes = (db.session.query(ProductAttribute.name, ProductAttributeValue.value).join(ProductAttribute, ProductAttributeValue.attribute_id == ProductAttribute.id).filter(ProductAttributeValue.product_id == product.id).all())
+                attributes_data = {}
+                for attr in attributes:
+                    attributes_data[attr.name] = attr.value
                 
                 product_data = {
                     "id": product.id,
@@ -76,7 +81,8 @@ class ProductService:
                     "price": float(product.price),
                     "img_url": primary_image.image_url if primary_image else None,
                     "img_alt_text": primary_image.alt_text if primary_image else None,
-                    "overall_rating": overall_rating
+                    "overall_rating": overall_rating,
+                    "attributes": attributes_data
                 }
                 products_data.append(product_data)
             
@@ -118,6 +124,11 @@ class ProductService:
                 
                 # Calculate overall rating
                 overall_rating = ProductService.calculate_overall_rating(product.id)
+
+                attributes = (db.session.query(ProductAttribute.name, ProductAttributeValue.value).join(ProductAttribute, ProductAttributeValue.attribute_id == ProductAttribute.id).filter(ProductAttributeValue.product_id == product.id).all())
+                attributes_data = {}
+                for attr in attributes:
+                    attributes_data[attr.name] = attr.value
                 
                 product_data = {
                     "id": product.id,
@@ -125,7 +136,8 @@ class ProductService:
                     "price": float(product.price),
                     "img_url": primary_image.image_url if primary_image else None,
                     "img_alt_text": primary_image.alt_text if primary_image else None,
-                    "overall_rating": overall_rating
+                    "overall_rating": overall_rating,
+                    "attributes": attributes_data
                 }
                 products_data.append(product_data)
             
