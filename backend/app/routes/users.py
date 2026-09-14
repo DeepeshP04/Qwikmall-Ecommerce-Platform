@@ -20,3 +20,10 @@ def update_user_profile():
     user_id = session.get("user").get("user_id")
     data = request.get_json()
     return UserService.update_user_profile(user_id, data)
+
+# Get all saved addresses for the current user
+@user_bp.route("/addresses", methods=["GET"], strict_slashes=False)
+@login_required
+def get_user_addresses():
+    user_id = session.get("user").get("user_id")
+    return UserService.get_user_addresses(user_id)

@@ -12,8 +12,7 @@ order_bp = Blueprint("orders", __name__, url_prefix="/orders")
 def create_order():
     user_id = session.get("user").get("user_id")
     data = request.get_json()
-    items = data.get("items", [])
-    return OrderService.create_order(user_id, items)
+    return OrderService.create_order(user_id, data)
 
 # List all orders for the current user
 @order_bp.route("/", methods=["GET"], strict_slashes=False)

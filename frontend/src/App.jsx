@@ -7,8 +7,10 @@ import CategoryProductsPage from './pages/CategoryProductsPage'
 import ProductPage from './pages/ProductPage'
 import { createContext, useState, useEffect } from 'react'
 import Cart from './pages/Cart'
+import Checkout from './pages/Checkout'
 import AllProductsPage from './pages/AllProductsPage';
 import { ToastContainer } from 'react-toastify'
+import UserAccount from './pages/UserAccount'
 
 const AuthContext = createContext()
 
@@ -33,7 +35,9 @@ function App() {
         <Route path='/category/:categoryName' element={<CategoryProductsPage></CategoryProductsPage>}/>
         <Route path='product/:productId' element={<ProductPage></ProductPage>}/>
         <Route path='cart' element={<Cart></Cart>}/>
+        <Route path='checkout' element={<Checkout />}/>
         <Route path='/products/' element={<AllProductsPage />}/>
+        <Route path='/account/' element={<UserAccount />}/>
       </Routes>
       <ToastContainer />
     </AuthContext.Provider>

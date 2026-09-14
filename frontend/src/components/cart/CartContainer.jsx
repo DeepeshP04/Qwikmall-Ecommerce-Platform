@@ -1,9 +1,11 @@
 import CartItemList from "./CartItemList";
 import './CartContainer.css'
 import { useEffect, useState, useContext } from "react";
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
 
 function CartContainer () {
+    const navigate = useNavigate();
     const [cart, setCart] = useState({
         cart_items: [],
         total_price: 0
@@ -89,6 +91,19 @@ function CartContainer () {
             console.error('Failed to remove cart item', err);
         }
     };
+
+    const placeOrder = async () => {
+        try {
+            await fetch(`http://localhost:5000/orders/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json'},
+                body: {}
+            })
+        } catch(err) {
+            console.log('Failed to create order', err)
+        }
+    }
 
     const calculateTotal = () => {
         const subtotal = cart.total_price || 0;
@@ -186,7 +201,7 @@ function CartContainer () {
                             <span>₹{calculateTotal()}</span>
                         </div>
                     </div>
-                    <button className="place-order-btn">Place Order</button>
+                    <button className="place-order-btn" onClick={() => navigate('/checkout')}>Place Order</button>
                 </div>
             )}
         </div>

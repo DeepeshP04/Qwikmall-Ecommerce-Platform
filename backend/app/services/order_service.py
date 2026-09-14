@@ -4,12 +4,23 @@ from app import db
 
 class OrderService:
     @staticmethod
-    def create_order(user_id, items):
+    def create_order(user_id, data):
+        items = data.get("items", []) if isinstance(data, dict) else []
         if not items:
             return {"success": False, "message": "No items provided."}, 400
-        address = Address.query.filter_by(user_id=user_id).first()
+
+        address_id = data.get("address_id") if isinstance(data, dict) else None
+        payment_method = data.get("payment_method", "cod") if isinstance(data, dict) else "cod"
+
+        address = None
+        if address_id:
+            address = Address.query.filter_by(id=address_id, user_id=user_id).first()
+        else:
+            address = Address.query.filter_by(user_id=user_id).first()
+
         if not address:
             return {"success": False, "message": "No address found for user."}, 404
+
         order_items = []
         total_price = 0
         for item in items:
@@ -23,20 +34,23 @@ class OrderService:
                 product_id=product.id,
                 quantity=quantity,
                 price=product.price,
-                total_price=item_total
             ))
+
         new_order = Order(
             user_id=user_id,
             address_id=address.id,
-            total_price=total_price
+            total_price=total_price,
+            payment_method=payment_method,
+            status="Pending"
         )
         db.session.add(new_order)
         db.session.commit()
+
         for item in order_items:
             item.order_id = new_order.id
             db.session.add(item)
         db.session.commit()
-        return {"success": True, "message": "Order created successfully", "order": new_order.to_dict()}, 201 
+        return {"success": True, "message": "Order created successfully", "order": new_order.to_dict()}, 201
 
     @staticmethod
     def list_user_orders(user_id):

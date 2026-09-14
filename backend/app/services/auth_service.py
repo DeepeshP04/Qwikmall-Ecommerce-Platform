@@ -33,11 +33,12 @@ class AuthService:
         redis_client.set(mobile, code, 300)
         
         try:
-            message = client.messages.create(
-                body=f"Your verification code is {code}",
-                from_=AuthService.phone_number,
-                to=mobile
-            )
+            # message = client.messages.create(
+                # body=f"Your verification code is {code}",
+                # from_=AuthService.phone_number,
+                # to=mobile
+            # )
+            print(code)
             return True
         except Exception as e:
             print(f"Error sending SMS: {e}")
