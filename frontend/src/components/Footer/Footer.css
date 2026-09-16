@@ -24,6 +24,10 @@
     cursor: pointer;
 }
 
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
 .copyright-space {
     width: 20%;
     text-align: center;
