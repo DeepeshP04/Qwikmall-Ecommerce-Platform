@@ -103,7 +103,7 @@ function Navbar (){
                     {accountDropdownOpen && (
                         <div className="account-dropdown-menu">
                             {!isLoggedIn ? (
-                                <button className="dropdown-item" onClick={goToSignup}>Sign Up</button>
+                                <button className="dropdown-item" onClick={goToSignup}>New Customer? <span className='signup-span'>Sign Up</span></button>
                             ) : (
                                 <>
                                     <button className="dropdown-item" onClick={goToAccount}>Account</button>
