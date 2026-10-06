@@ -178,9 +178,12 @@ class ProductService:
             
             # Calculate overall rating
             overall_rating = ProductService.calculate_overall_rating(product_id)
+            category = Category.query.get(product.category_id)
             
             product_data = {
                 "id": product.id,
+                "category_id": product.category_id,
+                "category_name": category.name if category else None,
                 "name": product.name,
                 "description": product.description,
                 "price": float(product.price),

@@ -1,17 +1,55 @@
 import './ProductDetails.css'
-import { useState, useContext } from 'react'
+import { useEffect, useState, useContext } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHeart } from '@fortawesome/free-solid-svg-icons'
+import { faHeart, faShieldHalved, faTruckFast } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import ProductCard from './ProductCard'
 import { AuthContext } from '../../App'
-import { useNavigate } from 'react-router-dom';
 
 function ProductDetails({ product }) {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    const [relatedLoading, setRelatedLoading] = useState(false);
     const { isLoggedIn } = useContext(AuthContext);
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!product?.category_name) {
+            setRelatedProducts([]);
+            return undefined;
+        }
+
+        const controller = new AbortController();
+        const loadRelatedProducts = async () => {
+            try {
+                setRelatedLoading(true);
+                const response = await fetch(
+                    `http://localhost:5000/products/category/${encodeURIComponent(product.category_name)}`,
+                    { signal: controller.signal }
+                );
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Unable to load related products.');
+                }
+
+                const products = result.data?.products || [];
+                setRelatedProducts(products.filter((item) => item.id !== product.id).slice(0, 8));
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Unable to load related products:', error);
+                    setRelatedProducts([]);
+                }
+            } finally {
+                if (!controller.signal.aborted) setRelatedLoading(false);
+            }
+        };
+
+        loadRelatedProducts();
+        return () => controller.abort();
+    }, [product?.category_name, product?.id]);
 
     if (!product) return <p>Loading...</p>
     
@@ -77,15 +115,6 @@ function ProductDetails({ product }) {
         }
     }
 
-    const handleBuy = () => {
-        if(isLoggedIn) {
-            
-        } else {
-            toast('Please login to buy product')
-            navigate('/login')
-        }
-    }    
-
     return (
         <div className="product-details-container">
             <div className="product-details-content">
@@ -97,6 +126,9 @@ function ProductDetails({ product }) {
                             alt={product.name}
                             className="main-product-image"
                         />
+                        {product.manufacturer && (
+                            <span className="product-image-brand">{product.manufacturer}</span>
+                        )}
                     </div>
                     
                     {/* Image Gallery */}
@@ -118,6 +150,7 @@ function ProductDetails({ product }) {
                 {/* Right Section - Product Info */}
                 <div className="product-info-section">
                     <div className="product-header">
+                        {product.category_name && <span className="product-category-label">{product.category_name}</span>}
                         <h1 className="product-title">{product.name}</h1>
                         
                         {/* Rating */}
@@ -133,14 +166,14 @@ function ProductDetails({ product }) {
                                         </span>
                                     ))}
                                 </div>
-                                <span className="rating-text">({product.overall_rating})</span>
+                                <span className="rating-text">{product.overall_rating} out of 5</span>
                             </div>
                         )}
                     </div>
 
                     {/* Price */}
                     <div className="product-price-section">
-                        <span className="product-price">₹{product.price}</span>
+                        <span className="product-price">₹{Number(product.price).toLocaleString('en-IN')}</span>
                         <span className="price-label">Inclusive of all taxes</span>
                     </div>
 
@@ -156,6 +189,17 @@ function ProductDetails({ product }) {
                     <div className="product-description">
                         <h3>Description</h3>
                         <p>{product.description}</p>
+                    </div>
+
+                    <div className="product-assurances">
+                        <div>
+                            <FontAwesomeIcon icon={faTruckFast} aria-hidden="true" />
+                            <span>Delivery options at checkout</span>
+                        </div>
+                        <div>
+                            <FontAwesomeIcon icon={faShieldHalved} aria-hidden="true" />
+                            <span>Secure shopping</span>
+                        </div>
                     </div>
 
                     {/* Quantity Selector */}
@@ -182,9 +226,6 @@ function ProductDetails({ product }) {
 
                     {/* Action Buttons */}
                     <div className="action-buttons">
-                        <button className="btn btn-primary buy-now-btn" onClick={handleBuy}>
-                            Buy Now
-                        </button>
                         <button className="btn btn-secondary add-to-cart-btn" onClick={handleAddToCart}>
                             Add to Cart
                         </button>
@@ -208,6 +249,7 @@ function ProductDetails({ product }) {
                             </div>
                         </div>
                     )}
+
                 </div>
             </div>
 
@@ -237,6 +279,37 @@ function ProductDetails({ product }) {
                     </div>
                 </div>
             )}
+
+            <section className="related-products-section" aria-labelledby="related-products-title">
+                <div className="related-products-heading">
+                    <div>
+                        <span className="product-category-label">More to explore</span>
+                        <h2 id="related-products-title">Related products</h2>
+                        <p>More picks from {product.category_name || 'this collection'}.</p>
+                    </div>
+                    {product.category_name && (
+                        <Link to={`/category/${encodeURIComponent(product.category_name)}`} className="related-products-link">
+                            View category
+                        </Link>
+                    )}
+                </div>
+                {relatedLoading ? (
+                    <p className="related-products-message" role="status">Finding similar products...</p>
+                ) : relatedProducts.length ? (
+                    <div className="related-products-grid">
+                        {relatedProducts.map((relatedProduct) => (
+                            <ProductCard
+                                key={relatedProduct.id}
+                                product={relatedProduct}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <p className="related-products-message">
+                        No other products in this category yet.
+                    </p>
+                )}
+            </section>
         </div>
     )
 }
