@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCartShopping, faMagnifyingGlass, faUser, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { faSellcast } from '@fortawesome/free-brands-svg-icons'
 import './Navbar.css'
-import { useEffect, useState, useRef } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import { useContext } from 'react'
 import { AuthContext } from '../../App'
@@ -11,11 +11,12 @@ function Navbar (){
 
     const [isMenuOpen, setMenuOpen] = useState(false);
     const toggleMenu = () => setMenuOpen(!isMenuOpen);
-    const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext)
+    const { isLoggedIn } = useContext(AuthContext)
     const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
     const accountRef = useRef(null);
     const [scrolled, setScrolled] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [cartItemCount, setCartItemCount] = useState(0);
     const navigate = useNavigate();
 
     // Close dropdown on outside click
@@ -29,24 +30,39 @@ function Navbar (){
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Handlers for dropdown actions (stub)
-    const goToSignup = () => { window.location.href = '/signup'; };
-    const goToAccount = () => { window.location.href = '/account'; };
-    const goToOrders = () => { window.location.href = '/orders'; };
-    const logout = () => { handleLogout() };
+    const fetchCartCount = useCallback(async () => {
+        if (!isLoggedIn) {
+            setCartItemCount(0);
+            return;
+        }
 
-    const handleLogout = () => {
-        fetch('http://localhost:5000/auth/logout', {method: "POST", credentials: "include"})
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                setIsLoggedIn(false);
-                window.location.href = '/';
+        try {
+            const response = await fetch('http://localhost:5000/cart/', {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                const items = data.data?.items || data.data?.cart_items || [];
+                setCartItemCount(items.reduce((total, item) => total + Number(item.quantity || 0), 0));
+            } else if (response.status === 404) {
+                setCartItemCount(0);
             } else {
-                console.log(data.message);
+                console.error('Unable to load cart item count:', data.message || response.statusText);
             }
-        })
-    }
+        } catch (error) {
+            console.error('Unable to load cart item count:', error);
+        }
+    }, [isLoggedIn]);
+
+    useEffect(() => {
+        fetchCartCount();
+    }, [fetchCartCount]);
+
+    useEffect(() => {
+        const handleCartUpdated = () => fetchCartCount();
+        window.addEventListener('cartUpdated', handleCartUpdated);
+        return () => window.removeEventListener('cartUpdated', handleCartUpdated);
+    }, [fetchCartCount]);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -84,7 +100,7 @@ function Navbar (){
                 <div 
                     className="login-space account-dropdown-container"
                     ref={accountRef}
-                    onMouseEnter={() => setAccountDropdownOpen(true)}
+                    onMouseEnter={() => !isLoggedIn && setAccountDropdownOpen(true)}
                     onMouseLeave={() => setAccountDropdownOpen(false)}
                     tabIndex={0}
                     onBlur={() => setAccountDropdownOpen(false)}
@@ -93,31 +109,24 @@ function Navbar (){
                     <Link to={isLoggedIn ? "/account" : "/login"} className="account-label">
                         {isLoggedIn ? 'Account' : 'Login'}
                     </Link>
-                    <span
-                        className={`arrow ${accountDropdownOpen ? 'open' : ''}`}
-                        onClick={() => setAccountDropdownOpen((open) => !open)}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <FontAwesomeIcon icon={faAngleDown} />
-                    </span>
-                    {accountDropdownOpen && (
+                    {!isLoggedIn && (
+                        <span
+                            className={`arrow ${accountDropdownOpen ? 'open' : ''}`}
+                            onClick={() => setAccountDropdownOpen((open) => !open)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <FontAwesomeIcon icon={faAngleDown} />
+                        </span>
+                    )}
+                    {!isLoggedIn && accountDropdownOpen && (
                         <div className="account-dropdown-menu">
-                            {!isLoggedIn ? (
-                                <button className="dropdown-item" onClick={goToSignup}>New Customer? <span className='signup-span'>Sign Up</span></button>
-                            ) : (
-                                <>
-                                    <button className="dropdown-item" onClick={goToAccount}>Account</button>
-                                    <button className="dropdown-item" onClick={goToOrders}>Orders</button>
-                                    <button className="dropdown-item" onClick={logout}>Logout</button>
-                                </>
-                            )}
+                            <Link className="dropdown-item" to="/signup" onClick={() => setAccountDropdownOpen(false)}>
+                                New Customer? <span className='signup-span'>Sign Up</span>
+                            </Link>
                         </div>
                     )}
                 </div>
-                <div className="cart-space">
-                    <FontAwesomeIcon icon={faCartShopping} />
-                    <Link to="/cart" className='cart'>Cart</Link>
-                </div>
+                <CartNavLink itemCount={cartItemCount} />
                 <div className="seller-space">
                     <FontAwesomeIcon icon={faSellcast} />
                     <a className='become-seller'>Become a Seller</a>
@@ -132,7 +141,7 @@ function Navbar (){
             (<div className="mobile-nav-actions">
                 <div className="login-space account-dropdown-container"
                     ref={accountRef}
-                    onClick={() => setAccountDropdownOpen((open) => !open)}
+                    onClick={() => !isLoggedIn && setAccountDropdownOpen((open) => !open)}
                     tabIndex={0}
                     onBlur={() => setAccountDropdownOpen(false)}
                 >
@@ -140,24 +149,25 @@ function Navbar (){
                     <Link to={isLoggedIn ? "/account" : "/login"} className="account-label">
                         {isLoggedIn ? 'Account' : 'Login'}
                     </Link>
-                    <span className={`arrow ${accountDropdownOpen ? 'open' : ''}`}> <FontAwesomeIcon icon={faAngleDown} /> </span>
-                    {accountDropdownOpen && (
+                    {!isLoggedIn && (
+                        <span className={`arrow ${accountDropdownOpen ? 'open' : ''}`}>
+                            <FontAwesomeIcon icon={faAngleDown} />
+                        </span>
+                    )}
+                    {!isLoggedIn && accountDropdownOpen && (
                         <div className="account-dropdown-menu">
-                            {!isLoggedIn ? (
-                                <button className="dropdown-item" onClick={goToSignup}>Sign Up</button>
-                            ) : (
-                                <>
-                                    <button className="dropdown-item" onClick={goToAccount}>Account</button>
-                                    <button className="dropdown-item" onClick={goToOrders}>Orders</button>
-                                    <button className="dropdown-item" onClick={logout}>Logout</button>
-                                </>
-                            )}
+                            <Link className="dropdown-item" to="/signup" onClick={() => setAccountDropdownOpen(false)}>Sign Up</Link>
                         </div>
                     )}
                 </div>
                 <div className="cart-space">
                     <FontAwesomeIcon icon={faCartShopping} />
-                    <a className='cart'>Cart</a>
+                    <Link to="/cart" className='cart'>Cart</Link>
+                    {isLoggedIn && cartItemCount > 0 && (
+                        <span className="cart-badge" aria-label={`${cartItemCount} items in cart`}>
+                            {cartItemCount > 99 ? '99+' : cartItemCount}
+                        </span>
+                    )}
                 </div>
                 <div className="seller-space">
                     <FontAwesomeIcon icon={faSellcast} />
@@ -167,6 +177,21 @@ function Navbar (){
             : ""}
         </>
     )
+}
+
+function CartNavLink({ itemCount }) {
+    const { isLoggedIn } = useContext(AuthContext);
+    return (
+        <div className="cart-space">
+            <FontAwesomeIcon icon={faCartShopping} />
+            <Link to="/cart" className='cart'>Cart</Link>
+            {isLoggedIn && itemCount > 0 && (
+                <span className="cart-badge" aria-label={`${itemCount} items in cart`}>
+                    {itemCount > 99 ? '99+' : itemCount}
+                </span>
+            )}
+        </div>
+    );
 }
 
 export default Navbar;

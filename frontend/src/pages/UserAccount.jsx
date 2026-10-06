@@ -459,6 +459,7 @@ function WishlistSection() {
       if (!response.ok || !result.success) {
         throw new Error(result.message || "Unable to add this product to your cart.");
       }
+      window.dispatchEvent(new Event("cartUpdated"));
       const removeResponse = await fetch(`http://localhost:5000/wishlist/items/${item.id}`, {
         method: "DELETE",
         credentials: "include",

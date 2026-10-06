@@ -63,6 +63,7 @@ function CartContainer () {
                 credentials: 'include',
                 body: JSON.stringify({ quantity: newQuantity })
             });
+            window.dispatchEvent(new Event('cartUpdated'));
             // Optionally, re-fetch cart to sync totals
             fetchCartItems();
         } catch (err) {
@@ -84,6 +85,7 @@ function CartContainer () {
                 method: 'DELETE',
                 credentials: 'include',
             });
+            window.dispatchEvent(new Event('cartUpdated'));
             // Optionally, re-fetch cart to sync totals
             fetchCartItems();
         } catch (err) {

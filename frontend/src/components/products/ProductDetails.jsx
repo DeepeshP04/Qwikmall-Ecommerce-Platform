@@ -38,6 +38,7 @@ function ProductDetails({ product }) {
         .then(data => {
             if (data.success) {
                 toast.success('Item added to cart');
+                window.dispatchEvent(new Event('cartUpdated'));
                 console.log(data.message);
             } else {
                 toast.error(data.message);
