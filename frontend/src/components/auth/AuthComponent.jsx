@@ -3,7 +3,7 @@ import './AuthComponent.css'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
 
-function AuthComponent({ isLogin }) {
+function AuthComponent({ isLogin, redirectTo, showAuthSwitch = true }) {
     const [phone, setPhone] = useState("")
     const [error, setError] = useState("")
     const [codeSent, setCodeSent] = useState(false)
@@ -107,7 +107,7 @@ function AuthComponent({ isLogin }) {
             }
 
             setIsLoggedIn(true)
-            navigate(location.state?.from?.pathname || "/", { replace: true })
+            navigate(redirectTo || location.state?.from?.pathname || "/", { replace: true })
         } catch {
             setError("Unable to verify the code. Please check your connection and try again.")
         } finally {
@@ -227,9 +227,11 @@ function AuthComponent({ isLogin }) {
                         )}
                     </div>
                 </form>
-                <div className="go-to-login-section">
-                    <Link to={isLogin ? "/signup" : "/login"}>{isLogin ? "New to Qwikmall? Create an account" : "Existing User? Log in"}</Link>
-                </div>
+                {showAuthSwitch && (
+                    <div className="go-to-login-section">
+                        <Link to={isLogin ? "/signup" : "/login"}>{isLogin ? "New to Qwikmall? Create an account" : "Existing User? Log in"}</Link>
+                    </div>
+                )}
             </div>
         </div>
     )

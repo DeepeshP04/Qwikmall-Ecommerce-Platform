@@ -4,6 +4,13 @@ from app.services.admin_service import AdminService
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
+@admin_bp.route('/login', methods=['POST'], strict_slashes=False)
+def admin_login():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return {"success": False, "message": "A login object is required."}, 400
+    return AdminService.login(data.get("identifier"), data.get("password"))
+
 # Product Management
 @admin_bp.route('/products', methods=['POST'], strict_slashes=False)
 @login_required
@@ -56,4 +63,5 @@ def get_user(user_id):
 @login_required
 @admin_required
 def get_admin_profile():
-    return AdminService.get_admin_profile()
+    user_id = session["user"]["user_id"]
+    return AdminService.get_admin_profile(user_id)

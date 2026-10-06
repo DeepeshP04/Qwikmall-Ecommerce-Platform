@@ -1,9 +1,65 @@
+import hmac
+import os
+
 from flask import session, jsonify
+from sqlalchemy import func, or_
+
 from app.models import Product, Order, User
 from app import db
 from app.models import ProductImage, ProductAttribute, ProductAttributeValue, Category
 
 class AdminService:
+    @staticmethod
+    def login(identifier, password):
+        configured_password = os.getenv("ADMIN_PASSWORD")
+        if not configured_password:
+            return jsonify({
+                "success": False,
+                "message": "Admin login is not configured on the server.",
+            }), 503
+
+        if not isinstance(identifier, str) or not isinstance(password, str):
+            return jsonify({
+                "success": False,
+                "message": "Enter your admin email or phone and password.",
+            }), 400
+
+        identifier = identifier.strip()
+        if not identifier or not password:
+            return jsonify({
+                "success": False,
+                "message": "Enter your admin email or phone and password.",
+            }), 400
+
+        password_matches = hmac.compare_digest(
+            password.encode("utf-8"),
+            configured_password.encode("utf-8"),
+        )
+        admin = User.query.filter(
+            User.role == "admin",
+            or_(
+                User.phone == identifier,
+                func.lower(User.email) == identifier.lower(),
+            ),
+        ).first()
+
+        if not admin or not password_matches:
+            return jsonify({
+                "success": False,
+                "message": "Invalid admin email/phone or password.",
+            }), 401
+
+        session["user"] = {
+            "user_id": admin.id,
+            "username": admin.username,
+            "role": admin.role,
+            "logged_in": True,
+        }
+        return jsonify({
+            "success": True,
+            "message": "Admin logged in successfully.",
+        }), 200
+
     @staticmethod
     def add_product(data):
         required_fields = ["name", "description", "price", "manufacturer", "category"]
@@ -115,8 +171,10 @@ class AdminService:
         return jsonify({"success": True, "data": users_data}), 200
 
     @staticmethod
-    def get_admin_profile():
-        admin = User.query.get(user["user_id"])
+    def get_admin_profile(user_id):
+        admin = User.query.get(user_id)
+        if not admin:
+            return jsonify({"success": False, "message": "Admin user not found."}), 404
         admin_data = {
             "id": admin.id,
             "username": admin.username,
