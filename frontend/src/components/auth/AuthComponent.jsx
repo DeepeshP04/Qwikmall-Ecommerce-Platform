@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import './AuthComponent.css'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
 
 function AuthComponent({ isLogin }) {
@@ -13,6 +13,7 @@ function AuthComponent({ isLogin }) {
     const [otpCooldown, setOtpCooldown] = useState(0)
     const { setIsLoggedIn } = useContext(AuthContext)
     const navigate = useNavigate()
+    const location = useLocation()
 
     useEffect(() => {
         if (otpCooldown === 0) {
@@ -106,7 +107,7 @@ function AuthComponent({ isLogin }) {
             }
 
             setIsLoggedIn(true)
-            navigate("/")
+            navigate(location.state?.from?.pathname || "/", { replace: true })
         } catch {
             setError("Unable to verify the code. Please check your connection and try again.")
         } finally {
