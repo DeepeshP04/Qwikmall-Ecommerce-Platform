@@ -861,6 +861,229 @@
   display: inline-flex;
 }
 
+.addresses-content {
+  display: grid;
+  gap: 18px;
+}
+
+.address-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.address-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid #e2e7ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(20, 35, 65, 0.04);
+}
+
+.address-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 11px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.address-type-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: #edf4ff;
+  color: #2867c2;
+  font-size: 14px;
+}
+
+.address-label-group {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.address-label-group h2 {
+  margin: 0;
+  color: #273449;
+  font-size: 14px;
+}
+
+.address-edit-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #dce6f5;
+  border-radius: 8px;
+  background: #fff;
+  color: #2867c2;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.address-edit-button:hover {
+  background: #f2f7ff;
+}
+
+.address-edit-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  padding-top: 15px;
+}
+
+.address-edit-field {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  color: #526077;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.address-edit-field--wide {
+  grid-column: 1 / -1;
+}
+
+.address-edit-field input {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #dce3ed;
+  border-radius: 7px;
+  outline: none;
+  background: #fff;
+  color: #273449;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.address-edit-field input:focus {
+  border-color: #4384ec;
+  box-shadow: 0 0 0 3px rgba(40, 116, 240, 0.1);
+}
+
+.address-default-checkbox {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 8px;
+  color: #526077;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.address-default-checkbox input {
+  width: 15px;
+  height: 15px;
+  accent-color: #2874f0;
+}
+
+.address-form-error,
+.address-form-actions {
+  grid-column: 1 / -1;
+}
+
+.address-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.address-form-actions button {
+  min-height: 37px;
+  padding: 0 12px;
+  font-size: 11px;
+}
+
+.address-default-badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #eaf8ef;
+  color: #27834b;
+  font-size: 9px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.address-card-body {
+  display: grid;
+  gap: 5px;
+  padding: 15px 0;
+  color: #69768a;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.address-card-body strong {
+  color: #334156;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.address-card-body p {
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+.address-landmark span {
+  color: #8b96a6;
+}
+
+.address-country {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #edf0f4;
+  font-size: 10px;
+}
+
+.address-country span {
+  color: #8994a5;
+}
+
+.address-country strong {
+  color: #526077;
+  font-weight: 650;
+}
+
+.address-empty {
+  padding: 42px 25px;
+  text-align: center;
+}
+
+.address-empty h2 {
+  margin: 0 0 7px;
+  color: #263449;
+  font-size: 17px;
+}
+
+.address-empty p {
+  max-width: 410px;
+  margin: 0 auto;
+  color: #778397;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 @media (max-width: 800px) {
   .account-page {
     padding-top: 24px;
@@ -916,6 +1139,23 @@
     padding: 15px 0 0;
     border-top: 1px solid #edf0f4;
     border-left: 0;
+  }
+
+  .address-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .address-edit-form {
+    grid-template-columns: 1fr;
+  }
+
+  .address-edit-field--wide,
+  .address-default-checkbox,
+  .address-form-error,
+  .address-form-actions {
+    grid-column: 1;
   }
 }
 

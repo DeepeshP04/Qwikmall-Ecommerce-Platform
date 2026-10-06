@@ -27,3 +27,10 @@ def update_user_profile():
 def get_user_addresses():
     user_id = session.get("user").get("user_id")
     return UserService.get_user_addresses(user_id)
+
+# Update one of the current user's saved addresses
+@user_bp.route("/addresses/<int:address_id>", methods=["PATCH"], strict_slashes=False)
+@login_required
+def update_user_address(address_id):
+    user_id = session.get("user").get("user_id")
+    return UserService.update_user_address(user_id, address_id, request.get_json())

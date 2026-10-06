@@ -71,21 +71,79 @@ class UserService:
         if not user:
             return jsonify({"success": False, "message": "User does not exist"}), 404
 
-        addresses = [
-            {
-                "id": address.id,
-                "address_line1": address.address_line1,
-                "address_line2": address.address_line2,
-                "city": address.city,
-                "state": address.state,
-                "postal_code": address.postal_code,
-                "country": address.country,
-                "is_default": address.is_default,
-                "landmark": address.landmark,
-            }
-            for address in user.addresses
-        ]
+        addresses = [UserService._address_to_dict(address) for address in user.addresses]
 
         return jsonify({"success": True, "data": addresses}), 200
 
-        
+    @staticmethod
+    def update_user_address(user_id, address_id, data):
+        if not isinstance(data, dict):
+            return jsonify({"success": False, "message": "An address object is required."}), 400
+
+        address = Address.query.filter_by(id=address_id, user_id=user_id).first()
+        if not address:
+            return jsonify({"success": False, "message": "Address does not exist."}), 404
+
+        field_limits = {
+            "address_line1": 100,
+            "address_line2": 100,
+            "city": 50,
+            "state": 50,
+            "postal_code": 10,
+            "country": 50,
+            "landmark": 100,
+        }
+        editable_fields = set(field_limits) | {"is_default"}
+        if not data or not set(data).issubset(editable_fields):
+            return jsonify({"success": False, "message": "The address contains unsupported fields."}), 400
+
+        updates = {}
+        for field, value in data.items():
+            if field == "is_default":
+                if not isinstance(value, bool):
+                    return jsonify({"success": False, "message": "is_default must be a boolean."}), 400
+                updates[field] = value
+                continue
+
+            if value is None and field in {"address_line2", "landmark"}:
+                updates[field] = None
+                continue
+            if not isinstance(value, str):
+                return jsonify({"success": False, "message": f"{field} must be a string."}), 400
+
+            value = value.strip()
+            if field in {"address_line1", "city", "state", "postal_code", "country"} and not value:
+                return jsonify({"success": False, "message": f"{field} cannot be empty."}), 400
+            if len(value) > field_limits[field]:
+                return jsonify({"success": False, "message": f"{field} is too long."}), 400
+            updates[field] = value or None if field in {"address_line2", "landmark"} else value
+
+        if updates.get("is_default") is True:
+            Address.query.filter(
+                Address.user_id == user_id,
+                Address.id != address.id
+            ).update({Address.is_default: False}, synchronize_session=False)
+
+        for field, value in updates.items():
+            setattr(address, field, value)
+
+        db.session.commit()
+        return jsonify({
+            "success": True,
+            "message": "Address updated successfully.",
+            "data": UserService._address_to_dict(address)
+        }), 200
+
+    @staticmethod
+    def _address_to_dict(address):
+        return {
+            "id": address.id,
+            "address_line1": address.address_line1,
+            "address_line2": address.address_line2,
+            "city": address.city,
+            "state": address.state,
+            "postal_code": address.postal_code,
+            "country": address.country,
+            "is_default": address.is_default,
+            "landmark": address.landmark,
+        }
