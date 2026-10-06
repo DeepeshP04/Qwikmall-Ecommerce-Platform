@@ -1,0 +1,39 @@
+.legal-page {
+    min-height: 50vh;
+    padding: 40px 20px;
+}
+
+.legal-content {
+    width: min(760px, 100%);
+    margin: 0 auto;
+    padding: 32px;
+    border: 1px solid #D3D3D3;
+    background: white;
+    color: #222;
+}
+
+.legal-content h1 {
+    margin: 0 0 20px;
+    color: #1abc9c;
+}
+
+.legal-content p {
+    line-height: 1.7;
+}
+
+.legal-content a {
+    display: inline-block;
+    margin-top: 12px;
+    color: #1abc9c;
+    text-decoration: none;
+}
+
+.legal-content a:hover {
+    color: #148f77;
+}
+
+@media (max-width: 600px) {
+    .legal-content {
+        padding: 24px 20px;
+    }
+}

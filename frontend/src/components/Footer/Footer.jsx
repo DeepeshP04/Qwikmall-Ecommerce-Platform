@@ -31,8 +31,8 @@ const footerGroups = [
     {
         title: 'Legal',
         links: [
-            { label: 'Privacy policy', to: '#privacy-policy' },
-            { label: 'Terms of use', to: '#terms-of-use' },
+            { label: 'Privacy policy', to: '/privacy' },
+            { label: 'Terms of use', to: '/terms' },
         ],
     },
 ];
@@ -63,29 +63,7 @@ function Footer() {
                 {footerGroups.map((group) => (
                     <nav className="footer-link-group" aria-label={group.title} key={group.title}>
                         <h2>{group.title}</h2>
-                        {group.title === 'Legal' ? (
-                            <>
-                                <details className="footer-legal-item" id="privacy-policy">
-                                    <summary>{group.links[0].label}</summary>
-                                    <p>
-                                        QwikMall uses the account details you provide, such as your name,
-                                        phone number, and email address, to support account features.
-                                        Saved addresses and shopping activity are used to provide checkout,
-                                        cart, order, and wishlist features. Keep verification codes private
-                                        and use your account settings to review your profile information.
-                                    </p>
-                                </details>
-                                <details className="footer-legal-item" id="terms-of-use">
-                                    <summary>{group.links[1].label}</summary>
-                                    <p>
-                                        Use QwikMall and its account features lawfully and provide accurate
-                                        information when placing an order. Product availability and order
-                                        details are presented in the storefront and checkout flow. An order
-                                        is subject to confirmation by the service.
-                                    </p>
-                                </details>
-                            </>
-                        ) : group.links.map((link) => (
+                        {group.links.map((link) => (
                             <Link to={link.to} key={`${group.title}-${link.label}`}>{link.label}</Link>
                         ))}
                     </nav>

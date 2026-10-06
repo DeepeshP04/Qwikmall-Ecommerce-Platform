@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import './AuthComponent.css'
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
@@ -6,136 +6,125 @@ import { AuthContext } from '../../App';
 function AuthComponent({ isLogin }) {
     const [phone, setPhone] = useState("")
     const [error, setError] = useState("")
-    const[codeSent, setCodeSent] = useState(false)
+    const [codeSent, setCodeSent] = useState(false)
     const [code, setCode] = useState("")
     const [username, setUsername] = useState("")
-    const {setIsLoggedIn} = useContext(AuthContext)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [otpCooldown, setOtpCooldown] = useState(0)
+    const { setIsLoggedIn } = useContext(AuthContext)
     const navigate = useNavigate()
 
-    function validatePhone () {
-        const regex = /^[0-9]{10}$/
-        return regex.test(phone)
+    useEffect(() => {
+        if (otpCooldown === 0) {
+            return undefined
+        }
+
+        const timer = window.setTimeout(() => {
+            setOtpCooldown((seconds) => Math.max(seconds - 1, 0))
+        }, 1000)
+
+        return () => window.clearTimeout(timer)
+    }, [otpCooldown])
+
+    function validatePhone() {
+        return /^[0-9]{10}$/.test(phone)
     }
 
-    function handleAuth () {
-        // Login
-        if (isLogin) {
-            // Send code for login
-            if (!codeSent) {
-                if (!validatePhone()) {
-                    setError("Phone number must be exactly 10 digits.")
-                } else{
-                    setError("")
+    async function requestOtp() {
+        setError("")
 
-                    const fullPhone = "+91" + phone
-                    fetch('http://localhost:5000/auth/login/request-otp', {
-                        method: "POST",
-                        headers: {
-                            "Content-type": "application/json"
-                        },
-                        body: JSON.stringify(
-                            {mobile: fullPhone}
-                        ),
-                        credentials: "include"
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data?.success) {
-                            setCodeSent(true)
-                        }
-                    })
-                    .catch(err => console.log("Error sending code", err))
-                }
-            // Verify code for login
-            } else {
-                if (code.length !== 6){
-                    setError("Enter a valid 6-digit code.")
-                    return
-                } else {
-                    setError("")
-                    fetch("http://localhost:5000/auth/login/verify-otp", {
-                        method: "POST", 
-                        headers: {
-                            "Content-type": "application/json"
-                        },
-                        body: JSON.stringify(
-                            {code: code}
-                        ),
-                        credentials: "include"
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log(data.message)
-                            setIsLoggedIn(true)
-                            navigate("/")
+        if (!validatePhone()) {
+            setError("Phone number must be exactly 10 digits.")
+            return
+        }
+        if (!isLogin && !username.trim()) {
+            setError("Enter a username.")
+            return
+        }
 
-                        } else{
-                            setError(data.message || "Verification failed")
-                        }
-                    })
-                    .catch(err => console.log("Verification error", err))
-                }
+        setIsSubmitting(true)
+        try {
+            const response = await fetch(
+                `http://localhost:5000/auth/${isLogin ? "login" : "signup"}/request-otp`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ...(isLogin ? {} : { username: username.trim() }),
+                        mobile: `+91${phone}`,
+                    }),
+                    credentials: "include",
+                },
+            )
+            const data = await response.json()
+
+            if (!response.ok || !data?.success) {
+                setError(data?.message || "Unable to send a verification code. Please try again.")
+                return
             }
-        // Signup
-        } else {
-            if (!codeSent) {
-                if (!validatePhone()) {
-                    setError("Phone number must be exactly 10 digits.")
-                } else {
-                    setError("")
 
-                    const fullPhone = "+91" + phone
-                    fetch("http://localhost:5000/auth/signup/request-otp", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(
-                            {username: username, mobile: fullPhone}
-                        ),
-                        credentials: "include"
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success){
-                            setCodeSent(true)
-                            console.log(data.message)
-                        } else {
-                            console.log(data.message)
-                        }
-                    })
-                    .catch(err => console.log("Error sending code", err))
-                }
-            } else {
-                if (code.length != 6) {
-                    setError("Enter a valid 6-digit code.")
-                    return
-                } else {
-                    setError("")
+            setCodeSent(true)
+            setCode("")
+            setOtpCooldown(30)
+        } catch {
+            setError("Unable to send a verification code. Please check your connection and try again.")
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
 
-                    fetch("http://localhost:5000/auth/signup/verify-otp", {
-                        method: "POST", 
-                        headers: {
-                            "Content-type": "application/json"
-                        },
-                        body: JSON.stringify(
-                            {code: code}
-                        ),
-                        credentials: "include"
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log(data.message)
-                            setIsLoggedIn(true)
-                            navigate("/")
-                        } else{
-                            setError(data.message || "Verification failed")
-                        }
-                    })
-                    .catch(err => console.log("Verification error", err))
-                }
+    async function handleAuth(event) {
+        event.preventDefault()
+
+        if (!codeSent) {
+            await requestOtp()
+            return
+        }
+
+        setError("")
+        if (!/^[0-9]{6}$/.test(code)) {
+            setError("Enter a valid 6-digit code.")
+            return
+        }
+
+        setIsSubmitting(true)
+        try {
+            const response = await fetch(
+                `http://localhost:5000/auth/${isLogin ? "login" : "signup"}/verify-otp`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code }),
+                    credentials: "include",
+                },
+            )
+            const data = await response.json()
+
+            if (!response.ok || !data?.success) {
+                setError(data?.message || "Verification failed. Check the code and try again.")
+                return
+            }
+
+            setIsLoggedIn(true)
+            navigate("/")
+        } catch {
+            setError("Unable to verify the code. Please check your connection and try again.")
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    function handleBackToPhone() {
+        setCodeSent(false)
+        setCode("")
+        setError("")
+    }
+
+    function handleInputKeyDown(event) {
+        if (event.key === "Enter") {
+            event.preventDefault()
+            if (!isSubmitting) {
+                handleAuth(event)
             }
         }
     }
@@ -143,30 +132,102 @@ function AuthComponent({ isLogin }) {
     return (
         <div className="auth-container">
             <div className="left-box">
-                <span>{ isLogin ? "Login" : "Looks like you're new here!" }</span>
-                <p>{ isLogin ? "Get access to your Orders, Wishlist and Recommendations" : "Sign up with your mobile number to get started" }</p>
+                <span>{isLogin ? "Login" : "Looks like you're new here!"}</span>
+                <p>{isLogin ? "Get access to your Orders, Wishlist and Recommendations" : "Sign up with your mobile number to get started"}</p>
             </div>
             <div className="right-box">
-                <div className="form-section">
+                <form className="form-section" onSubmit={handleAuth}>
                     <div className="input-section">
-                        { !isLogin && !codeSent && (<input id="username" type='text' name='username' placeholder='Enter Username' required onChange={(e) => setUsername(e.target.value)}></input>)} 
-                        {!codeSent ? (<div className='phone-space'>
-                            <span id="country-code-span">+91</span>
-                            <input id="phone" type="tel" name="phone" placeholder="Enter Phone Number" minLength="10" maxLength="10" required onChange={(e) => setPhone(e.target.value)}></input>
-                        </div>) : (
-                            <input id="code" type='number' placeholder='Enter code' maxLength="6" required onChange={(e) => setCode(e.target.value)}></input>
+                        {!isLogin && !codeSent && (
+                            <input
+                                id="username"
+                                type="text"
+                                name="username"
+                                placeholder="Enter Username"
+                                autoComplete="username"
+                                aria-label="Username"
+                                required
+                                value={username}
+                                onKeyDown={handleInputKeyDown}
+                                onChange={(event) => setUsername(event.target.value)}
+                            />
                         )}
-                        {error && <p id="error-message">{error}</p>}
+                        {!codeSent ? (
+                            <div className="phone-space">
+                                <span id="country-code-span">+91</span>
+                                <input
+                                    id="phone"
+                                    type="tel"
+                                    name="phone"
+                                    placeholder="Enter Phone Number"
+                                    aria-label="10-digit phone number"
+                                    autoComplete="tel-national"
+                                    inputMode="numeric"
+                                    pattern="[0-9]{10}"
+                                    minLength="10"
+                                    maxLength="10"
+                                    required
+                                    value={phone}
+                                    onKeyDown={handleInputKeyDown}
+                                    onChange={(event) => setPhone(event.target.value.replace(/\D/g, '').slice(0, 10))}
+                                />
+                            </div>
+                        ) : (
+                            <>
+                                <button className="back-button" type="button" onClick={handleBackToPhone}>
+                                    ← Back
+                                </button>
+                                <input
+                                    id="code"
+                                    type="text"
+                                    name="code"
+                                    placeholder="Enter 6-digit code"
+                                    aria-label="6-digit verification code"
+                                    autoComplete="one-time-code"
+                                    inputMode="numeric"
+                                    pattern="[0-9]{6}"
+                                    maxLength="6"
+                                    required
+                                    value={code}
+                                    onKeyDown={handleInputKeyDown}
+                                    onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                                />
+                            </>
+                        )}
+                        {error && <p id="error-message" role="alert">{error}</p>}
                     </div>
                     <div className="terms-section">
-                        {!codeSent && (<p>By continuing, you agree to QwikMall's <a href=''>Terms of Use</a> and <a href=''>Privacy Policy</a>.</p>)}
+                        {!codeSent && (
+                            <p>
+                                By continuing, you agree to QwikMall's <Link to="/terms">Terms of Use</Link> and{' '}
+                                <Link to="/privacy">Privacy Policy</Link>.
+                            </p>
+                        )}
                     </div>
                     <div className="button-section">
-                        <button id="submit-btn" type="submit" onClick={handleAuth}>{!codeSent ? "Request OTP" : "Verify Code"}</button>
+                        <button id="submit-btn" type="submit" disabled={isSubmitting}>
+                            {isSubmitting
+                                ? (codeSent ? "Verifying..." : "Requesting OTP...")
+                                : (codeSent ? "Verify Code" : "Request OTP")}
+                        </button>
+                        {codeSent && (
+                            <button
+                                className="resend-code-button"
+                                type="button"
+                                onClick={requestOtp}
+                                disabled={isSubmitting || otpCooldown > 0}
+                            >
+                                {isSubmitting
+                                    ? "Sending code..."
+                                    : otpCooldown > 0
+                                        ? `Get code again in 00:${String(otpCooldown).padStart(2, "0")}`
+                                        : "Get code again"}
+                            </button>
+                        )}
                     </div>
-                </div>
+                </form>
                 <div className="go-to-login-section">
-                    <Link to={ isLogin ? "/signup" : "/login" }>{ isLogin ? "New to Qwikmall? Create an account" : "Existing User? Log in" }</Link>
+                    <Link to={isLogin ? "/signup" : "/login"}>{isLogin ? "New to Qwikmall? Create an account" : "Existing User? Log in"}</Link>
                 </div>
             </div>
         </div>

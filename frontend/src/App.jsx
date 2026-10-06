@@ -11,6 +11,7 @@ import Checkout from './pages/Checkout'
 import AllProductsPage from './pages/AllProductsPage';
 import { ToastContainer } from 'react-toastify'
 import UserAccount from './pages/UserAccount'
+import LegalPage from './pages/LegalPage'
 
 const AuthContext = createContext()
 
@@ -32,6 +33,8 @@ function App() {
         <Route path='/' element={<Home></Home>}/>
         <Route path='signup' element={<Signup></Signup>}/>
         <Route path='login' element={<Login></Login>}/>
+        <Route path='/privacy' element={<LegalPage />}/>
+        <Route path='/terms' element={<LegalPage />}/>
         <Route path='/category/:categoryName' element={<CategoryProductsPage></CategoryProductsPage>}/>
         <Route path='product/:productId' element={<ProductPage></ProductPage>}/>
         <Route path='cart' element={<Cart></Cart>}/>

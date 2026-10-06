@@ -1,6 +1,6 @@
 import CartItemList from "./CartItemList";
 import './CartContainer.css'
-import { useEffect, useState, useContext, useRef } from "react";
+import { useCallback, useEffect, useState, useContext, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
 
@@ -17,15 +17,7 @@ function CartContainer () {
     const hasInitializedSelection = useRef(false);
     const { isLoggedIn } = useContext(AuthContext);
 
-    useEffect(() => {
-        if (isLoggedIn) {
-            fetchCartItems();
-        } else {
-            setLoading(false);
-        }
-    }, []);
-
-    const fetchCartItems = async () => {
+    const fetchCartItems = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
@@ -33,9 +25,7 @@ function CartContainer () {
                 credentials: "include"
             });
             const data = await response.json();
-            
-            console.log("Cart response:", data);
-            
+
             if (response.ok) {
                 const normalizedCart = {
                     ...data.data,
@@ -62,7 +52,15 @@ function CartContainer () {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            fetchCartItems();
+        } else {
+            setLoading(false);
+        }
+    }, [fetchCartItems, isLoggedIn]);
 
     // Update quantity handler
     const updateCartItemQuantity = async (cartItemId, newQuantity) => {
@@ -295,7 +293,7 @@ function CartContainer () {
                         className="place-order-btn"
                         disabled={!selectedItems.length}
                         onClick={() => navigate('/checkout', {
-                            state: { selectedCartItemIds },
+                            state: { selectedCartItemIds: selectedItemIds },
                         })}
                     >
                         Proceed to checkout
