@@ -91,7 +91,7 @@ function ProductCard ({ product }) {
                     )}
                 </div>
 
-                <div className="product-card-expanded" onClick={(event) => event.stopPropagation()}>
+                {/* <div className="product-card-expanded" onClick={(event) => event.stopPropagation()}>
                     <p className="product-card-expanded-description">
                         {product.description || 'Explore this product for more details.'}
                     </p>
@@ -115,8 +115,8 @@ function ProductCard ({ product }) {
                         <Link to={`/product/${product.id}`} onClick={(event) => event.stopPropagation()}>
                             View Product
                         </Link>
-                    </div>
-                </div>
+                    </div> 
+                </div> */ }
             </div>
         </article>
     )
