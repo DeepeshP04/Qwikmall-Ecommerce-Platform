@@ -2,11 +2,16 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   faArrowRightFromBracket,
+  faArrowUpRightFromSquare,
   faBox,
+  faCheck,
   faHeart,
   faHouse,
   faLock,
+  faMagnifyingGlass,
   faPen,
+  faRotateLeft,
+  faTruckFast,
   faUser,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
@@ -228,6 +233,8 @@ function UserAccount() {
                 onChange={handleFormChange}
                 onSave={saveProfile}
               />
+            ) : activeTab === "orders" ? (
+              <OrdersSection />
             ) : (
               <AccountPlaceholder tab={activeTab} />
             )}
@@ -237,6 +244,289 @@ function UserAccount() {
       <Footer />
     </>
   );
+}
+
+function OrdersSection() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All orders");
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadOrders = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/orders/", {
+          credentials: "include",
+        });
+        const result = await response.json();
+        if (response.status === 404 && !result.success) {
+          if (isMounted) setOrders([]);
+          return;
+        }
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Unable to load your orders.");
+        }
+        if (isMounted) {
+          const orderList = Array.isArray(result.data) ? result.data : [];
+          setOrders(orderList.slice().sort(
+            (first, second) => new Date(second.order_date) - new Date(first.order_date)
+          ));
+        }
+      } catch (loadError) {
+        if (isMounted) setError(loadError.message || "Unable to load your orders.");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadOrders();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const statusOptions = ["All orders", "On the way", "Delivered", "Cancelled"];
+  const filteredOrders = orders.filter((order) => {
+    const status = normalizeOrderStatus(order.status);
+    const matchesStatus = statusFilter === "All orders"
+      || (statusFilter === "On the way" && ["pending", "processing", "shipped", "out for delivery"].includes(status))
+      || status === statusFilter.toLowerCase();
+    const searchValue = search.trim().toLowerCase();
+    const matchesSearch = !searchValue
+      || String(order.id).includes(searchValue)
+      || (order.order_items || []).some((item) =>
+        item.product?.name?.toLowerCase().includes(searchValue)
+      );
+    return matchesStatus && matchesSearch;
+  });
+
+  return (
+    <div className="orders-content">
+      <header className="orders-page-heading">
+        <div>
+          <span className="profile-eyebrow">Your account</span>
+          <h1>My orders</h1>
+          <p>Track deliveries, review purchases, and find your order details.</p>
+        </div>
+        <span className="orders-total-count">{orders.length} {orders.length === 1 ? "order" : "orders"}</span>
+      </header>
+
+      <div className="orders-toolbar">
+        <div className="orders-status-tabs" role="group" aria-label="Filter orders by status">
+          {statusOptions.map((status) => (
+            <button
+              className={`orders-status-tab${statusFilter === status ? " is-active" : ""}`}
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              type="button"
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+        <label className="orders-search">
+          <FontAwesomeIcon icon={faMagnifyingGlass} aria-hidden="true" />
+          <input
+            aria-label="Search orders"
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search orders"
+            value={search}
+          />
+        </label>
+      </div>
+
+      {loading ? (
+        <section className="profile-panel">
+          <div className="profile-loading" role="status">Loading your orders...</div>
+        </section>
+      ) : error ? (
+        <section className="profile-panel orders-empty">
+          <h2>We couldn't load your orders</h2>
+          <p role="alert">{error}</p>
+        </section>
+      ) : filteredOrders.length ? (
+        <div className="orders-list">
+          {filteredOrders.map((order) => (
+            <OrderCard key={order.id} order={order} />
+          ))}
+        </div>
+      ) : (
+        <section className="profile-panel orders-empty">
+          <span className="orders-empty-icon"><FontAwesomeIcon icon={faBox} aria-hidden="true" /></span>
+          <h2>{orders.length ? "No matching orders" : "No orders yet"}</h2>
+          <p>
+            {orders.length
+              ? "Try a different status or search term."
+              : "When you place an order, its items and delivery updates will appear here."}
+          </p>
+          {!orders.length && <Link className="profile-primary-button" to="/products">Explore products</Link>}
+        </section>
+      )}
+    </div>
+  );
+}
+
+function OrderCard({ order }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const items = order.order_items || [];
+  const itemCount = items.reduce((total, item) => total + Number(item.quantity || 0), 0);
+  const status = normalizeOrderStatus(order.status);
+  const statusLabel = order.status || "Processing";
+  const orderDate = order.order_date
+    ? new Date(order.order_date).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "Date unavailable";
+  const address = order.address;
+  const addressText = address
+    ? [
+        address.address_line1,
+        address.address_line2,
+        address.city,
+        address.state,
+        address.postal_code,
+        address.country,
+      ].filter(Boolean).join(", ")
+    : "Delivery address unavailable";
+  const trackingSteps = [
+    { label: "Order placed", icon: faCheck },
+    { label: "Shipped", icon: faTruckFast },
+    { label: "Delivered", icon: faBox },
+  ];
+  const currentStep = status === "cancelled"
+    ? -1
+    : status === "delivered"
+      ? 2
+      : ["shipped", "out for delivery"].includes(status)
+        ? 1
+        : 0;
+
+  return (
+    <article className="order-card">
+      <header className="order-card-header">
+        <div className="order-meta-group">
+          <div className="order-meta">
+            <span>ORDER PLACED</span>
+            <strong>{orderDate}</strong>
+          </div>
+          <div className="order-meta">
+            <span>TOTAL</span>
+            <strong>{formatOrderPrice(order.total_price)}</strong>
+          </div>
+          <div className="order-meta order-meta--number">
+            <span>ORDER</span>
+            <strong>#{order.id}</strong>
+          </div>
+        </div>
+        <span className={`order-status order-status--${status.replaceAll(" ", "-")}`}>
+          {statusLabel}
+        </span>
+      </header>
+
+      <div className="order-card-body">
+        <div className="order-items">
+          {items.map((item) => (
+            <div className="order-item" key={item.id}>
+              <div className="order-item-image">
+                {item.product?.image_url ? (
+                  <img
+                    src={item.product.image_url}
+                    alt={item.product.image_alt_text || item.product.name}
+                  />
+                ) : (
+                  <FontAwesomeIcon icon={faBox} aria-hidden="true" />
+                )}
+              </div>
+              <div className="order-item-copy">
+                <strong>{item.product?.name || `Product #${item.product_id}`}</strong>
+                <span>Quantity: {item.quantity}</span>
+                <span>Unit price: {formatOrderPrice(item.price)}</span>
+              </div>
+              <strong className="order-item-total">
+                {formatOrderPrice(Number(item.price || 0) * Number(item.quantity || 0))}
+              </strong>
+            </div>
+          ))}
+        </div>
+
+        <div className="order-summary">
+          <div className="order-summary-block">
+            <h3>Delivery address</h3>
+            <p>{addressText}</p>
+            {address?.landmark && <span>Landmark: {address.landmark}</span>}
+          </div>
+          <div className="order-summary-block">
+            <h3>Payment</h3>
+            <p>{formatPaymentMethod(order.payment_method)}</p>
+            <span>Order total: {formatOrderPrice(order.total_price)}</span>
+          </div>
+          <button
+            className="order-details-button"
+            aria-expanded={detailsOpen}
+            onClick={() => setDetailsOpen((open) => !open)}
+            type="button"
+          >
+            {detailsOpen ? "Hide details" : "Order details"}
+            <FontAwesomeIcon icon={faArrowUpRightFromSquare} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      {detailsOpen && (
+        <div className="order-extra-details">
+          <span><strong>Order number:</strong> #{order.id}</span>
+          <span><strong>Placed on:</strong> {order.order_date ? new Date(order.order_date).toLocaleString() : orderDate}</span>
+          <span><strong>Payment method:</strong> {formatPaymentMethod(order.payment_method)}</span>
+          <span><strong>Items in this order:</strong> {itemCount}</span>
+        </div>
+      )}
+
+      <footer className="order-card-footer">
+        {status === "cancelled" ? (
+          <p className="order-cancelled-message">
+            <FontAwesomeIcon icon={faRotateLeft} aria-hidden="true" />
+            This order was cancelled.
+          </p>
+        ) : (
+          <>
+            <div className="order-progress" aria-label={`Order status: ${statusLabel}`}>
+              {trackingSteps.map((step, index) => (
+                <div className={`order-progress-step${index <= currentStep ? " is-complete" : ""}`} key={step.label}>
+                  <span className="order-progress-marker">
+                    <FontAwesomeIcon icon={step.icon} aria-hidden="true" />
+                  </span>
+                  <span>{step.label}</span>
+                </div>
+              ))}
+            </div>
+            <span className="order-items-count">{itemCount} {itemCount === 1 ? "item" : "items"}</span>
+          </>
+        )}
+      </footer>
+    </article>
+  );
+}
+
+function normalizeOrderStatus(status) {
+  return String(status || "processing").trim().toLowerCase();
+}
+
+function formatOrderPrice(value) {
+  return `₹${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function formatPaymentMethod(method) {
+  const paymentLabels = {
+    cod: "Cash on Delivery",
+    upi: "UPI",
+    card: "Debit / Credit Card",
+  };
+  return paymentLabels[String(method || "").toLowerCase()] || method || "Payment method unavailable";
 }
 
 function ProfileSection({
