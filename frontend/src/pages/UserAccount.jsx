@@ -4,6 +4,7 @@ import {
   faArrowRightFromBracket,
   faArrowUpRightFromSquare,
   faBox,
+  faCartPlus,
   faCheck,
   faCircleCheck,
   faEnvelope,
@@ -15,6 +16,7 @@ import {
   faPen,
   faRotateLeft,
   faShieldHalved,
+  faTrashCan,
   faTruckFast,
   faUser,
   faXmark,
@@ -251,6 +253,8 @@ function UserAccount() {
                 onLogout={handleLogout}
                 loggingOut={loggingOut}
               />
+            ) : activeTab === "wishlist" ? (
+              <WishlistSection />
             ) : (
               <AccountPlaceholder tab={activeTab} />
             )}
@@ -379,6 +383,189 @@ function OrdersSection() {
               : "When you place an order, its items and delivery updates will appear here."}
           </p>
           {!orders.length && <Link className="profile-primary-button" to="/products">Explore products</Link>}
+        </section>
+      )}
+    </div>
+  );
+}
+
+function WishlistSection() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [busyItemId, setBusyItemId] = useState(null);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadWishlist = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/wishlist", {
+          credentials: "include",
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Unable to load your wishlist.");
+        }
+        if (isMounted) setItems(Array.isArray(result.data) ? result.data : []);
+      } catch (loadError) {
+        if (isMounted) setError(loadError.message || "Unable to load your wishlist.");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadWishlist();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const removeItem = async (item) => {
+    setBusyItemId(item.id);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(`http://localhost:5000/wishlist/items/${item.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Unable to remove this product.");
+      }
+      setItems((current) => current.filter((savedItem) => savedItem.id !== item.id));
+      setNotice("Product removed from your wishlist.");
+    } catch (removeError) {
+      setError(removeError.message || "Unable to remove this product.");
+    } finally {
+      setBusyItemId(null);
+    }
+  };
+
+  const moveToCart = async (item) => {
+    setBusyItemId(item.id);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("http://localhost:5000/cart/items", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_id: item.product.id, quantity: 1 }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Unable to add this product to your cart.");
+      }
+      const removeResponse = await fetch(`http://localhost:5000/wishlist/items/${item.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const removeResult = await removeResponse.json();
+      if (!removeResponse.ok || !removeResult.success) {
+        throw new Error("Product was added to your cart, but could not be removed from your wishlist.");
+      }
+      setItems((current) => current.filter((savedItem) => savedItem.id !== item.id));
+      setNotice("Product moved to your cart.");
+    } catch (moveError) {
+      setError(moveError.message || "Unable to add this product to your cart.");
+    } finally {
+      setBusyItemId(null);
+    }
+  };
+
+  const visibleItems = items.filter((item) =>
+    item.product?.name?.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
+  return (
+    <div className="wishlist-content">
+      <header className="orders-page-heading">
+        <div>
+          <span className="profile-eyebrow">Your account</span>
+          <h1>My wishlist</h1>
+          <p>Keep products you love in one place and come back to them anytime.</p>
+        </div>
+        <span className="orders-total-count">{items.length} {items.length === 1 ? "saved item" : "saved items"}</span>
+      </header>
+
+      <div className="wishlist-toolbar">
+        <label className="orders-search">
+          <FontAwesomeIcon icon={faMagnifyingGlass} aria-hidden="true" />
+          <input
+            aria-label="Search wishlist"
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Find a saved product"
+            value={search}
+          />
+        </label>
+      </div>
+
+      {notice && <p className="profile-alert profile-alert--success" role="status">{notice}</p>}
+      {error && <p className="profile-alert profile-alert--error" role="alert">{error}</p>}
+
+      {loading ? (
+        <section className="profile-panel">
+          <div className="profile-loading" role="status">Loading your wishlist...</div>
+        </section>
+      ) : visibleItems.length ? (
+        <div className="wishlist-grid">
+          {visibleItems.map((item) => (
+            <article className="wishlist-card" key={item.id}>
+              <Link className="wishlist-product-link" to={`/product/${item.product.id}`}>
+                <div className="wishlist-image">
+                  {item.product.image_url ? (
+                    <img src={item.product.image_url} alt={item.product.image_alt_text || item.product.name} />
+                  ) : (
+                    <FontAwesomeIcon icon={faBox} aria-hidden="true" />
+                  )}
+                  <span className="wishlist-heart"><FontAwesomeIcon icon={faHeart} aria-hidden="true" /></span>
+                </div>
+                <div className="wishlist-product-info">
+                  {item.product.manufacturer && <span className="wishlist-brand">{item.product.manufacturer}</span>}
+                  <h2>{item.product.name}</h2>
+                  <strong className="wishlist-price">{formatOrderPrice(item.product.price)}</strong>
+                  <span className="wishlist-saved-date">
+                    Saved {item.created_at ? new Date(item.created_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "to your wishlist"}
+                  </span>
+                </div>
+              </Link>
+              <div className="wishlist-card-actions">
+                <button
+                  className="profile-primary-button wishlist-cart-button"
+                  disabled={busyItemId === item.id}
+                  onClick={() => moveToCart(item)}
+                  type="button"
+                >
+                  <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" />
+                  {busyItemId === item.id ? "Please wait..." : "Add to cart"}
+                </button>
+                <button
+                  aria-label={`Remove ${item.product.name} from wishlist`}
+                  className="wishlist-remove-button"
+                  disabled={busyItemId === item.id}
+                  onClick={() => removeItem(item)}
+                  type="button"
+                >
+                  <FontAwesomeIcon icon={faTrashCan} aria-hidden="true" />
+                  Remove
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <section className="profile-panel wishlist-empty">
+          <span className="orders-empty-icon"><FontAwesomeIcon icon={faHeart} aria-hidden="true" /></span>
+          <h2>{items.length ? "No matching products" : "Your wishlist is waiting"}</h2>
+          <p>
+            {items.length
+              ? "Try a different product name."
+              : "Save products from their product pages and they’ll be easy to find here."}
+          </p>
+          {!items.length && <Link className="profile-primary-button" to="/products">Explore products</Link>}
         </section>
       )}
     </div>

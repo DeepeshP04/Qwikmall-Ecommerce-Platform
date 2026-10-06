@@ -35,6 +35,7 @@ def create_app():
     from app.routes.orders import order_bp
     from app.routes.products import product_bp
     from app.routes.users import user_bp
+    from app.routes.wishlist import wishlist_bp
     from app.routes.payments import payment_bp
     from app.routes.checkout import checkout_bp
     from app.routes.admin import admin_bp
@@ -46,12 +47,13 @@ def create_app():
     app.register_blueprint(order_bp)
     app.register_blueprint(product_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(wishlist_bp)
     app.register_blueprint(payment_bp)
     app.register_blueprint(checkout_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(views)
     
-    from .models import Product, User, Category, Order, OrderItem, Cart, CartItem, Payment, ProductImage, Review, ProductAttribute, ProductAttributeValue, Address
+    from .models import Product, User, Category, Order, OrderItem, Cart, CartItem, Payment, ProductImage, Review, ProductAttribute, ProductAttributeValue, Address, WishlistItem
 
     # create_db_tables(app)
     # insert_test_data_in_database(db, Product, app)

@@ -248,6 +248,20 @@
     background: #545b62;
 }
 
+.btn-wishlist {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #e6cbd0;
+    background: #fff;
+    color: #b23a53;
+}
+
+.btn-wishlist:hover {
+    background: #fff4f6;
+}
+
 /* Specifications */
 .product-specifications {
     margin-top: 20px;

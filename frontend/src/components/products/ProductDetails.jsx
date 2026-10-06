@@ -1,5 +1,7 @@
 import './ProductDetails.css'
 import { useState, useContext } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHeart } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { AuthContext } from '../../App'
@@ -49,6 +51,30 @@ function ProductDetails({ product }) {
         navigate('/login')
     }
     };
+
+    const handleAddToWishlist = async () => {
+        if (!isLoggedIn) {
+            toast('Please login to save products to your wishlist')
+            navigate('/login')
+            return
+        }
+
+        try {
+            const response = await fetch('http://localhost:5000/wishlist/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: product.id }),
+                credentials: 'include'
+            })
+            const data = await response.json()
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Unable to save this product')
+            }
+            toast.success(data.message || 'Product saved to your wishlist')
+        } catch (error) {
+            toast.error(error.message || 'Unable to save this product')
+        }
+    }
 
     const handleBuy = () => {
         if(isLoggedIn) {
@@ -160,6 +186,10 @@ function ProductDetails({ product }) {
                         </button>
                         <button className="btn btn-secondary add-to-cart-btn" onClick={handleAddToCart}>
                             Add to Cart
+                        </button>
+                        <button className="btn btn-wishlist" onClick={handleAddToWishlist}>
+                            <FontAwesomeIcon icon={faHeart} aria-hidden="true" />
+                            Save
                         </button>
                     </div>
 

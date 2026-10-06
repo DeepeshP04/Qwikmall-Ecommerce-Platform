@@ -8,6 +8,7 @@ from .product_image import ProductImage
 from .review import Review
 from .product_attribute import ProductAttribute, ProductAttributeValue
 from .address import Address
+from .wishlist import WishlistItem
 
 # Export all models
 __all__ = [
@@ -23,5 +24,6 @@ __all__ = [
     'Review',
     'ProductAttribute',
     'ProductAttributeValue',
-    'Address'
-] 
+    'Address',
+    'WishlistItem',
+]
