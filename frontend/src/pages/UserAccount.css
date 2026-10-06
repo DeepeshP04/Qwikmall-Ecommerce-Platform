@@ -1084,6 +1084,155 @@
   line-height: 1.6;
 }
 
+.security-content {
+  display: grid;
+  gap: 18px;
+}
+
+.security-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 20px 22px;
+  border: 1px solid #d9e6fb;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #f3f8ff, #fff);
+}
+
+.security-banner-icon,
+.security-contact-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  background: #e4efff;
+  color: #2867c2;
+}
+
+.security-banner-icon {
+  width: 43px;
+  height: 43px;
+  font-size: 17px;
+}
+
+.security-banner h2 {
+  margin: 1px 0 5px;
+  color: #263449;
+  font-size: 15px;
+}
+
+.security-banner p {
+  max-width: 650px;
+  margin: 0;
+  color: #6d7b91;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.security-panel .profile-panel-heading {
+  align-items: center;
+}
+
+.security-protection-badge,
+.security-current-label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #eaf8ef;
+  color: #27834b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.security-contact-list {
+  border-top: 1px solid #edf0f4;
+}
+
+.security-contact-row,
+.security-session-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.security-contact-icon {
+  width: 38px;
+  height: 38px;
+  font-size: 14px;
+}
+
+.security-contact-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 4px;
+}
+
+.security-contact-copy strong {
+  overflow: hidden;
+  color: #334156;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.security-contact-copy span {
+  overflow-wrap: anywhere;
+  color: #7a879a;
+  font-size: 11px;
+}
+
+.security-contact-status {
+  flex: 0 0 auto;
+  color: #7b8799;
+  font-size: 10px;
+}
+
+.security-panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 15px;
+}
+
+.security-panel-actions .profile-secondary-button {
+  min-height: 38px;
+  font-size: 11px;
+}
+
+.security-session-row {
+  border-top: 1px solid #edf0f4;
+}
+
+.security-session-indicator {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #37a566;
+  box-shadow: 0 0 0 4px #eaf8ef;
+  margin: 0 5px;
+}
+
+.security-current-label {
+  background: #edf4ff;
+  color: #2867c2;
+}
+
+.security-logout-button {
+  color: #a43c3c;
+}
+
+.security-logout-button:hover:not(:disabled) {
+  border-color: #efcaca;
+  background: #fff5f5;
+}
+
 @media (max-width: 800px) {
   .account-page {
     padding-top: 24px;
@@ -1156,6 +1305,20 @@
   .address-form-error,
   .address-form-actions {
     grid-column: 1;
+  }
+
+  .security-banner {
+    padding: 17px;
+  }
+
+  .security-contact-row,
+  .security-session-row {
+    flex-wrap: wrap;
+  }
+
+  .security-contact-status,
+  .security-current-label {
+    margin-left: 50px;
   }
 }
 

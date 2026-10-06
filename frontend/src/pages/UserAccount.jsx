@@ -5,12 +5,16 @@ import {
   faArrowUpRightFromSquare,
   faBox,
   faCheck,
+  faCircleCheck,
+  faEnvelope,
   faHeart,
   faHouse,
   faLock,
   faMagnifyingGlass,
+  faMobileScreenButton,
   faPen,
   faRotateLeft,
+  faShieldHalved,
   faTruckFast,
   faUser,
   faXmark,
@@ -237,6 +241,16 @@ function UserAccount() {
               <OrdersSection />
             ) : activeTab === "addresses" ? (
               <AddressesSection />
+            ) : activeTab === "security" ? (
+              <SecuritySection
+                profile={profile}
+                onManageDetails={() => {
+                  setActiveTab("profile");
+                  beginEditing();
+                }}
+                onLogout={handleLogout}
+                loggingOut={loggingOut}
+              />
             ) : (
               <AccountPlaceholder tab={activeTab} />
             )}
@@ -938,6 +952,111 @@ function ProfileSection({
             </div>
           )}
         </dl>
+      </section>
+    </div>
+  );
+}
+
+function SecuritySection({ profile, onManageDetails, onLogout, loggingOut }) {
+  const maskedPhone = profile?.phone
+    ? `${"*".repeat(Math.max(0, profile.phone.length - 4))}${profile.phone.slice(-4)}`
+    : "No phone number added";
+
+  return (
+    <div className="security-content">
+      <header className="profile-page-heading">
+        <div>
+          <span className="profile-eyebrow">Your account</span>
+          <h1>Security</h1>
+          <p>Review how you sign in and keep your contact details current.</p>
+        </div>
+      </header>
+
+      <section className="security-banner">
+        <span className="security-banner-icon">
+          <FontAwesomeIcon icon={faShieldHalved} aria-hidden="true" />
+        </span>
+        <div>
+          <h2>Your account uses one-time-code sign-in</h2>
+          <p>
+            QwikMall signs you in with a verification code sent to your phone.
+            There is no account password to change here.
+          </p>
+        </div>
+      </section>
+
+      <section className="profile-panel security-panel">
+        <div className="profile-panel-heading">
+          <div>
+            <h2>Sign-in verification</h2>
+            <p>These details help you receive account and order updates.</p>
+          </div>
+          <span className="security-protection-badge">
+            <FontAwesomeIcon icon={faCircleCheck} aria-hidden="true" />
+            OTP sign-in
+          </span>
+        </div>
+
+        <div className="security-contact-list">
+          <div className="security-contact-row">
+            <span className="security-contact-icon">
+              <FontAwesomeIcon icon={faMobileScreenButton} aria-hidden="true" />
+            </span>
+            <div className="security-contact-copy">
+              <strong>Phone number</strong>
+              <span>{maskedPhone}</span>
+            </div>
+            <span className="security-contact-status">
+              {profile?.phone ? "Used for sign-in" : "Not set"}
+            </span>
+          </div>
+          <div className="security-contact-row">
+            <span className="security-contact-icon">
+              <FontAwesomeIcon icon={faEnvelope} aria-hidden="true" />
+            </span>
+            <div className="security-contact-copy">
+              <strong>Email address</strong>
+              <span>{profile?.email || "No email address added"}</span>
+            </div>
+            <span className="security-contact-status">
+              {profile?.email ? "Contact detail" : "Optional"}
+            </span>
+          </div>
+        </div>
+        <div className="security-panel-actions">
+          <button className="profile-secondary-button" onClick={onManageDetails} type="button">
+            <FontAwesomeIcon icon={faPen} aria-hidden="true" />
+            Manage contact details
+          </button>
+        </div>
+      </section>
+
+      <section className="profile-panel security-panel">
+        <div className="profile-panel-heading">
+          <div>
+            <h2>Active session</h2>
+            <p>This is the account session currently open in this browser.</p>
+          </div>
+        </div>
+        <div className="security-session-row">
+          <span className="security-session-indicator" />
+          <div className="security-contact-copy">
+            <strong>Current browser session</strong>
+            <span>Signed in as {profile?.username || "your QwikMall account"}</span>
+          </div>
+          <span className="security-current-label">Current</span>
+        </div>
+        <div className="security-panel-actions">
+          <button
+            className="profile-secondary-button security-logout-button"
+            disabled={loggingOut}
+            onClick={onLogout}
+            type="button"
+          >
+            <FontAwesomeIcon icon={faArrowRightFromBracket} aria-hidden="true" />
+            {loggingOut ? "Logging out..." : "Sign out of this session"}
+          </button>
+        </div>
       </section>
     </div>
   );
