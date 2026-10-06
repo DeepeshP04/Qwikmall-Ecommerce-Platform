@@ -1,211 +1,429 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  faArrowRightFromBracket,
+  faBox,
+  faHeart,
+  faHouse,
+  faLock,
+  faPen,
+  faUser,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { AuthContext } from "../App";
+import Footer from "../components/footer/Footer";
 import Navbar from "../components/header/Navbar";
+import "./UserAccount.css";
+
+const accountTabs = [
+  { id: "profile", label: "Profile information", icon: faUser },
+  { id: "orders", label: "My orders", icon: faBox },
+  { id: "wishlist", label: "Wishlist", icon: faHeart },
+  { id: "addresses", label: "Addresses", icon: faHouse },
+  { id: "security", label: "Security", icon: faLock },
+];
 
 function UserAccount() {
   const [activeTab, setActiveTab] = useState("profile");
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ username: "", email: "", phone: "" });
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveMessage, setSaveMessage] = useState("");
+  const [loggingOut, setLoggingOut] = useState(false);
+  const { setIsLoggedIn } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const styles = {
-    container: {
-      display: "flex",
-      minHeight: "100vh",
-      background: "#f5f7fa",
-      fontFamily: "Arial, sans-serif",
-      color: "#111827"
-    },
-    sidebar: {
-      width: "260px",
-      background: "#111827",
-      color: "#fff",
-      padding: "20px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "10px"
-    },
-    brand: {
-      fontSize: "22px",
-      fontWeight: "bold",
-      marginBottom: "20px",
-      textAlign: "center",
-      color: "#38bdf8"
-    },
-    sidebarBtn: (active) => ({
-      padding: "12px",
-      border: "1px solid #374151",
-      borderRadius: "8px",
-      cursor: "pointer",
-      background: active ? "#2563eb" : "#1f2937",
-      color: active ? "#ffffff" : "#e5e7eb",
-      textAlign: "left",
-      fontSize: "15px",
-      fontWeight: active ? "600" : "500",
-      transition: "all 0.2s ease"
-    }),
-    logoutBtn: {
-      marginTop: "auto",
-      padding: "12px",
-      border: "none",
-      borderRadius: "8px",
-      cursor: "pointer",
-      background: "#dc2626",
-      color: "#fff"
-    },
-    content: {
-      flex: 1,
-      padding: "30px"
-    },
-    section: {
-      background: "#fff",
-      padding: "20px",
-      borderRadius: "12px",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-      color: "#111827"
-    },
-    card: {
-      display: "flex",
-      gap: "15px",
-      alignItems: "center",
-      padding: "15px",
-      border: "1px solid #e5e7eb",
-      borderRadius: "10px",
-      marginBottom: "12px",
-      color: "#111827"
-    },
-    btnPrimary: {
-      background: "#2563eb",
-      color: "#fff",
-      padding: "10px 14px",
-      borderRadius: "6px",
-      border: "none",
-      cursor: "pointer",
-      marginTop: "10px"
-    },
-    btnOutline: {
-      background: "transparent",
-      color: "#2563eb",
-      padding: "8px 12px",
-      borderRadius: "6px",
-      border: "1px solid #2563eb",
-      cursor: "pointer",
-      marginTop: "6px"
-    },
-    danger: {
-      borderColor: "#dc2626",
-      color: "#dc2626"
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProfile = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/users/me", {
+          credentials: "include",
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Unable to load your profile.");
+        }
+        if (isMounted) {
+          setProfile(result.data);
+          setForm({
+            username: result.data.username || "",
+            email: result.data.email || "",
+            phone: result.data.phone || "",
+          });
+        }
+      } catch (error) {
+        if (isMounted) {
+          setPageError(error.message || "Unable to load your profile.");
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadProfile();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const beginEditing = () => {
+    setForm({
+      username: profile?.username || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+    });
+    setSaveError("");
+    setSaveMessage("");
+    setEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setForm({
+      username: profile?.username || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+    });
+    setSaveError("");
+    setEditing(false);
+  };
+
+  const handleFormChange = (event) => {
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
+  };
+
+  const saveProfile = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setSaveError("");
+    setSaveMessage("");
+
+    try {
+      const response = await fetch("http://localhost:5000/users/me", {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: form.username.trim(),
+          email: form.email.trim() || null,
+          phone: form.phone.trim(),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Unable to save your profile.");
+      }
+
+      const updatedProfile = {
+        ...profile,
+        username: form.username.trim(),
+        email: form.email.trim() || null,
+        phone: form.phone.trim(),
+      };
+      setProfile(updatedProfile);
+      setForm({
+        username: updatedProfile.username,
+        email: updatedProfile.email || "",
+        phone: updatedProfile.phone,
+      });
+      setEditing(false);
+      setSaveMessage("Your profile details have been updated.");
+    } catch (error) {
+      setSaveError(error.message || "Unable to save your profile.");
+    } finally {
+      setSaving(false);
     }
   };
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "profile":
-        return <ProfileSection styles={styles} />;
-      case "orders":
-        return <OrdersSection styles={styles} />;
-      case "wishlist":
-        return <WishlistSection styles={styles} />;
-      case "addresses":
-        return <AddressSection styles={styles} />;
-      case "security":
-        return <SecuritySection styles={styles} />;
-      default:
-        return <ProfileSection styles={styles} />;
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      const response = await fetch("http://localhost:5000/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Unable to log out.");
+      }
+      setIsLoggedIn(false);
+      navigate("/login");
+    } catch (error) {
+      setPageError(error.message || "Unable to log out.");
+      setLoggingOut(false);
     }
   };
+
+  const initials = profile?.username?.trim().slice(0, 2).toUpperCase() || "U";
+  const avatarUrl = profile?.profile_picture || profile?.avatar_url;
+  const joinedDate = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString(undefined, {
+        month: "long",
+        year: "numeric",
+      })
+    : null;
 
   return (
     <>
-    <Navbar></Navbar>
-    <div style={styles.container}>
-      <aside style={styles.sidebar}>
-        <h2 style={styles.brand}>QwikMall</h2>
+      <Navbar />
+      <div className="account-page">
+        <div className="account-layout">
+          <aside className="account-sidebar" aria-label="Account navigation">
+            <div className="account-sidebar-heading">
+              <span className="account-sidebar-avatar" aria-hidden="true">
+                {initials}
+              </span>
+              <div>
+                <span className="account-eyebrow">Welcome back</span>
+                <strong>{profile?.username || "My account"}</strong>
+              </div>
+            </div>
+            <nav className="account-nav">
+              {accountTabs.map((tab) => (
+                <button
+                  className={`account-nav-item${activeTab === tab.id ? " is-active" : ""}`}
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  type="button"
+                >
+                  <FontAwesomeIcon icon={tab.icon} aria-hidden="true" />
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+            <button
+              className="account-logout"
+              onClick={handleLogout}
+              disabled={loggingOut}
+              type="button"
+            >
+              <FontAwesomeIcon icon={faArrowRightFromBracket} aria-hidden="true" />
+              <span>{loggingOut ? "Logging out..." : "Log out"}</span>
+            </button>
+          </aside>
 
-        <button style={styles.sidebarBtn(activeTab === "profile")} onClick={() => setActiveTab("profile")}>👤 Profile</button>
-        <button style={styles.sidebarBtn(activeTab === "orders")} onClick={() => setActiveTab("orders")}>📦 My Orders</button>
-        <button style={styles.sidebarBtn(activeTab === "wishlist")} onClick={() => setActiveTab("wishlist")}>❤️ Wishlist</button>
-        <button style={styles.sidebarBtn(activeTab === "addresses")} onClick={() => setActiveTab("addresses")}>🏠 Addresses</button>
-        <button style={styles.sidebarBtn(activeTab === "security")} onClick={() => setActiveTab("security")}>🔐 Security</button>
-
-        <button style={styles.logoutBtn}>🚪 Logout</button>
-      </aside>
-
-      <main style={styles.content}>
-        {renderContent()}
-      </main>
-    </div>
+          <main className="account-main">
+            {activeTab === "profile" ? (
+              <ProfileSection
+                profile={profile}
+                loading={loading}
+                error={pageError}
+                editing={editing}
+                form={form}
+                saving={saving}
+                saveError={saveError}
+                saveMessage={saveMessage}
+                initials={initials}
+                avatarUrl={avatarUrl}
+                joinedDate={joinedDate}
+                onBeginEditing={beginEditing}
+                onCancelEditing={cancelEditing}
+                onChange={handleFormChange}
+                onSave={saveProfile}
+              />
+            ) : (
+              <AccountPlaceholder tab={activeTab} />
+            )}
+          </main>
+        </div>
+      </div>
+      <Footer />
     </>
   );
 }
 
-/* -------- Sections -------- */
+function ProfileSection({
+  profile,
+  loading,
+  error,
+  editing,
+  form,
+  saving,
+  saveError,
+  saveMessage,
+  initials,
+  avatarUrl,
+  joinedDate,
+  onBeginEditing,
+  onCancelEditing,
+  onChange,
+  onSave,
+}) {
+  if (loading) {
+    return (
+      <section className="profile-panel">
+        <div className="profile-loading" role="status">Loading your profile...</div>
+      </section>
+    );
+  }
 
-function ProfileSection({ styles }) {
-  return (
-    <div style={styles.section}>
-      <h2>My Profile</h2>
-      <div style={styles.card}>
-        <img src="https://i.pravatar.cc/100" alt="profile" style={{ borderRadius: "50%" }} />
-        <div>
-          <p><strong>Name:</strong> John Doe</p>
-          <p><strong>Email:</strong> john@example.com</p>
-          <p><strong>Phone:</strong> +91 9876543210</p>
-          <button style={styles.btnPrimary}>Edit Profile</button>
+  if (error && !profile) {
+    return (
+      <section className="profile-panel profile-error">
+        <div className="profile-section-heading">
+          <span className="profile-eyebrow">Your account</span>
+          <h1>Profile information</h1>
         </div>
-      </div>
-    </div>
-  );
-}
+        <p role="alert">{error}</p>
+        <Link className="profile-primary-button" to="/login">Log in to view your profile</Link>
+      </section>
+    );
+  }
 
-function OrdersSection({ styles }) {
   return (
-    <div style={styles.section}>
-      <h2>My Orders</h2>
-      <div style={styles.card}>
+    <div className="profile-content">
+      <header className="profile-page-heading">
         <div>
-          <p><strong>Order #12345</strong></p>
-          <p>Status: Delivered</p>
-          <p>Total: ₹1,299</p>
-          <button style={styles.btnOutline}>View Details</button>
+          <span className="profile-eyebrow">Your account</span>
+          <h1>Profile information</h1>
+          <p>Manage your personal details and how we can reach you.</p>
         </div>
-      </div>
+      </header>
+
+      {saveMessage && <p className="profile-alert profile-alert--success" role="status">{saveMessage}</p>}
+      {error && <p className="profile-alert profile-alert--error" role="alert">{error}</p>}
+
+      <section className="profile-hero">
+        <div className="profile-identity">
+          <div className="profile-avatar">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={`${profile.username}'s profile`} />
+            ) : (
+              <span aria-label={`${profile.username}'s initials`}>{initials}</span>
+            )}
+          </div>
+          <div className="profile-identity-copy">
+            <span className="profile-eyebrow">QwikMall customer</span>
+            <h2>{profile.username}</h2>
+            <p>{profile.email || "Add an email address to your account"}</p>
+          </div>
+        </div>
+        {!editing && (
+          <button className="profile-primary-button" onClick={onBeginEditing} type="button">
+            <FontAwesomeIcon icon={faPen} aria-hidden="true" />
+            Edit details
+          </button>
+        )}
+      </section>
+
+      <section className="profile-panel">
+        <div className="profile-panel-heading">
+          <div>
+            <h2>Personal details</h2>
+            <p>Keep your contact information up to date.</p>
+          </div>
+          {editing && (
+            <button className="profile-close-button" onClick={onCancelEditing} type="button" aria-label="Cancel editing">
+              <FontAwesomeIcon icon={faXmark} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+
+        {editing ? (
+          <form className="profile-form" onSubmit={onSave}>
+            <label className="profile-field">
+              <span>Full name</span>
+              <input
+                autoComplete="name"
+                maxLength={100}
+                name="username"
+                onChange={onChange}
+                required
+                value={form.username}
+              />
+            </label>
+            <label className="profile-field">
+              <span>Email address</span>
+              <input
+                autoComplete="email"
+                name="email"
+                onChange={onChange}
+                type="email"
+                value={form.email}
+              />
+            </label>
+            <label className="profile-field">
+              <span>Phone number</span>
+              <input
+                autoComplete="tel"
+                maxLength={20}
+                name="phone"
+                onChange={onChange}
+                required
+                type="tel"
+                value={form.phone}
+              />
+              <small>Your phone number is used for sign-in and order updates.</small>
+            </label>
+            {saveError && <p className="profile-alert profile-alert--error" role="alert">{saveError}</p>}
+            <div className="profile-form-actions">
+              <button className="profile-secondary-button" onClick={onCancelEditing} type="button">Cancel</button>
+              <button className="profile-primary-button" disabled={saving} type="submit">
+                {saving ? "Saving..." : "Save changes"}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <dl className="profile-details-list">
+            <div className="profile-detail-row">
+              <dt>Full name</dt>
+              <dd>{profile.username || "Not provided"}</dd>
+            </div>
+            <div className="profile-detail-row">
+              <dt>Email address</dt>
+              <dd>{profile.email || "Not provided"}</dd>
+            </div>
+            <div className="profile-detail-row">
+              <dt>Phone number</dt>
+              <dd>{profile.phone || "Not provided"}</dd>
+            </div>
+          </dl>
+        )}
+      </section>
+
+      <section className="profile-panel profile-account-panel">
+        <div className="profile-panel-heading">
+          <div>
+            <h2>Account details</h2>
+            <p>Basic information about your QwikMall account.</p>
+          </div>
+        </div>
+        <dl className="profile-details-list profile-details-list--compact">
+          <div className="profile-detail-row">
+            <dt>Customer ID</dt>
+            <dd>#{profile.id}</dd>
+          </div>
+          <div className="profile-detail-row">
+            <dt>Account type</dt>
+            <dd>{profile.role === "admin" ? "Administrator" : "Customer"}</dd>
+          </div>
+          {joinedDate && (
+            <div className="profile-detail-row">
+              <dt>Member since</dt>
+              <dd>{joinedDate}</dd>
+            </div>
+          )}
+        </dl>
+      </section>
     </div>
   );
 }
 
-function WishlistSection({ styles }) {
+function AccountPlaceholder({ tab }) {
+  const selectedTab = accountTabs.find((item) => item.id === tab);
   return (
-    <div style={styles.section}>
-      <h2>Wishlist</h2>
-      <div style={styles.card}>
-        <p>Wireless Headphones</p>
-        <button style={styles.btnOutline}>Add to Cart</button>
-      </div>
-    </div>
-  );
-}
-
-function AddressSection({ styles }) {
-  return (
-    <div style={styles.section}>
-      <h2>Saved Addresses</h2>
-      <div style={styles.card}>
-        <p><strong>Home</strong></p>
-        <p>221B Baker Street, Nagpur</p>
-        <button style={styles.btnOutline}>Edit</button>
-      </div>
-      <button style={styles.btnPrimary}>+ Add New Address</button>
-    </div>
-  );
-}
-
-function SecuritySection({ styles }) {
-  return (
-    <div style={styles.section}>
-      <h2>Security</h2>
-      <button style={styles.btnOutline}>Change Password</button>
-      <br />
-      <button style={{ ...styles.btnOutline, ...styles.danger, marginTop: "10px" }}>
-        Delete Account
-      </button>
-    </div>
+    <section className="profile-panel account-placeholder">
+      <span className="profile-eyebrow">Your account</span>
+      <h1>{selectedTab?.label || "My account"}</h1>
+      <p>This section is not available yet. Your profile details can be managed from Profile information.</p>
+    </section>
   );
 }
 

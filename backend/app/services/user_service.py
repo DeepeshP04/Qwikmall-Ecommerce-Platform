@@ -1,6 +1,7 @@
 from app.models import User, Address
 from app import db
 from flask import jsonify
+from sqlalchemy.exc import IntegrityError
 
 class UserService:
     @staticmethod
@@ -13,7 +14,8 @@ class UserService:
             "username": user.username,
             "email": user.email,
             "phone": user.phone,
-            "role": user.role
+            "role": user.role,
+            "created_at": user.created_at.isoformat() if user.created_at else None
         }
         return jsonify({"success": True, "data": user_data}), 200
 
@@ -22,11 +24,45 @@ class UserService:
         user = User.query.get(user_id)
         if not user:
             return jsonify({"success": False, "message": "User does not exist"}), 404
-        if "role" in data:
-            data.pop("role")
-        for key, value in data.items():
-            setattr(user, key, value)
-        db.session.commit()
+        if not isinstance(data, dict):
+            return jsonify({"success": False, "message": "A profile object is required."}), 400
+
+        editable_fields = {"username", "email", "phone"}
+        if not data or not set(data).issubset(editable_fields):
+            return jsonify({"success": False, "message": "Only username, email, and phone can be updated."}), 400
+
+        updates = {}
+        for field in data:
+            value = data[field]
+            if field == "email" and value is None:
+                updates[field] = None
+                continue
+            if not isinstance(value, str):
+                return jsonify({"success": False, "message": f"{field} must be a string."}), 400
+
+            value = value.strip()
+            max_length = 100 if field == "username" else (100 if field == "email" else 20)
+            if field in {"username", "phone"} and not value:
+                return jsonify({"success": False, "message": f"{field} cannot be empty."}), 400
+            if len(value) > max_length:
+                return jsonify({"success": False, "message": f"{field} is too long."}), 400
+            if field == "email" and value and ("@" not in value or "." not in value.rsplit("@", 1)[-1]):
+                return jsonify({"success": False, "message": "Enter a valid email address."}), 400
+            updates[field] = value or None if field == "email" else value
+
+        if "phone" in updates and User.query.filter(
+            User.phone == updates["phone"],
+            User.id != user.id
+        ).first():
+            return jsonify({"success": False, "message": "That phone number is already registered."}), 409
+
+        for field, value in updates.items():
+            setattr(user, field, value)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return jsonify({"success": False, "message": "That phone number is already registered."}), 409
         return jsonify({"success": True, "message": "User profile updated successfully."}), 200
 
     @staticmethod
