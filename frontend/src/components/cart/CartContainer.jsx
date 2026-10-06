@@ -1,6 +1,6 @@
 import CartItemList from "./CartItemList";
 import './CartContainer.css'
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
 
@@ -12,6 +12,9 @@ function CartContainer () {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedItemIds, setSelectedItemIds] = useState([]);
+    const [actionMessage, setActionMessage] = useState("");
+    const hasInitializedSelection = useRef(false);
     const { isLoggedIn } = useContext(AuthContext);
 
     useEffect(() => {
@@ -34,7 +37,22 @@ function CartContainer () {
             console.log("Cart response:", data);
             
             if (response.ok) {
-                setCart(data.data || { items: data.data.cart_items, total_price: data.data.total_price});
+                const normalizedCart = {
+                    ...data.data,
+                    items: data.data.items || data.data.cart_items || [],
+                };
+                setCart(normalizedCart);
+                setSelectedItemIds((current) => {
+                    const availableIds = normalizedCart.items.map((item) => item.item_id);
+                    if (!hasInitializedSelection.current) {
+                        hasInitializedSelection.current = true;
+                        return availableIds;
+                    }
+                    return current.filter((id) => availableIds.includes(id));
+                });
+            } else if (response.status === 404) {
+                setCart({ items: [], total_price: 0 });
+                setSelectedItemIds([]);
             } else {
                 setError(data.message || 'Failed to load cart items');
             }
@@ -51,24 +69,29 @@ function CartContainer () {
         // Optimistically update UI
         setCart(prevCart => {
             const updatedItems = (prevCart.items || prevCart.cart_items).map(item =>
-                item.id === cartItemId ? { ...item, quantity: newQuantity } : item
+                item.item_id === cartItemId ? { ...item, quantity: newQuantity } : item
             );
             return { ...prevCart, items: updatedItems, cart_items: updatedItems };
         });
         // Send PATCH to backend
         try {
-            await fetch(`http://localhost:5000/cart/items/${cartItemId}/`, {
+            const response = await fetch(`http://localhost:5000/cart/items/${cartItemId}/`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ quantity: newQuantity })
             });
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Failed to update cart item quantity');
+            }
             window.dispatchEvent(new Event('cartUpdated'));
             // Optionally, re-fetch cart to sync totals
-            fetchCartItems();
-        } catch (err) {
-            // Optionally, show error and revert UI
-            console.error('Failed to update cart item quantity', err);
+            await fetchCartItems();
+        } catch (updateError) {
+            console.error('Failed to update cart item quantity', updateError);
+            setActionMessage(updateError.message || 'Failed to update cart item quantity');
+            await fetchCartItems();
         }
     };
 
@@ -76,41 +99,93 @@ function CartContainer () {
     const removeCartItem = async (cartItemId) => {
         // Optimistically update UI
         setCart(prevCart => {
-            const updatedItems = (prevCart.items || prevCart.cart_items).filter(item => item.item_id !== cartItemId);
+            const updatedItems = prevCart.items.filter(item => item.item_id !== cartItemId);
             return { ...prevCart, items: updatedItems, cart_items: updatedItems };
         });
+        setSelectedItemIds((current) => current.filter((id) => id !== cartItemId));
         // Send DELETE to backend
         try {
-            await fetch(`http://localhost:5000/cart/items/${cartItemId}/`, {
+            const response = await fetch(`http://localhost:5000/cart/items/${cartItemId}/`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Failed to remove cart item');
+            }
             window.dispatchEvent(new Event('cartUpdated'));
-            // Optionally, re-fetch cart to sync totals
-            fetchCartItems();
-        } catch (err) {
-            // Optionally, show error and revert UI
-            console.error('Failed to remove cart item', err);
+            await fetchCartItems();
+            return true;
+        } catch (removeError) {
+            console.error('Failed to remove cart item', removeError);
+            setActionMessage(removeError.message || 'Failed to remove cart item');
+            await fetchCartItems();
+            return false;
         }
     };
 
-    const placeOrder = async () => {
+    const cartItems = cart.items || [];
+    const selectedItems = cartItems.filter((item) => selectedItemIds.includes(item.item_id));
+    const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length;
+    const selectedSubtotal = selectedItems.reduce(
+        (total, item) => total + Number(item.product.price || 0) * Number(item.quantity || 0),
+        0
+    );
+    const shipping = selectedItems.length ? 40 : 0;
+    const selectedQuantity = selectedItems.reduce((total, item) => total + Number(item.quantity || 0), 0);
+
+    const toggleAllItems = () => {
+        setSelectedItemIds(allSelected ? [] : cartItems.map((item) => item.item_id));
+    };
+
+    const toggleCartItem = (itemId) => {
+        setSelectedItemIds((current) => current.includes(itemId)
+            ? current.filter((id) => id !== itemId)
+            : [...current, itemId]);
+    };
+
+    const shareCartItem = async (item) => {
+        const productUrl = `${window.location.origin}/product/${item.product.id}`;
         try {
-            await fetch(`http://localhost:5000/orders/`, {
+            if (navigator.share) {
+                await navigator.share({
+                    title: item.product.name,
+                    text: `Take a look at ${item.product.name} on QwikMall`,
+                    url: productUrl,
+                });
+            } else if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(productUrl);
+                setActionMessage('Product link copied to clipboard.');
+            } else {
+                throw new Error('Sharing is not available in this browser.');
+            }
+        } catch (shareError) {
+            if (shareError.name !== 'AbortError') {
+                setActionMessage(shareError.message || 'Unable to share this product.');
+            }
+        }
+    };
+
+    const saveForLater = async (item) => {
+        setActionMessage('');
+        try {
+            const response = await fetch('http://localhost:5000/wishlist/items', {
                 method: 'POST',
                 credentials: 'include',
-                headers: { 'Content-Type': 'application/json'},
-                body: {}
-            })
-        } catch(err) {
-            console.log('Failed to create order', err)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: item.product.id }),
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Unable to save this product for later.');
+            }
+            window.dispatchEvent(new Event('wishlistUpdated'));
+            const removed = await removeCartItem(item.item_id);
+            if (!removed) return;
+            setActionMessage('Product saved to your wishlist.');
+        } catch (saveError) {
+            setActionMessage(saveError.message || 'Unable to save this product for later.');
         }
-    }
-
-    const calculateTotal = () => {
-        const subtotal = cart.total_price || 0;
-        const shipping = 40;
-        return parseInt(subtotal) + parseInt(shipping);
     };
 
     if (loading) {
@@ -164,7 +239,7 @@ function CartContainer () {
         );
     }
 
-    const isCartEmpty = !cart.items || cart.items.length === 0;
+    const isCartEmpty = cartItems.length === 0;
 
     return (
         <div className="cart-container">
@@ -179,7 +254,20 @@ function CartContainer () {
                         </a>
                     </div>
                 ) : (
-                    <CartItemList cartItems={cart.items} onUpdateQuantity={updateCartItemQuantity} onRemoveItem={removeCartItem} />
+                    <>
+                        {actionMessage && <p className="cart-action-message" role="status">{actionMessage}</p>}
+                        <CartItemList
+                            cartItems={cartItems}
+                            selectedItemIds={selectedItemIds}
+                            allSelected={allSelected}
+                            onToggleAll={toggleAllItems}
+                            onToggleItem={toggleCartItem}
+                            onUpdateQuantity={updateCartItemQuantity}
+                            onRemoveItem={removeCartItem}
+                            onShareItem={shareCartItem}
+                            onSaveForLater={saveForLater}
+                        />
+                    </>
                 )}
             </div>
             {!isCartEmpty && (
@@ -187,23 +275,31 @@ function CartContainer () {
                     <h3 className="price-details-heading">Price Details</h3>
                     <div className="price-details">
                         <div className="price-row">
-                            <span>Total Items:</span>
-                            <span>{cart.items.length}</span>
+                            <span>Selected items:</span>
+                            <span>{selectedQuantity}</span>
                         </div>
                         <div className="price-row">
                             <span>Subtotal:</span>
-                            <span>₹{cart.total_price}</span>
+                            <span>₹{selectedSubtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                         </div>
                         <div className="price-row">
                             <span>Shipping:</span>
-                            <span>₹40</span>
+                            <span>{shipping ? `₹${shipping}` : '—'}</span>
                         </div>
                         <div className="price-row tota">
                             <span>Total Price:</span>
-                            <span>₹{calculateTotal()}</span>
+                            <span>₹{(selectedSubtotal + shipping).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                         </div>
                     </div>
-                    <button className="place-order-btn" onClick={() => navigate('/checkout')}>Place Order</button>
+                    <button
+                        className="place-order-btn"
+                        disabled={!selectedItems.length}
+                        onClick={() => navigate('/checkout', {
+                            state: { selectedCartItemIds },
+                        })}
+                    >
+                        Proceed to checkout
+                    </button>
                 </div>
             )}
         </div>

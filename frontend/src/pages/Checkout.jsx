@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/header/Navbar';
 import Footer from '../components/footer/Footer';
 import './Checkout.css';
@@ -15,6 +15,7 @@ const formatPrice = (value) => `₹${Number(value || 0).toLocaleString('en-IN')}
 
 function Checkout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [cart, setCart] = useState({ items: [], total_price: 0, cart_id: null });
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState('');
@@ -43,7 +44,19 @@ function Checkout() {
           total_price: cartData.data.total_price || 0,
         };
 
-        setCart(normalizedCart);
+        const selectedIds = location.state?.selectedCartItemIds;
+        const itemsForCheckout = Array.isArray(selectedIds)
+          ? normalizedCart.items.filter((item) => selectedIds.includes(item.item_id))
+          : normalizedCart.items;
+        const checkoutSubtotal = itemsForCheckout.reduce(
+          (sum, item) => sum + Number(item.product.price || 0) * Number(item.quantity || 0),
+          0
+        );
+        setCart({
+          ...normalizedCart,
+          items: itemsForCheckout,
+          total_price: checkoutSubtotal,
+        });
 
         const addressResponse = await fetch('http://localhost:5000/users/addresses', { credentials: 'include' });
         const addressData = await addressResponse.json();
@@ -67,10 +80,13 @@ function Checkout() {
     };
 
     fetchCartAndAddress();
-  }, []);
+  }, [location.state]);
 
   const shippingFee = useMemo(() => (cart.items.length ? 40 : 0), [cart.items.length]);
-  const subtotal = useMemo(() => Number(cart.total_price || 0), [cart.total_price]);
+  const subtotal = useMemo(
+    () => cart.items.reduce((sum, item) => sum + Number(item.product.price || 0) * Number(item.quantity || 0), 0),
+    [cart.items]
+  );
   const total = subtotal + shippingFee;
 
   const selectedAddress = addresses.find((address) => String(address.id) === selectedAddressId) || null;
