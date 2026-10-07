@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import Footer from '../components/Footer/Footer';
+import Footer from '../components/footer/Footer';
 import Navbar from '../components/header/Navbar';
 import './LegalPage.css';
 

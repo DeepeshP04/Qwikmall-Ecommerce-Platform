@@ -4,7 +4,7 @@ import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import ProductGrid from './ProductGrid'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import Loader from '../Loader/loader'
+import Loader from '../loader/Loader'
 
 function RecommendedCategoryProducts () {
     const [categoryProducts, setCategoryProducts] = useState([]);
