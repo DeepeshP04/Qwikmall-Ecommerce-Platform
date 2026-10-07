@@ -17,11 +17,12 @@ def create_app():
     password = os.getenv("MYSQL_PASSWORD")
     host = os.getenv("MYSQL_HOST")
     database = os.getenv("MYSQL_DATABASE")
+    port = os.getenv("MYSQL_PORT")
 
     # create flask app
     app = Flask(__name__)
     
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqldb://{username}:{password}@{host}/{database}"
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqldb://{username}:{password}@{host}:{port}/{database}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config["RAZORPAY_KEY_ID"] = os.getenv("RAZORPAY_KEY_ID")
     app.config["RAZORPAY_KEY_SECRET"] = os.getenv("RAZORPAY_KEY_SECRET")
