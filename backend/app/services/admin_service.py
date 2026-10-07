@@ -1,7 +1,8 @@
 import hmac
 import os
+import uuid
 
-from flask import session, jsonify
+from flask import current_app, jsonify, session, url_for
 from sqlalchemy import func, or_
 
 from app.models import InventoryMovement, Product, Order, OrderStatusHistory, User
@@ -10,6 +11,50 @@ from app.models import ProductImage, ProductAttribute, ProductAttributeValue, Ca
 from app.services.inventory_service import InventoryService
 
 class AdminService:
+    MAX_PRODUCT_IMAGES = 10
+    MAX_PRODUCT_IMAGE_SIZE = 5 * 1024 * 1024
+    ALLOWED_PRODUCT_IMAGE_EXTENSIONS = {".gif", ".jpeg", ".jpg", ".png", ".webp"}
+
+    @staticmethod
+    def _save_product_images(image_files):
+        if len(image_files) > AdminService.MAX_PRODUCT_IMAGES:
+            raise ValueError("A product can have up to 10 images.")
+
+        image_directory = os.path.join(current_app.static_folder, "images", "products")
+        os.makedirs(image_directory, exist_ok=True)
+        saved_paths = []
+        image_urls = []
+
+        try:
+            for image_file in image_files:
+                extension = os.path.splitext(image_file.filename or "")[1].lower()
+                if extension not in AdminService.ALLOWED_PRODUCT_IMAGE_EXTENSIONS:
+                    raise ValueError("Images must be JPG, PNG, WEBP, or GIF files.")
+
+                image_contents = image_file.stream.read(AdminService.MAX_PRODUCT_IMAGE_SIZE + 1)
+                if len(image_contents) > AdminService.MAX_PRODUCT_IMAGE_SIZE:
+                    raise ValueError("Each product image must be 5 MB or smaller.")
+                if not image_contents:
+                    raise ValueError("Product images cannot be empty.")
+
+                filename = f"{uuid.uuid4().hex}{extension}"
+                image_path = os.path.join(image_directory, filename)
+                with open(image_path, "wb") as saved_image:
+                    saved_image.write(image_contents)
+                saved_paths.append(image_path)
+                image_urls.append(url_for(
+                    "static",
+                    filename=f"images/products/{filename}",
+                    _external=True,
+                ))
+        except (OSError, ValueError):
+            for image_path in saved_paths:
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+            raise
+
+        return image_urls, saved_paths
+
     @staticmethod
     def get_inventory():
         products = Product.query.order_by(Product.name.asc()).all()
@@ -20,6 +65,22 @@ class AdminService:
                 "sku": product.sku,
                 "stock": product.stock,
                 "is_active": product.is_active,
+                "price": float(product.price),
+                "description": product.description,
+                "manufacturer": product.manufacturer,
+                "brand": product.brand,
+                "category": product.category.name if product.category else "",
+                "images": [
+                    {
+                        "id": image.id,
+                        "image_url": image.image_url,
+                        "is_primary": image.is_primary,
+                    }
+                    for image in sorted(
+                        product.images,
+                        key=lambda image: (not image.is_primary, image.id),
+                    )
+                ],
             }
             for product in products
         ]
@@ -77,7 +138,7 @@ class AdminService:
         }), 200
 
     @staticmethod
-    def add_product(data, actor_id=None):
+    def add_product(data, actor_id=None, image_files=None):
         if not isinstance(data, dict):
             return jsonify({"success": False, "message": "A product object is required."}), 400
         required_fields = ["name", "description", "price", "manufacturer", "category"]
@@ -98,16 +159,43 @@ class AdminService:
                 return jsonify({"success": False, "message": "Price must be greater than 0."}), 400
         except (TypeError, ValueError):
             return jsonify({"success": False, "message": "Invalid price value."}), 400
+        if not isinstance(data["description"], str) or len(data["description"]) > 2000:
+            return jsonify({"success": False, "message": "Description must be 2000 characters or fewer."}), 400
+        if not isinstance(data["name"], str) or len(data["name"]) > 50:
+            return jsonify({"success": False, "message": "Product name must be 50 characters or fewer."}), 400
+        if not isinstance(data["manufacturer"], str) or len(data["manufacturer"]) > 50:
+            return jsonify({"success": False, "message": "Manufacturer must be 50 characters or fewer."}), 400
+        if not isinstance(data["category"], str) or len(data["category"]) > 50:
+            return jsonify({"success": False, "message": "Category must be 50 characters or fewer."}), 400
+        brand = data.get("brand", "")
+        if not isinstance(brand, str) or len(brand) > 50:
+            return jsonify({"success": False, "message": "Brand must be 50 characters or fewer."}), 400
+        images = data.get("images", [])
+        if not isinstance(images, list) or any(
+            not isinstance(img_url, str) or len(img_url) > 200 for img_url in images
+        ):
+            return jsonify({"success": False, "message": "Images must be a list of URLs up to 200 characters long."}), 400
+        image_files = image_files or []
+        if len(images) + len(image_files) > AdminService.MAX_PRODUCT_IMAGES:
+            return jsonify({"success": False, "message": "A product can have up to 10 images."}), 400
+        try:
+            uploaded_image_urls, _ = AdminService._save_product_images(image_files)
+        except ValueError as image_error:
+            return jsonify({"success": False, "message": str(image_error)}), 400
+        except OSError:
+            return jsonify({"success": False, "message": "Unable to store product images."}), 500
+
         category = Category.query.filter_by(name=data["category"]).first()
         if not category:
             category = Category(name=data["category"])
             db.session.add(category)
-            db.session.commit()
+            db.session.flush()
         product = Product(
             name=data["name"],
             price=price,
             description=data["description"],
             manufacturer=data["manufacturer"],
+            brand=brand,
             stock=stock,
             sku=sku,
             category_id=category.id
@@ -121,31 +209,61 @@ class AdminService:
                 reason="initial_stock",
                 changed_by_id=actor_id,
             ))
-        images = data.get("images", [])
-        for img_url in images:
-            img = ProductImage(product_id=product.id, image_url=img_url, is_primary=False)
-            db.session.add(img)
-        if images:
-            ProductImage.query.filter_by(product_id=product.id, image_url=images[0]).update({"is_primary": True})
+        images.extend(uploaded_image_urls)
+        for image_index, img_url in enumerate(images):
+            db.session.add(ProductImage(
+                product_id=product.id,
+                image_url=img_url,
+                is_primary=image_index == 0,
+            ))
         attributes = data.get("attributes", {})
         for attr_name, attr_value in attributes.items():
             attr = ProductAttribute.query.filter_by(name=attr_name).first()
             if not attr:
                 attr = ProductAttribute(name=attr_name)
                 db.session.add(attr)
-                db.session.commit()
+                db.session.flush()
             pav = ProductAttributeValue(product_id=product.id, attribute_id=attr.id, value=attr_value)
             db.session.add(pav)
         db.session.commit()
         return jsonify({"success": True, "message": "Product added successfully."}), 201
 
     @staticmethod
-    def update_product(product_id, data, actor_id=None):
+    def update_product(product_id, data, actor_id=None, image_files=None):
         if not isinstance(data, dict) or not data:
             return jsonify({"success": False, "message": "A product update object is required."}), 400
         product = Product.query.filter_by(id=product_id).with_for_update().first()
         if not product:
             return jsonify({"success": False, "message": "Product does not exist"}), 404
+        field_limits = {
+            "name": 50,
+            "manufacturer": 50,
+            "brand": 50,
+            "description": 2000,
+            "category": 50,
+        }
+        for field, max_length in field_limits.items():
+            if field in data and (
+                not isinstance(data[field], str) or len(data[field]) > max_length
+            ):
+                return jsonify({
+                    "success": False,
+                    "message": f"{field.capitalize()} must be a string of at most {max_length} characters.",
+                }), 400
+
+        keep_image_ids = data.get("keep_image_ids")
+        if keep_image_ids is not None and (
+            not isinstance(keep_image_ids, list)
+            or any(isinstance(image_id, bool) or not isinstance(image_id, int) for image_id in keep_image_ids)
+        ):
+            return jsonify({"success": False, "message": "Image IDs must be a list of integers."}), 400
+
+        image_files = image_files or []
+        if image_files and keep_image_ids is None:
+            return jsonify({"success": False, "message": "Image IDs must be provided when updating product images."}), 400
+        if keep_image_ids is not None and len(keep_image_ids) + len(image_files) > AdminService.MAX_PRODUCT_IMAGES:
+            return jsonify({"success": False, "message": "A product can have up to 10 images."}), 400
+
         for field, value in data.items():
             if field.lower() == "stock":
                 if isinstance(value, bool) or not isinstance(value, int) or value < 0:
@@ -172,7 +290,7 @@ class AdminService:
                 if not category:
                     category = Category(name=value)
                     db.session.add(category)
-                    db.session.commit()
+                    db.session.flush()
                 product.category_id = category.id
             elif field.lower() == "sku":
                 if value is not None and (not isinstance(value, str) or len(value) > 64):
@@ -188,8 +306,34 @@ class AdminService:
                 if not isinstance(value, bool):
                     return jsonify({"success": False, "message": "is_active must be a boolean."}), 400
                 product.is_active = value
+            elif field.lower() in {"keep_image_ids", "images"}:
+                continue
             elif hasattr(product, field.lower()):
                 setattr(product, field.lower(), value)
+
+        if keep_image_ids is not None:
+            try:
+                uploaded_image_urls, _ = AdminService._save_product_images(image_files)
+            except ValueError as image_error:
+                db.session.rollback()
+                return jsonify({"success": False, "message": str(image_error)}), 400
+            except OSError:
+                db.session.rollback()
+                return jsonify({"success": False, "message": "Unable to store product images."}), 500
+
+            current_images = ProductImage.query.filter_by(product_id=product.id).all()
+            for image in current_images:
+                if image.id not in keep_image_ids:
+                    db.session.delete(image)
+            retained_images = [image for image in current_images if image.id in keep_image_ids]
+            if retained_images and not any(image.is_primary for image in retained_images):
+                retained_images[0].is_primary = True
+            for image_index, image_url in enumerate(uploaded_image_urls):
+                db.session.add(ProductImage(
+                    product_id=product.id,
+                    image_url=image_url,
+                    is_primary=not retained_images and image_index == 0,
+                ))
         db.session.commit()
         return jsonify({"success": True, "message": "Product details updated successfully."}), 200
 
@@ -254,7 +398,8 @@ class AdminService:
                 "id": u.id,
                 "username": u.username,
                 "phone": u.phone,
-                "email": u.email
+                "email": u.email,
+                "role": u.role,
             } for u in users
         ]
         return jsonify({"success": True, "data": users_data}), 200

@@ -126,8 +126,8 @@ function ProductDetails({ product }) {
                             alt={product.name}
                             className="main-product-image"
                         />
-                        {product.manufacturer && (
-                            <span className="product-image-brand">{product.manufacturer}</span>
+                        {(product.brand || product.manufacturer) && (
+                            <span className="product-image-brand">{product.brand || product.manufacturer}</span>
                         )}
                     </div>
                     
@@ -178,9 +178,15 @@ function ProductDetails({ product }) {
                     </div>
 
                     {/* Manufacturer */}
-                    {product.manufacturer && (
+                    {product.brand && (
                         <div className="product-manufacturer">
                             <span className="label">Brand:</span>
+                            <span className="value">{product.brand}</span>
+                        </div>
+                    )}
+                    {product.manufacturer && (
+                        <div className="product-manufacturer">
+                            <span className="label">Manufacturer:</span>
                             <span className="value">{product.manufacturer}</span>
                         </div>
                     )}

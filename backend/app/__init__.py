@@ -25,6 +25,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config["RAZORPAY_KEY_ID"] = os.getenv("RAZORPAY_KEY_ID")
     app.config["RAZORPAY_KEY_SECRET"] = os.getenv("RAZORPAY_KEY_SECRET")
+    app.config["MAX_CONTENT_LENGTH"] = 55 * 1024 * 1024
     app.secret_key = secret_key
 
     db.init_app(app)

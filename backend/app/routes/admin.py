@@ -1,8 +1,32 @@
-from flask import Blueprint, request, session
+import json
+
+from flask import Blueprint, jsonify, request, session
 from app.utils.helpers import admin_required, login_required
 from app.services.admin_service import AdminService
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+
+def _product_request_data():
+    if request.mimetype != "multipart/form-data":
+        return request.get_json(silent=True), [], None
+
+    try:
+        data = json.loads(request.form.get("product", ""))
+    except json.JSONDecodeError:
+        return None, [], (jsonify({
+            "success": False,
+            "message": "Product details must be valid JSON.",
+        }), 400)
+
+    if not isinstance(data, dict):
+        return None, [], (jsonify({
+            "success": False,
+            "message": "A product object is required.",
+        }), 400)
+
+    return data, request.files.getlist("images"), None
+
 
 @admin_bp.route('/login', methods=['POST'], strict_slashes=False)
 def admin_login():
@@ -16,15 +40,19 @@ def admin_login():
 @login_required
 @admin_required
 def add_product():
-    data = request.get_json()
-    return AdminService.add_product(data, session["user"]["user_id"])
+    data, image_files, error = _product_request_data()
+    if error:
+        return error
+    return AdminService.add_product(data, session["user"]["user_id"], image_files)
 
 @admin_bp.route('/products/<int:product_id>', methods=['PATCH'], strict_slashes=False)
 @login_required
 @admin_required
 def update_product(product_id):
-    data = request.get_json()
-    return AdminService.update_product(product_id, data, session["user"]["user_id"])
+    data, image_files, error = _product_request_data()
+    if error:
+        return error
+    return AdminService.update_product(product_id, data, session["user"]["user_id"], image_files)
 
 @admin_bp.route('/products/<int:product_id>', methods=['DELETE'], strict_slashes=False)
 @login_required

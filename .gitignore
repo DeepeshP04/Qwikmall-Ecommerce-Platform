@@ -4,6 +4,8 @@ backend/venv/
 backend/.env
 backend/*.pyc
 backend/**/__pycache__/
+backend/app/static/images/products/*
+!backend/app/static/images/products/.gitkeep
 
 # Frontend
 frontend/node_modules/

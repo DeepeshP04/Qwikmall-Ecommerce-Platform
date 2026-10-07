@@ -33,6 +33,8 @@ class ProductService:
                         "id": product.id,
                         "name": product.name,
                         "sku": product.sku,
+                        "manufacturer": product.manufacturer,
+                        "brand": product.brand,
                         "price": float(product.price),
                         "in_stock": product.stock > 0,
                         "img_url": primary_image.image_url if primary_image else None,
@@ -86,6 +88,8 @@ class ProductService:
                     "id": product.id,
                     "name": product.name,
                     "sku": product.sku,
+                    "manufacturer": product.manufacturer,
+                    "brand": product.brand,
                     "price": float(product.price),
                     "in_stock": product.stock > 0,
                     "img_url": primary_image.image_url if primary_image else None,
@@ -143,6 +147,8 @@ class ProductService:
                     "id": product.id,
                     "name": product.name,
                     "sku": product.sku,
+                    "manufacturer": product.manufacturer,
+                    "brand": product.brand,
                     "price": float(product.price),
                     "in_stock": product.stock > 0,
                     "img_url": primary_image.image_url if primary_image else None,
@@ -166,7 +172,10 @@ class ProductService:
                 return jsonify({"success": False, "message": "Product does not exist"}), 404
             
             # Get all images
-            images = ProductImage.query.filter_by(product_id=product_id).all()
+            images = ProductImage.query.filter_by(product_id=product_id).order_by(
+                ProductImage.is_primary.desc(),
+                ProductImage.id.asc(),
+            ).all()
             img_urls = [img.image_url for img in images]
             
             # Get attributes
@@ -201,6 +210,7 @@ class ProductService:
                 "price": float(product.price),
                 "in_stock": product.stock > 0,
                 "manufacturer": product.manufacturer,
+                "brand": product.brand,
                 "overall_rating": overall_rating,
                 "img_url": img_urls,
                 "attributes": attributes_data,
