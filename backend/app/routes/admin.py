@@ -17,14 +17,14 @@ def admin_login():
 @admin_required
 def add_product():
     data = request.get_json()
-    return AdminService.add_product(data)
+    return AdminService.add_product(data, session["user"]["user_id"])
 
 @admin_bp.route('/products/<int:product_id>', methods=['PATCH'], strict_slashes=False)
 @login_required
 @admin_required
 def update_product(product_id):
     data = request.get_json()
-    return AdminService.update_product(product_id, data)
+    return AdminService.update_product(product_id, data, session["user"]["user_id"])
 
 @admin_bp.route('/products/<int:product_id>', methods=['DELETE'], strict_slashes=False)
 @login_required
@@ -33,6 +33,12 @@ def delete_product(product_id):
     return AdminService.delete_product(product_id)
 
 # Order Management
+@admin_bp.route('/inventory', methods=['GET'], strict_slashes=False)
+@login_required
+@admin_required
+def get_inventory():
+    return AdminService.get_inventory()
+
 @admin_bp.route('/orders', methods=['GET'], strict_slashes=False)
 @login_required
 @admin_required
@@ -44,7 +50,7 @@ def get_all_orders():
 @admin_required
 def update_order_status(order_id):
     data = request.get_json()
-    return AdminService.update_order_status(order_id, data)
+    return AdminService.update_order_status(order_id, data, session["user"]["user_id"])
 
 # User Management
 @admin_bp.route('/users', methods=['GET'], strict_slashes=False)

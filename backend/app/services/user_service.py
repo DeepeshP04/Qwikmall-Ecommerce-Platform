@@ -85,6 +85,8 @@ class UserService:
             return jsonify({"success": False, "message": "Address does not exist."}), 404
 
         field_limits = {
+            "recipient_name": 100,
+            "recipient_phone": 20,
             "address_line1": 100,
             "address_line2": 100,
             "city": 50,
@@ -105,7 +107,7 @@ class UserService:
                 updates[field] = value
                 continue
 
-            if value is None and field in {"address_line2", "landmark"}:
+            if value is None and field in {"recipient_name", "recipient_phone", "address_line2", "landmark"}:
                 updates[field] = None
                 continue
             if not isinstance(value, str):
@@ -116,7 +118,12 @@ class UserService:
                 return jsonify({"success": False, "message": f"{field} cannot be empty."}), 400
             if len(value) > field_limits[field]:
                 return jsonify({"success": False, "message": f"{field} is too long."}), 400
-            updates[field] = value or None if field in {"address_line2", "landmark"} else value
+            updates[field] = value or None if field in {
+                "recipient_name",
+                "recipient_phone",
+                "address_line2",
+                "landmark",
+            } else value
 
         if updates.get("is_default") is True:
             Address.query.filter(
@@ -138,6 +145,8 @@ class UserService:
     def _address_to_dict(address):
         return {
             "id": address.id,
+            "recipient_name": address.recipient_name,
+            "recipient_phone": address.recipient_phone,
             "address_line1": address.address_line1,
             "address_line2": address.address_line2,
             "city": address.city,

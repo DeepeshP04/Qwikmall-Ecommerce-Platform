@@ -23,6 +23,8 @@ def create_app():
     
     app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqldb://{username}:{password}@{host}/{database}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config["RAZORPAY_KEY_ID"] = os.getenv("RAZORPAY_KEY_ID")
+    app.config["RAZORPAY_KEY_SECRET"] = os.getenv("RAZORPAY_KEY_SECRET")
     app.secret_key = secret_key
 
     db.init_app(app)
@@ -53,7 +55,24 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(views)
     
-    from .models import Product, User, Category, Order, OrderItem, Cart, CartItem, Payment, ProductImage, Review, ProductAttribute, ProductAttributeValue, Address, WishlistItem
+    from .models import (
+        Address,
+        Cart,
+        CartItem,
+        Category,
+        InventoryMovement,
+        Order,
+        OrderItem,
+        OrderStatusHistory,
+        Payment,
+        Product,
+        ProductAttribute,
+        ProductAttributeValue,
+        ProductImage,
+        Review,
+        User,
+        WishlistItem,
+    )
 
     # create_db_tables(app)
     # insert_test_data_in_database(db, Product, app)

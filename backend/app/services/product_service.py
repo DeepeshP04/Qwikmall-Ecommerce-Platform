@@ -1,7 +1,6 @@
 from app.models import Product, Category, ProductImage, Review, ProductAttribute, ProductAttributeValue
 from app import db
-from sqlalchemy import or_, func
-from sqlalchemy.orm import joinedload
+from sqlalchemy import or_
 from flask import jsonify
 
 class ProductService:
@@ -14,7 +13,10 @@ class ProductService:
             
             for category in categories:
                 # Get 5 products from each category
-                products = Product.query.filter_by(category_id=category.id).limit(5).all()
+                products = Product.query.filter_by(
+                    category_id=category.id,
+                    is_active=True,
+                ).limit(5).all()
                 
                 category_products = []
                 for product in products:
@@ -30,7 +32,9 @@ class ProductService:
                     product_data = {
                         "id": product.id,
                         "name": product.name,
+                        "sku": product.sku,
                         "price": float(product.price),
+                        "in_stock": product.stock > 0,
                         "img_url": primary_image.image_url if primary_image else None,
                         "img_alt_text": primary_image.alt_text if primary_image else None,
                         "overall_rating": overall_rating
@@ -57,7 +61,10 @@ class ProductService:
             if not category:
                 return jsonify({"success": False, "message": "Category does not exist"}), 404
             
-            products = Product.query.filter_by(category_id=category.id).all()
+            products = Product.query.filter_by(
+                category_id=category.id,
+                is_active=True,
+            ).all()
             
             products_data = []
             for product in products:
@@ -78,7 +85,9 @@ class ProductService:
                 product_data = {
                     "id": product.id,
                     "name": product.name,
+                    "sku": product.sku,
                     "price": float(product.price),
+                    "in_stock": product.stock > 0,
                     "img_url": primary_image.image_url if primary_image else None,
                     "img_alt_text": primary_image.alt_text if primary_image else None,
                     "overall_rating": overall_rating,
@@ -101,7 +110,7 @@ class ProductService:
     def get_all_products(search_query=None):
         """Get all products with optional search"""
         try:
-            query = Product.query
+            query = Product.query.filter_by(is_active=True)
             
             if search_query:
                 query = query.filter(
@@ -133,7 +142,9 @@ class ProductService:
                 product_data = {
                     "id": product.id,
                     "name": product.name,
+                    "sku": product.sku,
                     "price": float(product.price),
+                    "in_stock": product.stock > 0,
                     "img_url": primary_image.image_url if primary_image else None,
                     "img_alt_text": primary_image.alt_text if primary_image else None,
                     "overall_rating": overall_rating,
@@ -150,7 +161,7 @@ class ProductService:
     def get_product_by_id(product_id):
         """Get specific product details"""
         try:
-            product = Product.query.get(product_id)
+            product = Product.query.filter_by(id=product_id, is_active=True).first()
             if not product:
                 return jsonify({"success": False, "message": "Product does not exist"}), 404
             
@@ -185,8 +196,10 @@ class ProductService:
                 "category_id": product.category_id,
                 "category_name": category.name if category else None,
                 "name": product.name,
+                "sku": product.sku,
                 "description": product.description,
                 "price": float(product.price),
+                "in_stock": product.stock > 0,
                 "manufacturer": product.manufacturer,
                 "overall_rating": overall_rating,
                 "img_url": img_urls,
@@ -210,11 +223,19 @@ class ProductService:
             if not category:
                 return jsonify({"success": False, "message": "Category does not exist"}), 404
                 
-            product_ids = [p.id for p in Product.query.filter_by(category_id=category.id).all()]
+            product_ids = [
+                product.id
+                for product in Product.query.filter_by(
+                    category_id=category.id,
+                    is_active=True,
+                ).all()
+            ]
             attr_values = (
                 db.session.query(ProductAttribute.name, ProductAttributeValue.value)
                 .join(ProductAttribute, ProductAttributeValue.attribute_id == ProductAttribute.id)
+                .join(Product, Product.id == ProductAttributeValue.product_id)
                 .filter(ProductAttributeValue.product_id.in_(product_ids))
+                .filter(Product.is_active.is_(True))
                 .all()
             )
             
@@ -235,6 +256,8 @@ class ProductService:
             attr_values = (
                 db.session.query(ProductAttribute.name, ProductAttributeValue.value)
                 .join(ProductAttribute, ProductAttributeValue.attribute_id == ProductAttribute.id)
+                .join(Product, Product.id == ProductAttributeValue.product_id)
+                .filter(Product.is_active.is_(True))
                 .all()
             )
             filters = {}

@@ -23,7 +23,7 @@ def index():
     from .models import Product
     
     logged_in = session.get("logged_in", False)
-    products = Product.query.limit(5).all()
+    products = Product.query.filter_by(is_active=True).limit(5).all()
     return render_template("index.html", logged_in=logged_in, products=products) 
 
 @views.route("/login", methods=["GET"])
@@ -75,14 +75,14 @@ def verify_code():
 def categories_more_subcategory_products():
     from .models import Product
     
-    products = Product.query.all()
+    products = Product.query.filter_by(is_active=True).all()
     return render_template("categories-more-subcategory-products.html", products=products)    
 
 @views.route("/categories_all_products")
 def categories_all_products():
     from .models import Product
     
-    products = Product.query.all()
+    products = Product.query.filter_by(is_active=True).all()
     return render_template("categories-all-products.html", products=products)
 
 @views.route("/about")

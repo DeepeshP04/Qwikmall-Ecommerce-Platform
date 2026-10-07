@@ -23,7 +23,7 @@ class WishlistService:
             return jsonify({"success": False, "message": "A valid product_id is required."}), 400
 
         product = Product.query.get(product_id)
-        if not product:
+        if not product or not product.is_active:
             return jsonify({"success": False, "message": "Product not found."}), 404
 
         existing_item = WishlistItem.query.filter_by(

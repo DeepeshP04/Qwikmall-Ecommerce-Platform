@@ -3,6 +3,8 @@ from .. import db
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient_name = db.Column(db.String(100), nullable=True)
+    recipient_phone = db.Column(db.String(20), nullable=True)
     address_line1 = db.Column(db.String(100), nullable=False)
     address_line2 = db.Column(db.String(100), nullable=True)
     city = db.Column(db.String(50), nullable=False)
