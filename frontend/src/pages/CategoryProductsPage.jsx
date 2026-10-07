@@ -3,7 +3,7 @@ import Footer from "../components/footer/Footer";
 import Navbar from "../components/header/Navbar";
 import CategoryAllProducts from "../components/products/CategoryAllProducts";
 import { useEffect, useState } from "react";
-import Loader from "../components/Loader/loader";
+import Loader from "../components/loader/Loader";
 
 function CategoryProductsPage () {
     const {categoryName} = useParams()
