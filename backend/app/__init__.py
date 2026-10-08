@@ -28,6 +28,8 @@ def create_app():
     app.config["RAZORPAY_KEY_SECRET"] = os.getenv("RAZORPAY_KEY_SECRET")
     app.config["MAX_CONTENT_LENGTH"] = 55 * 1024 * 1024
     app.secret_key = secret_key
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "None"
 
     db.init_app(app)
     migrate = Migrate(app, db)
