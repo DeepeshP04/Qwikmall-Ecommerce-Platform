@@ -51,8 +51,12 @@ class AuthService:
         if not stored_code:
             return False
         
-        if str(code) != stored_code.decode("utf-8"):
+        if str(code) != stored_code:
             return False
+        
+        # use when decode_responses = False in redis
+        # if str(code) != stored_code.decode("utf-8"):
+        #     return False
         
         # Delete the code from redis after successful verification
         redis_client.delete(mobile)
