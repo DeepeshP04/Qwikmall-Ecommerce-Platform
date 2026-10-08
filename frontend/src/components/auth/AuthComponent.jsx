@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import './AuthComponent.css'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
@@ -15,6 +15,7 @@ function AuthComponent({ isLogin, redirectTo, showAuthSwitch = true }) {
     const { setIsLoggedIn } = useContext(AuthContext)
     const navigate = useNavigate()
     const location = useLocation()
+    const otpInputRef = useRef(null)
 
     useEffect(() => {
         if (otpCooldown === 0) {
@@ -28,9 +29,19 @@ function AuthComponent({ isLogin, redirectTo, showAuthSwitch = true }) {
         return () => window.clearTimeout(timer)
     }, [otpCooldown])
 
+    useEffect(() => {
+    if (codeSent) {
+        otpInputRef.current?.focus()
+    }
+}, [codeSent])
+
     function validatePhone() {
         return /^[0-9]{10}$/.test(phone)
     }
+
+    function getMaskedPhone() {
+    return `+91 ${phone.slice(0, 2)}•••••${phone.slice(-3)}`
+}
 
     async function requestOtp() {
         setError("")
@@ -120,6 +131,7 @@ function AuthComponent({ isLogin, redirectTo, showAuthSwitch = true }) {
         setCodeSent(false)
         setCode("")
         setError("")
+        setOtpCooldown(0)
     }
 
     function handleInputKeyDown(event) {
@@ -176,25 +188,43 @@ function AuthComponent({ isLogin, redirectTo, showAuthSwitch = true }) {
                             </div>
                         ) : (
                             <>
-                                <button className="back-button" type="button" onClick={handleBackToPhone}>
-                                    ← Back
-                                </button>
-                                <input
-                                    id="code"
-                                    type="text"
-                                    name="code"
-                                    placeholder="Enter 6-digit code"
-                                    aria-label="6-digit verification code"
-                                    autoComplete="one-time-code"
-                                    inputMode="numeric"
-                                    pattern="[0-9]{6}"
-                                    maxLength="6"
-                                    required
-                                    value={code}
-                                    onKeyDown={handleInputKeyDown}
-                                    onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                                />
-                            </>
+    <div className="otp-phone-info">
+        <span>Code sent to</span>
+        <strong>{getMaskedPhone()}</strong>
+
+        <button
+            type="button"
+            className="change-phone-button"
+            onClick={handleBackToPhone}
+            disabled={isSubmitting}
+        >
+            Change
+        </button>
+    </div>
+
+    <input
+        ref={otpInputRef}
+        id="code"
+        type="text"
+        name="code"
+        placeholder="Enter 6-digit code"
+        aria-label="6-digit verification code"
+        autoComplete="one-time-code"
+        inputMode="numeric"
+        pattern="[0-9]{6}"
+        maxLength="6"
+        required
+        value={code}
+        onKeyDown={handleInputKeyDown}
+        onChange={(event) =>
+            setCode(
+                event.target.value
+                    .replace(/\D/g, '')
+                    .slice(0, 6)
+            )
+        }
+    />
+</>
                         )}
                         {error && <p id="error-message" role="alert">{error}</p>}
                     </div>

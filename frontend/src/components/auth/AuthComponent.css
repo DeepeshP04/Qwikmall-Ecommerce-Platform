@@ -189,3 +189,42 @@
         gap:  15px;
     }
 }
+
+.otp-phone-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    flex-wrap: wrap;
+}
+
+.otp-phone-info span {
+    color: #777;
+}
+
+.otp-phone-info strong {
+    color: #222;
+    font-weight: 600;
+}
+
+.change-phone-button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin-left: 4px;
+    color: #2874f0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.change-phone-button:hover {
+    text-decoration: underline;
+}
+
+.change-phone-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
