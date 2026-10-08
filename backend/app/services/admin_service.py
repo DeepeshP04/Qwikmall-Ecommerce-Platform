@@ -1,19 +1,230 @@
 import hmac
+import math
 import os
 import uuid
+from urllib.parse import urlsplit
 
 from flask import current_app, jsonify, session, url_for
 from sqlalchemy import func, or_
 
-from app.models import InventoryMovement, Product, Order, OrderStatusHistory, User
+from app.models import InventoryMovement, Product, Order, OrderStatusHistory, User, Review
 from app import db
 from app.models import ProductImage, ProductAttribute, ProductAttributeValue, Category
+from app.models.category_filter import CategoryFilter
+from app.models.store_settings import StoreSettings
 from app.services.inventory_service import InventoryService
 
 class AdminService:
     MAX_PRODUCT_IMAGES = 10
     MAX_PRODUCT_IMAGE_SIZE = 5 * 1024 * 1024
     ALLOWED_PRODUCT_IMAGE_EXTENSIONS = {".gif", ".jpeg", ".jpg", ".png", ".webp"}
+    DEFAULT_STORE_SETTINGS = {
+        "store": {
+            "business_name": "QwikMall",
+            "logo_url": "",
+            "phone": "",
+            "email": "",
+            "address": "",
+        },
+        "payment": {
+            "cod_enabled": True,
+            "upi_enabled": True,
+            "card_enabled": True,
+            "razorpay_enabled": False,
+        },
+        "delivery": {
+            "enabled": True,
+            "shipping_fee": 40,
+            "free_shipping_threshold": None,
+            "serviceable_postal_codes": [],
+        },
+        "account": {
+            "low_stock_threshold": 5,
+        },
+    }
+
+    @staticmethod
+    def _store_settings_record():
+        return StoreSettings.query.get(1)
+
+    @staticmethod
+    def get_store_settings():
+        settings = AdminService._store_settings_record()
+        return jsonify({
+            "success": True,
+            "data": settings.data if settings else AdminService.DEFAULT_STORE_SETTINGS,
+        }), 200
+
+    @staticmethod
+    def update_store_settings(data):
+        if not isinstance(data, dict):
+            return jsonify({"success": False, "message": "A settings object is required."}), 400
+
+        current = AdminService._store_settings_record()
+        merged = {
+            group: dict(values)
+            for group, values in (
+                current.data if current else AdminService.DEFAULT_STORE_SETTINGS
+            ).items()
+        }
+        string_limits = {
+            "business_name": 100,
+            "logo_url": 500,
+            "phone": 20,
+            "email": 120,
+            "address": 500,
+        }
+        for group, fields in data.items():
+            if group not in merged or not isinstance(fields, dict):
+                return jsonify({"success": False, "message": "Settings contain an unsupported section."}), 400
+            for key, value in fields.items():
+                if key not in merged[group]:
+                    return jsonify({"success": False, "message": f"Unsupported {group} setting: {key}."}), 400
+                if group == "store":
+                    if not isinstance(value, str) or len(value.strip()) > string_limits[key]:
+                        return jsonify({"success": False, "message": f"{key.replace('_', ' ').capitalize()} is too long or invalid."}), 400
+                    value = value.strip()
+                    if key == "email" and value and ("@" not in value or value.startswith("@") or value.endswith("@")):
+                        return jsonify({"success": False, "message": "Enter a valid store email address."}), 400
+                    if key == "logo_url" and value:
+                        parsed_url = urlsplit(value)
+                        if not (
+                            (parsed_url.scheme in {"http", "https"} and parsed_url.netloc)
+                            or (value.startswith("/") and not value.startswith("//"))
+                        ):
+                            return jsonify({"success": False, "message": "Logo must be an HTTP(S) URL or a site-relative path."}), 400
+                elif group == "payment":
+                    if not isinstance(value, bool):
+                        return jsonify({"success": False, "message": "Payment options must be enabled or disabled."}), 400
+                elif group == "delivery":
+                    if key == "enabled":
+                        if not isinstance(value, bool):
+                            return jsonify({"success": False, "message": "Delivery availability must be enabled or disabled."}), 400
+                    elif key in {"shipping_fee", "free_shipping_threshold"}:
+                        if value is None and key == "free_shipping_threshold":
+                            pass
+                        elif isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0 or value > 1000000:
+                            return jsonify({"success": False, "message": "Delivery amounts must be between 0 and 1,000,000."}), 400
+                    elif key == "serviceable_postal_codes":
+                        if not isinstance(value, list) or any(
+                            not isinstance(code, str) or not code.strip() or len(code.strip()) > 20
+                            for code in value
+                        ):
+                            return jsonify({"success": False, "message": "Enter a list of valid delivery postal codes."}), 400
+                        value = list(dict.fromkeys(code.strip() for code in value))
+                elif group == "account":
+                    if (
+                        key != "low_stock_threshold"
+                        or isinstance(value, bool)
+                        or not isinstance(value, int)
+                        or value < 0
+                        or value > 1000000
+                    ):
+                        return jsonify({"success": False, "message": "Low-stock threshold must be a non-negative whole number."}), 400
+                merged[group][key] = value
+
+        if not any(merged["payment"].values()):
+            return jsonify({"success": False, "message": "Enable at least one payment option."}), 400
+
+        settings = current or StoreSettings(id=1, data=merged)
+        settings.data = merged
+        db.session.add(settings)
+        db.session.commit()
+        return jsonify({"success": True, "data": settings.data}), 200
+
+    @staticmethod
+    def get_categories():
+        categories = (
+            db.session.query(Category, func.count(Product.id))
+            .outerjoin(Product, Product.category_id == Category.id)
+            .group_by(Category.id)
+            .order_by(Category.name.asc())
+            .all()
+        )
+        return jsonify({
+            "success": True,
+            "data": [
+                {"id": category.id, "name": category.name, "product_count": product_count}
+                for category, product_count in categories
+            ],
+        }), 200
+
+    @staticmethod
+    def save_category(data, category_id=None):
+        if not isinstance(data, dict) or not isinstance(data.get("name"), str):
+            return jsonify({"success": False, "message": "A category name is required."}), 400
+        name = data["name"].strip()
+        if not name or len(name) > 50:
+            return jsonify({"success": False, "message": "Category name must be between 1 and 50 characters."}), 400
+        duplicate = Category.query.filter(func.lower(Category.name) == name.lower())
+        if category_id is not None:
+            category = Category.query.get(category_id)
+            if not category:
+                return jsonify({"success": False, "message": "Category not found."}), 404
+            duplicate = duplicate.filter(Category.id != category_id)
+        else:
+            category = Category(name=name)
+        if duplicate.first():
+            return jsonify({"success": False, "message": "A category with that name already exists."}), 409
+        category.name = name
+        db.session.add(category)
+        db.session.commit()
+        return jsonify({
+            "success": True,
+            "data": {"id": category.id, "name": category.name},
+        }), 200 if category_id is not None else 201
+
+    @staticmethod
+    def delete_category(category_id):
+        category = Category.query.get(category_id)
+        if not category:
+            return jsonify({"success": False, "message": "Category not found."}), 404
+        if Product.query.filter_by(category_id=category.id).first():
+            return jsonify({"success": False, "message": "Move or remove this category's products before deleting it."}), 409
+        CategoryFilter.query.filter_by(category_id=category.id).delete(synchronize_session=False)
+        db.session.delete(category)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Category deleted."}), 200
+
+    @staticmethod
+    def get_reviews():
+        reviews = Review.query.order_by(Review.created_at.desc(), Review.id.desc()).all()
+        return jsonify({
+            "success": True,
+            "data": [
+                {
+                    "id": review.id,
+                    "rating": review.rating,
+                    "comment": review.comment or "",
+                    "is_approved": review.is_approved,
+                    "created_at": review.created_at.isoformat() if review.created_at else None,
+                    "product_id": review.product_id,
+                    "product_name": review.product.name if review.product else "Deleted product",
+                    "customer_name": review.user.username if review.user else "Anonymous",
+                }
+                for review in reviews
+            ],
+        }), 200
+
+    @staticmethod
+    def update_review(review_id, data):
+        if not isinstance(data, dict) or not isinstance(data.get("is_approved"), bool):
+            return jsonify({"success": False, "message": "A valid review approval status is required."}), 400
+        review = Review.query.get(review_id)
+        if not review:
+            return jsonify({"success": False, "message": "Review not found."}), 404
+        review.is_approved = data["is_approved"]
+        db.session.commit()
+        return jsonify({"success": True, "message": "Review visibility updated."}), 200
+
+    @staticmethod
+    def delete_review(review_id):
+        review = Review.query.get(review_id)
+        if not review:
+            return jsonify({"success": False, "message": "Review not found."}), 404
+        db.session.delete(review)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Review deleted."}), 200
 
     @staticmethod
     def _save_product_images(image_files):

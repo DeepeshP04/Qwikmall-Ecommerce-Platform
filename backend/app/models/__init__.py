@@ -10,6 +10,7 @@ from .product_attribute import ProductAttribute, ProductAttributeValue
 from .address import Address
 from .wishlist import WishlistItem
 from .inventory_movement import InventoryMovement
+from .store_settings import StoreSettings
 
 # Export all models
 __all__ = [
@@ -29,4 +30,5 @@ __all__ = [
     'WishlistItem',
     'InventoryMovement',
     'OrderStatusHistory',
+    'StoreSettings',
 ]

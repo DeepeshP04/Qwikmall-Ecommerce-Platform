@@ -74,6 +74,7 @@ def create_app():
         ProductAttributeValue,
         ProductImage,
         Review,
+        StoreSettings,
         User,
         WishlistItem,
     )

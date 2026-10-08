@@ -185,7 +185,7 @@ class ProductService:
                 attributes_data[attr.name] = attr.value
             
             # Get reviews
-            reviews = Review.query.filter_by(product_id=product_id).all()
+            reviews = Review.query.filter_by(product_id=product_id, is_approved=True).all()
             reviews_data = []
             for review in reviews:
                 review_data = {
@@ -284,7 +284,7 @@ class ProductService:
     def calculate_overall_rating(product_id):
         """Calculate overall rating for a product"""
         try:
-            reviews = Review.query.filter_by(product_id=product_id).all()
+            reviews = Review.query.filter_by(product_id=product_id, is_approved=True).all()
             if not reviews:
                 return 0.0
             

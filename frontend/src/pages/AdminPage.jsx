@@ -13,6 +13,8 @@ import {
     faPlus,
     faRightFromBracket,
     faSliders,
+    faStar,
+    faTags,
     faUser,
     faUsers,
     faWarehouse,
@@ -23,6 +25,9 @@ import { AuthContext } from '../App';
 import Loader from '../components/loader/Loader';
 import './AdminPage.css';
 import { API_URL } from '../config/api';
+import AdminCategories from '../components/admin/AdminCategories';
+import AdminReviews from '../components/admin/AdminReviews';
+import AdminSettings from '../components/admin/AdminSettings';
 
 const LOW_STOCK_THRESHOLD = 5;
 const EMPTY_PRODUCT_FORM = {
@@ -52,6 +57,9 @@ function AdminPage() {
     const [users, setUsers] = useState([]);
     const [orders, setOrders] = useState([]);
     const [inventory, setInventory] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [reviews, setReviews] = useState([]);
+    const [storeSettings, setStoreSettings] = useState(null);
     const [stockDrafts, setStockDrafts] = useState({});
     const [updatingStockIds, setUpdatingStockIds] = useState([]);
     const [error, setError] = useState('');
@@ -75,13 +83,7 @@ function AdminPage() {
     const [isSavingProduct, setIsSavingProduct] = useState(false);
     const [profileDraft, setProfileDraft] = useState({ username: '', email: '', phone: '' });
     const [isSavingProfile, setIsSavingProfile] = useState(false);
-    const [settingsSaved, setSettingsSaved] = useState(false);
-    const [lowStockThreshold, setLowStockThreshold] = useState(() => {
-        const savedValue = window.localStorage.getItem('admin-low-stock-threshold');
-        if (savedValue === null) return LOW_STOCK_THRESHOLD;
-        const savedThreshold = Number(savedValue);
-        return Number.isInteger(savedThreshold) && savedThreshold >= 0 ? savedThreshold : LOW_STOCK_THRESHOLD;
-    });
+    const [lowStockThreshold, setLowStockThreshold] = useState(LOW_STOCK_THRESHOLD);
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
@@ -115,15 +117,23 @@ function AdminPage() {
                 });
                 setAccess('loading');
 
-                const [adminUsers, adminOrders, adminInventory] = await Promise.all([
+                const [adminUsers, adminOrders, adminInventory, adminCategories, adminReviews, adminSettings] = await Promise.all([
                     fetchAdminData('users'),
                     fetchAdminData('orders'),
                     fetchAdminData('inventory'),
+                    fetchAdminData('categories'),
+                    fetchAdminData('reviews'),
+                    fetchAdminData('settings'),
                 ]);
                 if (isMounted) {
                     setUsers(adminUsers);
                     setOrders(adminOrders);
                     setInventory(adminInventory);
+                    setCategories(adminCategories);
+                    setReviews(adminReviews);
+                    setStoreSettings(adminSettings);
+                    const savedThreshold = adminSettings.account?.low_stock_threshold;
+                    setLowStockThreshold(Number.isInteger(savedThreshold) && savedThreshold >= 0 ? savedThreshold : LOW_STOCK_THRESHOLD);
                     setAccess('admin');
                 }
             } catch (loadError) {
@@ -402,6 +412,12 @@ function AdminPage() {
                 .toLocaleLowerCase()
                 .includes(normalizedSearch)
         )).length,
+        categories: categories.filter((category) => category.name.toLocaleLowerCase().includes(normalizedSearch)).length,
+        reviews: reviews.filter((review) => (
+            `${review.product_name} ${review.customer_name} ${review.comment} ${review.rating}`
+                .toLocaleLowerCase()
+                .includes(normalizedSearch)
+        )).length,
     };
     const totalSales = orders.reduce((total, order) => total + Number(order.total_price || 0), 0);
     const monthlyOrders = Array.from({ length: 6 }, (_, index) => {
@@ -522,8 +538,8 @@ function AdminPage() {
                             <FontAwesomeIcon icon={faMagnifyingGlass} aria-hidden="true" />
                             <input
                                 type="search"
-                                placeholder="Search products, orders, customers..."
-                                aria-label="Search products, orders, and customers"
+                                placeholder="Search products, orders, customers, categories, reviews..."
+                                aria-label="Search products, orders, customers, categories, and reviews"
                                 value={searchQuery}
                                 onChange={(event) => setSearchQuery(event.target.value)}
                             />
@@ -539,13 +555,16 @@ function AdminPage() {
                                     ['products', 'Products', globalSearchCounts.products],
                                     ['orders', 'Orders', globalSearchCounts.orders],
                                     ['customers', 'Customers', globalSearchCounts.customers],
+                                    ['categories', 'Categories', globalSearchCounts.categories],
+                                    ['reviews', 'Reviews', globalSearchCounts.reviews],
                                 ].filter(([, , count]) => count > 0).map(([section, label, count]) => (
                                     <button type="button" key={section} onClick={() => openSearchResults(section)}>
                                         <span>{label}</span><strong>{count} result{count === 1 ? '' : 's'}</strong>
                                     </button>
                                 ))}
-                                {!globalSearchCounts.products && !globalSearchCounts.orders && !globalSearchCounts.customers && (
-                                    <p>No matching products, orders, or customers.</p>
+                                {!globalSearchCounts.products && !globalSearchCounts.orders && !globalSearchCounts.customers
+                                    && !globalSearchCounts.categories && !globalSearchCounts.reviews && (
+                                    <p>No matching products, orders, customers, categories, or reviews.</p>
                                 )}
                             </div>
                         )}
@@ -621,6 +640,13 @@ function AdminPage() {
                         <a className={activeSection === 'customers' ? 'is-active' : ''} href="#customers" title="Customers" onClick={(event) => { event.preventDefault(); openAdminSection('customers'); }}>
                             <FontAwesomeIcon icon={faUsers} /><span>Customers</span>
                         </a>
+                        <a className={activeSection === 'categories' ? 'is-active' : ''} href="#categories" title="Categories" onClick={(event) => { event.preventDefault(); openAdminSection('categories'); }}>
+                            <FontAwesomeIcon icon={faTags} /><span>Categories</span>
+                        </a>
+                        <a className={activeSection === 'reviews' ? 'is-active' : ''} href="#reviews" title="Reviews" onClick={(event) => { event.preventDefault(); openAdminSection('reviews'); }}>
+                            <FontAwesomeIcon icon={faStar} /><span>Reviews</span>
+                            {reviews.some((review) => !review.is_approved) && <span className="admin-sidebar-count">{reviews.filter((review) => !review.is_approved).length}</span>}
+                        </a>
                     </div>
                     <div className="admin-sidebar-section">
                         <span className="admin-sidebar-label">Account</span>
@@ -646,6 +672,8 @@ function AdminPage() {
                             orders: 'Orders',
                             inventory: 'Inventory',
                             products: 'Products',
+                            categories: 'Categories',
+                            reviews: 'Reviews',
                             profile: 'My profile',
                             settings: 'Settings',
                         }[activeSection]}</h1>
@@ -1027,28 +1055,17 @@ function AdminPage() {
                     </div>
                     <button className="admin-primary-action" type="submit" disabled={isSavingProfile}>{isSavingProfile ? 'Saving...' : 'Save profile'}</button>
                 </form>}
-                {activeSection === 'settings' && <form className="admin-orders-panel admin-management-form admin-settings-form" onSubmit={(event) => {
-                    event.preventDefault();
-                    window.localStorage.setItem('admin-low-stock-threshold', String(lowStockThreshold));
-                    setSettingsSaved(true);
-                }}>
-                    <div className="admin-panel-heading">
-                        <div><h2>Dashboard preferences</h2><p>Set how the dashboard flags inventory that needs attention.</p></div>
-                    </div>
-                    <label className="admin-setting-field">
-                        Low-stock alert threshold
-                        <span>Products with this quantity or fewer will be marked as low stock.</span>
-                        <input type="number" min="0" step="1" value={lowStockThreshold} onChange={(event) => {
-                            const value = Number(event.target.value);
-                            if (Number.isInteger(value) && value >= 0) {
-                                setLowStockThreshold(value);
-                                setSettingsSaved(false);
-                            }
-                        }} />
-                    </label>
-                    <button className="admin-primary-action" type="submit"><FontAwesomeIcon icon={faSliders} /> Save settings</button>
-                    {settingsSaved && <p className="admin-success-message" role="status">Settings saved on this device.</p>}
-                </form>}
+                {activeSection === 'categories' && <AdminCategories request={fetchAdminData} searchQuery={searchQuery} categories={categories} onCategoriesChange={setCategories} />}
+                {activeSection === 'reviews' && <AdminReviews request={fetchAdminData} searchQuery={searchQuery} reviews={reviews} onReviewsChange={setReviews} />}
+                {activeSection === 'settings' && <AdminSettings
+                    request={fetchAdminData}
+                    profile={profile}
+                    initialSettings={storeSettings}
+                    onSettingsChange={(settings) => {
+                        setStoreSettings(settings);
+                        setLowStockThreshold(settings.account.low_stock_threshold);
+                    }}
+                />}
                 </main>
             </div>
         );
