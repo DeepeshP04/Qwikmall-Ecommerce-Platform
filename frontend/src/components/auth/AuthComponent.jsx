@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import './AuthComponent.css'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
+import { API_URL } from '../../config/api';
 
 function AuthComponent({ isLogin, redirectTo, showAuthSwitch = true }) {
     const [phone, setPhone] = useState("")
@@ -46,7 +47,7 @@ function AuthComponent({ isLogin, redirectTo, showAuthSwitch = true }) {
         setIsSubmitting(true)
         try {
             const response = await fetch(
-                `http://localhost:5000/auth/${isLogin ? "login" : "signup"}/request-otp`,
+                `${API_URL}/auth/${isLogin ? "login" : "signup"}/request-otp`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -91,7 +92,7 @@ function AuthComponent({ isLogin, redirectTo, showAuthSwitch = true }) {
         setIsSubmitting(true)
         try {
             const response = await fetch(
-                `http://localhost:5000/auth/${isLogin ? "login" : "signup"}/verify-otp`,
+                `${API_URL}/auth/${isLogin ? "login" : "signup"}/verify-otp`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

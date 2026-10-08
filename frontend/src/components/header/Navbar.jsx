@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState, useRef } from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import { useContext } from 'react'
 import { AuthContext } from '../../App'
+import { API_URL } from '../../config/api'
 
 function Navbar (){
 
@@ -37,7 +38,7 @@ function Navbar (){
         }
 
         try {
-            const response = await fetch('http://localhost:5000/cart/', {
+            const response = await fetch(`${API_URL}/cart/`, {
                 credentials: 'include'
             });
             const data = await response.json();

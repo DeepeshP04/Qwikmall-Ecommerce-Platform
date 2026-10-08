@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import ProductCard from './ProductCard'
 import { AuthContext } from '../../App'
+import { API_URL } from '../../config/api'
 
 function ProductDetails({ product }) {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -27,7 +28,7 @@ function ProductDetails({ product }) {
             try {
                 setRelatedLoading(true);
                 const response = await fetch(
-                    `http://localhost:5000/products/category/${encodeURIComponent(product.category_name)}`,
+                    `${API_URL}/products/category/${encodeURIComponent(product.category_name)}`,
                     { signal: controller.signal }
                 );
                 const result = await response.json();
@@ -66,7 +67,7 @@ function ProductDetails({ product }) {
 
     const handleAddToCart = () => {
         if(isLoggedIn) {
-        fetch('http://localhost:5000/cart/items', {
+        fetch(`${API_URL}/cart/items`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -99,7 +100,7 @@ function ProductDetails({ product }) {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/wishlist/items', {
+            const response = await fetch(`${API_URL}/wishlist/items`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ product_id: product.id }),

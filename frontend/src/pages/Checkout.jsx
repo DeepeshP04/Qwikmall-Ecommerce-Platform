@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/header/Navbar';
 import Footer from '../components/footer/Footer';
 import './Checkout.css';
+import { API_URL } from '../config/api';
 
 const DELIVERY_STEPS = ['Delivery address', 'Payment method', 'Review'];
 const DEFAULT_PAYMENT_METHODS = [
@@ -31,7 +32,7 @@ function Checkout() {
         setLoading(true);
         setError('');
 
-        const cartResponse = await fetch('http://localhost:5000/cart/', { credentials: 'include' });
+        const cartResponse = await fetch(`${API_URL}/cart/`, { credentials: 'include' });
         const cartData = await cartResponse.json();
 
         if (!cartResponse.ok) {
@@ -58,7 +59,7 @@ function Checkout() {
           total_price: checkoutSubtotal,
         });
 
-        const addressResponse = await fetch('http://localhost:5000/users/addresses', { credentials: 'include' });
+        const addressResponse = await fetch(`${API_URL}/users/addresses`, { credentials: 'include' });
         const addressData = await addressResponse.json();
 
         if (addressResponse.ok && addressData.data) {
@@ -124,7 +125,7 @@ function Checkout() {
       setPlacingOrder(true);
       setError('');
 
-      const response = await fetch('http://localhost:5000/orders/', {
+      const response = await fetch(`${API_URL}/orders/`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

@@ -26,6 +26,7 @@ import { AuthContext } from "../App";
 import Footer from "../components/footer/Footer";
 import Navbar from "../components/header/Navbar";
 import "./UserAccount.css";
+import { API_URL } from "../config/api";
 
 const accountTabs = [
   { id: "profile", label: "Profile information", icon: faUser },
@@ -54,7 +55,7 @@ function UserAccount() {
 
     const loadProfile = async () => {
       try {
-        const response = await fetch("http://localhost:5000/users/me", {
+        const response = await fetch(`${API_URL}/users/me`, {
           credentials: "include",
         });
         const result = await response.json();
@@ -117,7 +118,7 @@ function UserAccount() {
     setSaveMessage("");
 
     try {
-      const response = await fetch("http://localhost:5000/users/me", {
+      const response = await fetch(`${API_URL}/users/me`, {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -156,7 +157,7 @@ function UserAccount() {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
-      const response = await fetch("http://localhost:5000/auth/logout", {
+      const response = await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -278,7 +279,7 @@ function OrdersSection() {
 
     const loadOrders = async () => {
       try {
-        const response = await fetch("http://localhost:5000/orders/", {
+        const response = await fetch(`${API_URL}/orders/`, {
           credentials: "include",
         });
         const result = await response.json();
@@ -401,7 +402,7 @@ function WishlistSection() {
     let isMounted = true;
     const loadWishlist = async () => {
       try {
-        const response = await fetch("http://localhost:5000/wishlist", {
+        const response = await fetch(`${API_URL}/wishlist`, {
           credentials: "include",
         });
         const result = await response.json();
@@ -427,7 +428,7 @@ function WishlistSection() {
     setError("");
     setNotice("");
     try {
-      const response = await fetch(`http://localhost:5000/wishlist/items/${item.id}`, {
+      const response = await fetch(`${API_URL}/wishlist/items/${item.id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -449,7 +450,7 @@ function WishlistSection() {
     setError("");
     setNotice("");
     try {
-      const response = await fetch("http://localhost:5000/cart/items", {
+      const response = await fetch(`${API_URL}/cart/items`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -460,7 +461,7 @@ function WishlistSection() {
         throw new Error(result.message || "Unable to add this product to your cart.");
       }
       window.dispatchEvent(new Event("cartUpdated"));
-      const removeResponse = await fetch(`http://localhost:5000/wishlist/items/${item.id}`, {
+      const removeResponse = await fetch(`${API_URL}/wishlist/items/${item.id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -748,7 +749,7 @@ function AddressesSection() {
 
     const loadAddresses = async () => {
       try {
-        const response = await fetch("http://localhost:5000/users/addresses", {
+        const response = await fetch(`${API_URL}/users/addresses`, {
           credentials: "include",
         });
         const result = await response.json();
@@ -810,7 +811,7 @@ function AddressesSection() {
     setSaveMessage("");
 
     try {
-      const response = await fetch(`http://localhost:5000/users/addresses/${addressId}`, {
+      const response = await fetch(`${API_URL}/users/addresses/${addressId}`, {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

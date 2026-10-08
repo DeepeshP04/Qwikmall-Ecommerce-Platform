@@ -2,6 +2,7 @@ import ProductGrid from './ProductGrid';
 import FilterPanel from './FilterPanel';
 import './CategoryAllProducts.css'
 import { useState, useEffect } from 'react';
+import { API_URL } from '../../config/api';
 
 function CategoryAllProducts ({categoryName, products}) {
     const [filteredProducts, setFilteredProducts] = useState(products);
@@ -18,9 +19,9 @@ function CategoryAllProducts ({categoryName, products}) {
             setLoading(true);
             let url;
             if (categoryName === "None") {
-                url = `http://localhost:5000/products/filters`;
+                url = `${API_URL}/products/filters`;
             } else {
-                url = `http://localhost:5000/products/category/${categoryName}/filters`;
+                url = `${API_URL}/products/category/${categoryName}/filters`;
             }
             const response = await fetch(url);
             const data = await response.json();

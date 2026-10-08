@@ -3,6 +3,7 @@ import './CartContainer.css'
 import { useCallback, useEffect, useState, useContext, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
+import { API_URL } from '../../config/api';
 
 function CartContainer () {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ function CartContainer () {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch("http://localhost:5000/cart/", {
+            const response = await fetch(`${API_URL}/cart/`, {
                 credentials: "include"
             });
             const data = await response.json();
@@ -73,7 +74,7 @@ function CartContainer () {
         });
         // Send PATCH to backend
         try {
-            const response = await fetch(`http://localhost:5000/cart/items/${cartItemId}/`, {
+            const response = await fetch(`${API_URL}/cart/items/${cartItemId}/`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -103,7 +104,7 @@ function CartContainer () {
         setSelectedItemIds((current) => current.filter((id) => id !== cartItemId));
         // Send DELETE to backend
         try {
-            const response = await fetch(`http://localhost:5000/cart/items/${cartItemId}/`, {
+            const response = await fetch(`${API_URL}/cart/items/${cartItemId}/`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
@@ -167,7 +168,7 @@ function CartContainer () {
     const saveForLater = async (item) => {
         setActionMessage('');
         try {
-            const response = await fetch('http://localhost:5000/wishlist/items', {
+            const response = await fetch(`${API_URL}/wishlist/items`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },

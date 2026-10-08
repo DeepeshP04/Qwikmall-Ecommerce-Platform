@@ -14,6 +14,7 @@ import UserAccount from './pages/UserAccount'
 import LegalPage from './pages/LegalPage'
 import Loader from './components/loader/Loader'
 import AdminPage from './pages/AdminPage'
+import { API_URL } from './config/api'
 
 const AuthContext = createContext()
 
@@ -49,7 +50,7 @@ function App() {
 
     async function checkAuthStatus() {
       try {
-        const response = await fetch('http://localhost:5000/auth/status', {
+        const response = await fetch(`${API_URL}/auth/status`, {
           credentials: "include",
         })
         const data = await response.json()

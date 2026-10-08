@@ -22,6 +22,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AuthContext } from '../App';
 import Loader from '../components/loader/Loader';
 import './AdminPage.css';
+import { API_URL } from '../config/api';
 
 const LOW_STOCK_THRESHOLD = 5;
 const EMPTY_PRODUCT_FORM = {
@@ -29,7 +30,7 @@ const EMPTY_PRODUCT_FORM = {
 };
 
 async function fetchAdminData(path, options = {}) {
-    const response = await fetch(`http://localhost:5000/admin/${path}`, {
+    const response = await fetch(`${API_URL}/admin/${path}`, {
         credentials: 'include',
         ...options,
     });
@@ -151,7 +152,7 @@ function AdminPage() {
         setIsLoggingIn(true);
 
         try {
-            const response = await fetch('http://localhost:5000/admin/login', {
+            const response = await fetch(`${API_URL}/admin/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -175,7 +176,7 @@ function AdminPage() {
         setIsLoggingOut(true);
         setError('');
         try {
-            const response = await fetch('http://localhost:5000/auth/logout', {
+            const response = await fetch(`${API_URL}/auth/logout`, {
                 method: 'POST',
                 credentials: 'include',
             });
@@ -312,7 +313,7 @@ function AdminPage() {
         setIsSavingProfile(true);
         setError('');
         try {
-            await fetch('http://localhost:5000/users/me', {
+            await fetch(`${API_URL}/users/me`, {
                 method: 'PATCH',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },

@@ -5,6 +5,7 @@ import ProductGrid from './ProductGrid'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Loader from '../loader/Loader'
+import { API_URL } from '../../config/api'
 
 function RecommendedCategoryProducts () {
     const [categoryProducts, setCategoryProducts] = useState([]);
@@ -12,7 +13,7 @@ function RecommendedCategoryProducts () {
 
     useEffect(() => {
         setIsLoading(true)
-        fetch("http://localhost:5000/products/recommended")
+        fetch(`${API_URL}/products/recommended`)
         .then(res => res.json())
         .then(data => {
             setCategoryProducts(data.data)

@@ -3,6 +3,7 @@ import Footer from "../components/footer/Footer";
 import Navbar from "../components/header/Navbar";
 import ProductDetails from "../components/products/ProductDetails";
 import { useEffect, useState } from "react";
+import { API_URL } from '../config/api';
 
 function ProductPage() {
     const { productId } = useParams();
@@ -14,7 +15,7 @@ function ProductPage() {
         setLoading(true);
         setError(null);
         
-        fetch(`http://localhost:5000/products/${productId}`)
+        fetch(`${API_URL}/products/${productId}`)
         .then(res => {
             console.log("Response status:", res.status);
             if (!res.ok) {

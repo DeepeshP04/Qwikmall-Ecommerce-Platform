@@ -4,6 +4,7 @@ import CategoryAllProducts from "../components/products/CategoryAllProducts";
 import { useEffect, useState } from "react";
 import Loader from "../components/loader/Loader";
 import { useLocation } from 'react-router-dom';
+import { API_URL } from '../config/api';
 
 function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -16,7 +17,7 @@ function AllProductsPage () {
 
     useEffect(() => {
         setIsLoading(true)
-        const url = query ? `http://localhost:5000/products?query=${query}` : `http://localhost:5000/products`
+        const url = query ? `${API_URL}/products?query=${query}` : `${API_URL}/products`
         fetch(url)
         .then(res => res.json())
         .then(data => {

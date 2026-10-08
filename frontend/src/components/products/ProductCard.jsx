@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
 import { toast } from 'react-toastify'
 import { AuthContext } from '../../App'
+import { API_URL } from '../../config/api'
 
 function ProductCard ({ product }) {
     const navigate = useNavigate()
@@ -32,7 +33,7 @@ function ProductCard ({ product }) {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/cart/items', {
+            const response = await fetch(`${API_URL}/cart/items`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ product_id: product.id, quantity: 1 }),
